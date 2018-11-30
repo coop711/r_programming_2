@@ -225,7 +225,7 @@ quiz0523$Q2_2 %>%
   table(quiz0523$group, .) %>%
   cbind(., "계" = rowSums(.)) %>%
   rbind(., "계" = colSums(.)) %>%
-  pander
+  kable
 ```
 
 ##### 카이제곱 적합도 테스트
@@ -240,9 +240,8 @@ Expected %>%
   as.matrix %>%
   t %>%
   cbind(., "계" = rowSums(.)) %>%
-   format(digits = 3, nsmall = 1) %>%
-  pander
-pander(t(as.matrix(round(Expected))))
+  format(digits = 3, nsmall = 1) %>%
+  kable
 ```
 
 ```{r, echo = FALSE}
@@ -251,7 +250,6 @@ quiz0523$Q2_2 %>%
   table %>%
   chisq.test(, p = c(9, 8, 6, 1)/24, simulate.p.value = TRUE) %>%
   pander
-pander(chisq.test(table(matching_score), p = c(9, 8, 6, 1)/24, simulate.p.value = TRUE, B = 2000))
 ```
 
 #### 직관과 어긋나는 용어
@@ -269,7 +267,7 @@ tbl_q3_a <- quiz0523$Q3 %>%
 colnames(tbl_q3_a)[3:5] <- c("불참", "결석", "계")
 rownames(tbl_q3_a)[3] <- "계"
 tbl_q3_a %>% 
-  pander
+  kable
 tbl_q3_a %>%
   `[`(-3, -(3:5)) %>% 
   chisq.test(simulate.p.value = TRUE, B = 20000) %>%
@@ -280,12 +278,12 @@ tbl_q3_a %>%
 
 ```{r, Framing effects in percentage, echo = FALSE}
 tbl_q3_a %>%
-  `[`(3, -(3:5)) %>%
+  `[`(3, -(3:5), drop = FALSE) %>%
   prop.table %>%
-  c(., "계" = sum(.)) %>%
+  cbind("계" = rowSums(.)) %>%
   `*`(100) %>%
   format(digits = 2, nsmall = 1) %>%
-  pander
+  kable
 ```
 
 #### 화폐 착각
@@ -309,7 +307,7 @@ tbl_q4_a <- quiz0523$Q4 %>%
 colnames(tbl_q4_a)[3:5] <- c("불참", "결석", "계")
 rownames(tbl_q4_a) <- c("실업+인플레0%, 임금삭감7%", "실업+인플레12%, 임금인상5%", "계")
 tbl_q4_a %>% 
-  pander
+  kable
 tbl_q4_a %>%
   `[`(-3, -(3:5)) %>%
   chisq.test(simulate.p.value = FALSE) %>%
@@ -325,7 +323,7 @@ tbl_q4_a %>%
   `*`(100) %>%
   cbind("계" = rowSums(.)) %>%
   format(digits = 2, nsmall = 1) %>%
-  pander
+  kable
 ```
 
 ```{r, save, echo = FALSE}
