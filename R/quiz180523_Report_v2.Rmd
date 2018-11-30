@@ -282,9 +282,9 @@ tbl_q3_a %>%
 
 ```{r, Framing effects in percentage, echo = FALSE}
 tbl_q3_a %>%
-  `[`(3, -(3:5)) %>%
+  `[`(3, -(3:5), drop = FALSE) %>%
   prop.table %>%
-  c("계" = sum(.)) %>%
+  cbind("계" = rowSums(.)) %>%
   `*`(100) %>%
   format(digits = 2, nsmall = 1) %>%
   kable
