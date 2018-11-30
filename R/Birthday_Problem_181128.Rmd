@@ -69,6 +69,7 @@ quiz0523_2[, c("id", "Q1_2")]
 #> NA 아닌 값만 추출
 birthdate <- quiz0523_2$Q1_2 %>%
   `[`(is.na(.) %>% `!`)
+N1 <- length(birthdate)
 # birthdate <- quiz0523_2$Q1_2[!is.na(quiz0523_2$Q1_2)]
 #> Places where duplicated birthdates appears
 dup_b <- birthdate %>%
@@ -120,16 +121,20 @@ matching_score <- quiz0523$Q2 %>%
   strsplit(split = "") %>%
   sapply(function(x) ifelse(x == unlist(ans), 1, 0)) %>%
   apply(MARGIN = 2, sum)
+N2 <- matching_score %>%
+  is.na %>%
+  `!` %>%
+  sum
 # matching <- strsplit(quiz0523$Q2, "")
 # matching_count <- mapply(function(x) ifelse(x == unlist(ans), 1, 0), matching)
 # matching_score <- apply(matching_count, 2, sum)
 quiz0523$Q2_2 <- matching_score
 #> Q3
-quiz0523$Q3 %<>% factor(levels = c("가", "나", "무응답"), 
-                        labels = c("연비 10 => 12", "연비 30 => 40", "불참"))
+quiz0523$Q3 %<>% factor(levels = c("가", "나"), 
+                        labels = c("연비 10 => 12", "연비 30 => 40"))
 #> Q4
-quiz0523$Q4 %<>% factor(levels = c("가", "나", "무응답"),
-                        labels = c("수용가능", "불공정", "불참"))
+quiz0523$Q4 %<>% factor(levels = c("가", "나"),
+                        labels = c("수용가능", "불공정"))
 # str(quiz0523)
 pander(quiz0523[c("Q3", "Q4", "group")])
 ```
@@ -138,11 +143,11 @@ pander(quiz0523[c("Q3", "Q4", "group")])
 summary(quiz0523)
 ```
 
-### 퀴즈 응답
+## 퀴즈 응답
 
-#### Birthday Problem
+### Birthday Problem
 
-##### 생일이 같은 사람
+#### 생일이 같은 사람
 
 ```{r, echo = FALSE}
 quiz0523_2 %>%
@@ -150,7 +155,7 @@ quiz0523_2 %>%
   kable(col.names = c("학번", "생일", "그룹"), align = "c")
 ```
 
-##### 어느 날에 몇 명씩 생일이 같은가?
+#### 어느 날에 몇 명씩 생일이 같은가?
 
 ```{r, echo = FALSE}
 quiz0523_2$Q1_2 %>%
@@ -162,15 +167,15 @@ quiz0523_2$Q1_2 %>%
   kable(row.names = NA)
 ```
 
-##### 생일이 같은 사람은 몇 명 정도 기대되는가?
+#### 생일이 같은 사람은 몇 명 정도 기대되는가?
 
 $N$을 전체 인원이라 할 때, 기대 인원은 $N\times\{1- (\frac{364}{365})^{N-1}\}$로 계산된다.
-무응답이거나 결석한 학생을 제외한 응답 인원 $N = 148$명에 대하여 기대인원을 계산하면
+무응답이거나 결석한 학생을 제외한 응답 인원 `r N1`명에 대하여 기대인원을 계산하면
 
 ```{r, echo = FALSE}
 options(digits = 3)
 E_N <- function(N){N * (1 - (364 / 365) ^ (N - 1))}
-E_N(41)
+E_N(N1)
 ```
 
 이고, 오차는 
@@ -178,20 +183,20 @@ E_N(41)
 ```{r, echo = FALSE}
 options(digits = 2)
 V_N <- function(N){N * (1 - (364 / 365) ^ (N - 1)) + N * (N - 1) * (1 - (363 / 365)) ^ (N - 2)}
-sqrt(V_N(41))
+sqrt(V_N(N1))
 ```
 
 이므로 이론적으로 계산한 값은 관찰된 값과 잘 부합한다.
 
-##### 태어난 달의 분포는?
+#### 태어난 달의 분포는?
 
 ```{r, month of the birthdates, echo = FALSE}
 quiz0523$month <- quiz0523$month %>%
   factor(levels = unique(quiz0523$month), labels = paste0(1:12, "월"))
 quiz0523$month %>%
   table(quiz0523$group, .) %>%
-  cbind(., "계" = rowSums(.)) %>%
-  rbind(., "계" = colSums(.)) %>%
+  cbind("계" = rowSums(.)) %>%
+  rbind("계" = colSums(.)) %>%
   kable(align = "r")
 ```
 
@@ -209,38 +214,38 @@ quiz0523$month %>%
 ```{r, echo = FALSE}
 quiz0523$month %>%
   table %>%
-  chisq.test %>%
+  chisq.test(simulate.p.value = TRUE) %>%
   pander
 ```
 
-#### Matching Problem
+### Matching Problem
 
 `r knitr::include_graphics("../pics/Quiz171115_Q2.png", dpi = NA)`
 
-##### 정답갯수의 분포
+#### 정답갯수의 분포
 
 ```{r, matching, echo = FALSE}
 quiz0523$Q2_2 %>%
   factor(levels = c(0, 1, 2, 4)) %>%
   table(quiz0523$group, .) %>%
-  cbind(., "계" = rowSums(.)) %>%
-  rbind(., "계" = colSums(.)) %>%
+  cbind("계" = rowSums(.)) %>%
+  rbind("계" = colSums(.)) %>%
   kable
 ```
 
-##### 카이제곱 적합도 테스트
+#### 카이제곱 적합도 테스트
 
-랜덤하게 골랐다면, 각각의 확률은 9/24, 8/24, 6/24, 1/24임. 응답인원 144명을 각 확률에 곱해보면,
+랜덤하게 골랐다면, 각각의 확률은 9/24, 8/24, 6/24, 1/24임. 응답인원 `r N2`명을 각 확률에 곱해보면,
 
 ```{r, echo = FALSE}
 prob <- c(9, 8, 6, 1) / 24
-Expected <- 144 * prob
+Expected <- N2 * prob
 names(Expected) <- c("0", "1", "2", "4")
 Expected %>%
   as.matrix %>%
   t %>%
-  cbind(., "계" = rowSums(.)) %>%
-  format(digits = 3, nsmall = 1) %>%
+  cbind("계" = rowSums(.)) %>%
+  format(digits = 2, nsmall = 1) %>%
   kable
 ```
 
@@ -252,9 +257,9 @@ quiz0523$Q2_2 %>%
   pander
 ```
 
-#### 직관과 어긋나는 용어
+### 직관과 어긋나는 용어
 
-##### 연비
+#### 연비
 
 `r knitr::include_graphics("../pics/Quiz180523_Q3.png", dpi = NA)`
 
@@ -263,22 +268,22 @@ quiz0523$Q2_2 %>%
 ```{r, Framing Effect, echo = FALSE}
 tbl_q3_a <- quiz0523$Q3 %>%
   table(quiz0523$group, ., useNA = "ifany") %>%
-  addmargins
-colnames(tbl_q3_a)[3:5] <- c("불참", "결석", "계")
-rownames(tbl_q3_a)[3] <- "계"
+  cbind("계" = rowSums(.)) %>%
+  rbind("계" = colSums(.))
+colnames(tbl_q3_a)[3] <- "결석"
 tbl_q3_a %>% 
   kable
 tbl_q3_a %>%
-  `[`(-3, -(3:5)) %>% 
+  `[`(-3, -(3:4)) %>% 
   chisq.test(simulate.p.value = TRUE, B = 20000) %>%
   pander
 ```
 
-##### % 비교.  
+#### % 비교.  
 
 ```{r, Framing effects in percentage, echo = FALSE}
 tbl_q3_a %>%
-  `[`(3, -(3:5), drop = FALSE) %>%
+  `[`(3, -(3:4), drop = FALSE) %>%
   prop.table %>%
   cbind("계" = rowSums(.)) %>%
   `*`(100) %>%
@@ -286,15 +291,15 @@ tbl_q3_a %>%
   kable
 ```
 
-#### 화폐 착각
+### 화폐 착각
 
-##### 인플레이션과 임금인상
+#### 인플레이션과 임금인상
 
-##### Red
+#### Red
 
 `r knitr::include_graphics("../pics/Quiz171115_Q4_Red.png", dpi = NA)`
 
-##### Black
+#### Black
 
 `r knitr::include_graphics("../pics/Quiz171115_Q4_Black.png", dpi = NA)`
 
@@ -303,22 +308,23 @@ tbl_q3_a %>%
 ```{r, Money illusion, echo = FALSE}
 tbl_q4_a <- quiz0523$Q4 %>%
   table(quiz0523$group, ., useNA = "ifany") %>%
-  addmargins
-colnames(tbl_q4_a)[3:5] <- c("불참", "결석", "계")
+  cbind("계" = rowSums(.)) %>%
+  rbind("계" = colSums(.))
+colnames(tbl_q4_a)[3] <- "결석"
 rownames(tbl_q4_a) <- c("실업+인플레0%, 임금삭감7%", "실업+인플레12%, 임금인상5%", "계")
 tbl_q4_a %>% 
   kable
 tbl_q4_a %>%
-  `[`(-3, -(3:5)) %>%
+  `[`(-3, -(3:4)) %>%
   chisq.test(simulate.p.value = FALSE) %>%
   pander
 ```
 
-##### % 비교.  
+#### % 비교.  
 
 ```{r, Money illusion in percentage, echo = FALSE}
 tbl_q4_a %>% 
-  `[`(-3, -(3:5)) %>%
+  `[`(-3, -(3:4)) %>%
   prop.table(margin = 1) %>%
   `*`(100) %>%
   cbind("계" = rowSums(.)) %>%
