@@ -163,7 +163,7 @@ quiz0523_2$Q1_2 %>%
   table %>%
   as.matrix %>%
   t %>%
-  cbind(., "계" = rowSums(.)) %>%
+  cbind("계" = rowSums(.)) %>%
   kable(row.names = NA)
 ```
 
