@@ -63,7 +63,9 @@ quiz0523$Q1_2[quiz0523$Q1_2 == "NA월NA일"] <- NA
 # quiz0523$Q1_2 <- str_c(quiz0523$month, "월", quiz0523$date, "일")
 #> 생일을 날짜 순서대로 정리한 복제본 생성
 quiz0523_2 <- quiz0523 %>%
-  `[`(.$month %>% order(quiz0523$date), )
+  `[`(order(.$month, .$date), )
+# quiz0523_2 <- quiz0523 %>%
+#   `[`(.$month %>% order(quiz0523$date), )
 # quiz0523_2 <- quiz0523[order(quiz0523$month, quiz0523$date), ]
 quiz0523_2[, c("id", "Q1_2")]
 #> NA 아닌 값만 추출
