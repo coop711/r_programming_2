@@ -119,7 +119,9 @@ ans <- "RCGL" %>% strsplit(split = "")
 #> 답안 분해
 matching_score <- quiz0523$Q2 %>% 
   strsplit(split = "") %>%
-  sapply(function(x) ifelse(x == unlist(ans), 1, 0)) %>%
+  sapply(. %>% { `==`(., unlist(ans)) %>% ifelse(1, 0)}) %>%
+#   sapply(. %>% {ifelse( . == unlist(ans), 1, 0)}) %>%
+#   sapply(function(x) ifelse(x == unlist(ans), 1, 0)) %>%
   apply(MARGIN = 2, sum)
 N2 <- matching_score %>%
   is.na %>%
@@ -299,7 +301,7 @@ tbl_q3_a %>%
   cbind("계" = rowSums(.)) %>%
   `*`(100) %>%
   format(digits = 2, nsmall = 1) %>%
-  kable
+  kable(align = "c", row.names = FALSE)
 ```
 
 ### 화폐 착각
