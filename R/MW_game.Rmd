@@ -1,0 +1,288 @@
+---
+title: "MW Game 180604"
+author: "coop711"
+date: "2017-11-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# install.packages("pander", repos = "https://cran.rstudio.com")
+# install.packages("xlsx", repos = "https://cran.rstudio.com")
+library(xlsx)
+library(pander)
+library(knitr)
+library(magrittr)
+panderOptions('table.split.table', Inf)
+panderOptions('table.alignment.rownames', 'left')
+panderOptions('table.alignment.default', 'right')
+options(width = 180)
+```
+
+### 개별 기록
+
+```{r, data, echo = FALSE, results = 'hide'}
+#> 엑셀 자료 읽어들이기
+quiz0604 <- "../data/MW180604v2.xlsx" %>%
+  read.xlsx(sheetIndex = 1, 
+            startRow = 2, endRow = 182, 
+            colIndex = 1:13, colClasses = rep("character", 13), 
+            header = TRUE, 
+            encoding = "UTF-8",
+            stringsAsFactors = FALSE)
+# str(quiz0604)
+#> Rearrangement (팀명을 7번째 열에)
+quiz0604 %<>% 
+  `[`(., c(1, 13, 3:12, 2)) 
+# quiz0604 <- quiz0604[, c(1, 13, 3:12, 2)]
+#> Names for the Columns
+quiz0604 %<>%
+  `names<-`(c("id", "Team", paste0("Q", 1:10),  "Group"))
+# names(quiz0604) <- c("id", "Team", paste0("Q", 1:10),  "Group")
+# kable(quiz0604)
+#> Team Names Assortment // Need to Check the Pairs
+Team <- quiz0604$Team 
+#> Unique team names
+team_names <- Team %>%
+  unique
+# team_names <- unique(Team)
+# team_names
+#> Absentees
+na_index <- Team %>%
+  is.na %>%
+  which 
+# na_index <- which(is.na(Team))
+#> Number of absentees
+# length(na_index) 
+#> Remove the NAs
+quiz0604_2 <- quiz0604 %>%
+  `[`(-na_index, ) 
+quiz0604_2 <- quiz0604[-na_index, ]
+#> Assignment of non NAs to a vector
+Team_2 <- quiz0604_2$Team 
+team_names_2 <- Team_2 %>%
+  unique
+# team_names_2 <- unique(Team_2)
+#> table of unique team names, regard it as a named matrix
+tbl_2 <- Team_2 %>%
+  table
+# tbl_2 <- table(Team_2)
+#> Do something if not in pair
+# names(tbl_2)[tbl_2 != 2] 
+#> Who are they?
+names_wrong <- tbl_2 %>%
+  names %>%
+  `[`(`!=`(tbl_2, 2))
+# names_wrong <- names(tbl_2)[tbl_2 != 2]
+# names_wrong
+# which(Team %in% names_wrong)
+#> Collapse their names into one. 
+team_new <- names_wrong %>%
+  paste(collapse = "+")
+# team_new <- paste(names_wrong, collapse = "+")
+# team_new
+#> Replace their names into the colllapsed one.
+quiz0604_2$Team %<>%
+  `[<-`(Team_2 %in% names_wrong, team_new)
+# quiz0604_2$Team[Team_2 %in% names_wrong] <- team_new 
+#> Rerun the Team_2 and team_names_2 in order to get it right
+Team_2 <- quiz0604_2$Team 
+team_names_2 <- Team_2 %>%
+  unique
+# team_names_2 <- unique(Team_2)
+records <- quiz0604_2 %>%
+  `[`(., 2:12)
+# records <- quiz0604_2[, 2:12]
+# kable(quiz0604_2[, c("id", "name","Team", paste("Q", 1:10, sep = ""))])
+#> "M " 찾아내기
+records %>%
+  `[`(., -1) %>%
+  apply(MARGIN = 2, FUN = table)
+# apply(records[, -1], 2, table)
+records %>%
+  `[`(., "Q10") %>%
+  `==`("M ") %>%
+  which
+# which(records[, "Q10"] == "M ")
+records %<>%
+  `[<-`(52, "Q10", "M")
+# records[52, "Q10"] <- "M"
+```
+
+```{r, echo = FALSE}
+kable(records)
+```
+
+<P style = "page-break-before:always">
+
+### 팀별 기록
+
+```{r, score, echo = FALSE, results = 'markup'}
+#> Define the rule of scores of the game through an anonymous function with switch
+score <- . %>% 
+  {switch(., 
+          MM = c(-3, -3),
+          MW = c(6, -6),
+          WM = c(-6, 6),
+          WW = c(3, 3))}
+# score <- function(x) {  
+#   switch(x,
+#          MM = c(-3, -3),
+#          MW = c(6, -6),
+#          WM = c(-6, 6),
+#          WW = c(3, 3))
+# }
+#> Collapse the results of each trial of the game
+sample_coll <- records %>%
+  `[`(Team_2 == "홀짝", -1) %>%
+  sapply(paste, collapse = "")
+# sample_coll <- sapply(records[Team_2 == "홀짝", -1], paste, collapse = "") 
+#> Score reassignment sample for Team = "A1"
+sample_coll %>%
+  sapply(score)
+# sapply(sample_coll, score) 
+#> Inintialize 
+records_coll <- NULL 
+#> Outcome of each trial of the game collapsed
+for(x in team_names_2) { 
+records_coll %<>%
+    rbind(records %>%
+            `[`(Team_2 == x, -1) %>% 
+                    sapply(paste, collapse = ""))
+}
+# for(x in team_names_2) { 
+# records_coll <- rbind(records_coll, 
+#                       sapply(records[Team_2 == x, -1], 
+#                              paste, collapse = ""))
+# }
+# records_coll
+#> row.names added
+records_coll %<>%
+  `rownames<-`(team_names_2)
+# rownames(records_coll) <- team_names_2 
+kable(records_coll)
+```
+
+<P style = "page-break-always">
+
+### 게임 규칙에 따른 점수
+
+```{r, scores, echo = FALSE, results = 'asis', eval = TRUE}
+#> Score for each trial of the game 
+score_coll <- NULL 
+for(x in team_names_2) {
+score_coll %<>%
+    rbind(records_coll %>%
+            `[`(rownames(records_coll) == x, ) %>%
+            sapply(score))
+}
+# for(x in team_names_2) {
+# score_coll <- rbind(score_coll, 
+#                     sapply(records_coll[rownames(records_coll) == x, ], 
+#                           score))
+# }
+# kable(score_coll)
+#> Repeat team names for each palyers
+score_coll %<>%
+  `rownames<-`(records_coll %>% rownames %>% rep(each = 2))
+# rownames(score_coll) <- rep(rownames(records_coll), each = 2) 
+kable(score_coll)
+```
+
+<P style = "page-break-before:always">
+
+### 팀별 점수
+
+```{r, team scores, echo = FALSE, results = 'markup', eval = TRUE}
+# id.name <- NULL ## ID and Names for each team and compute the final total scores
+# for(x in team_names_2) {
+# id.name <- rbind(id.name, quiz0604_2[Team_2 == x, c("id", "name")])
+# }
+# result_df <- data.frame(id.name, Team = rownames(score_coll), score_coll)
+# result_df$sum <- rowSums(result_df[, 4:13])
+# names(result_df) <- c("학번", "이름", 팀", paste(1:10, "회차", sep = ""), "총점")
+#> ID only version
+id_team <- NULL 
+for(x in team_names_2) {
+id_team %<>% 
+    c(quiz0604_2 %>% `[`(Team_2 == x, "id"))
+}
+# for(x in team_names_2) {
+# id_team <- c(id_team, quiz0604_2[Team_2 == x, "id"])
+# }
+## row.names = NULL needed to deal with score.roll
+result_df <- data.frame(id_team, 
+                        Team = rownames(score_coll), 
+                        score_coll, 
+                        row.names = NULL) 
+
+result_df$sum <- result_df %>%
+  `[`(., 3:12) %>%
+  rowSums
+# result_df$sum <- rowSums(result_df[, 3:12])
+result_df %<>%
+  `names<-`(c("학번", "팀", paste(1:10, "회차", sep = ""), "총점"))
+# names(result_df) <- c("학번", "팀", paste(1:10, "회차", sep = ""), "총점")
+#> 팀 점수 계산
+team_scores <- result_df %$%
+  tapply(.$"총점", .$"팀", FUN = sum)
+# team_scores <- tapply(result_df$"총점", result_df$"팀", sum)
+#> 협동이 잘 이루어진 팀과 그러지 못한 팀 파악
+
+best_names <- team_scores %>%
+  `==`(60) %>%
+  which %>%
+  names
+# best_names <- names(which(team_scores == 60))
+good_names <- team_scores %>%
+  `>=`(48) %>%
+  `&`(team_scores < 60) %>%
+  which %>%
+  names
+# good_names <- names(which(team_scores >= 48 & team_scores < 60))
+worst_names <- team_scores %>%
+  `<=`(-30) %>%
+  which %>%
+  names
+# worst_names <- names(which(team_scores <= -30))
+kable(result_df)
+```
+
+###  협동이 매우 잘된 팀
+
+```{r, echo = FALSE, eval = TRUE}
+#> Best team scores
+result_df %>%
+  `[`(.$"팀" %in% best_names, ) %>%
+  kable
+# kable(result_df[result_df$"팀" %in% best_names, ]) 
+```
+
+### 협동이 비교적 잘된 팀 (팀점수 48점 이상)
+
+```{r, echo = FALSE, eval = TRUE}
+#> Team scores higher than 48
+result_df %>%
+  `[`(.$"팀" %in% good_names, ) %>%
+  kable
+# kable(result_df[result_df$"팀" %in% good_names, ]) 
+```
+
+### 협동이 잘 안되는 팀 (팀 점수 -30점 이하)
+
+```{r, echo = FALSE, eval = TRUE}
+#> Worst team scores
+result_df %>%
+  `[`(.$"팀" %in% worst_names, ) %>%
+  kable
+# kable(result_df[result_df$"팀" %in% worst_names, ]) 
+# str(quiz1128)
+```
+
+<!--
+### Save and Exit
+
+```{r, save, echo = FALSE}
+save.image("./quiz0604.RDada")
+```
+-->
