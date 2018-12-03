@@ -22,13 +22,14 @@ options(width = 180)
 
 ```{r, data, echo = FALSE, results = 'hide'}
 #> 엑셀 자료 읽어들이기
-quiz0604 <- read.xlsx("../data/MW180604.xlsx", 
+quiz0604 <- read.xlsx("../data/MW180604v2.xlsx", 
                       sheetIndex = 1, 
                       startRow = 2, 
                       endRow = 182, 
                       colIndex = 1:13, 
                       colClasses = rep("character", 13), 
                       header = TRUE, 
+                      encoding = "UTF-8",
                       stringsAsFactors = FALSE)
 # str(quiz0604)
 #> Rearrangement (팀명을 7번째 열에)
@@ -68,10 +69,10 @@ Team.2 <- quiz0604.2$Team
 team.names.2 <- unique(Team.2)
 records <- quiz0604.2[, 2:12]
 # kable(quiz0604.2[, c("id", "name","Team", paste("Q", 1:10, sep = ""))])
-#> "홀 " 찾아내기
+#> "W " 찾아내기
 apply(records[, -1], 2, table)
-which(records[, "Q10"] == "홀 ")
-records[52, "Q10"] <- "홀"
+which(records[, "Q10"] == "M ")
+records[52, "Q10"] <- "M"
 ```
 
 ```{r, echo = FALSE}
@@ -86,13 +87,13 @@ kable(records)
 #> Define the rule of scores of the game through an anonymous function with switch
 score <- function(x) {  
   switch(x,
-         홀홀 = c(-3, -3),
-         홀짝 = c(6, -6),
-         짝홀 = c(-6, 6),
-         짝짝 = c(3, 3))
+         MM = c(-3, -3),
+         MW = c(6, -6),
+         WM = c(-6, 6),
+         WW = c(3, 3))
 }
 #> Collapse the results of each trial of the game
-sample.coll <- sapply(records[Team.2 == "홀짝", -1], paste, collapse = "") 
+sample.coll <- sapply(records[Team.2 == "MW", -1], paste, collapse = "") 
 #> Score reassignment sample for Team = "A1"
 # sapply(sample.coll, score) 
 #> Inintialize 
