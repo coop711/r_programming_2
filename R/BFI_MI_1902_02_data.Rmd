@@ -1,0 +1,94 @@
+---
+title: "BFI MI data"
+author: "coop711"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(pander)
+library(magrittr)
+panderOptions("table.split.table", Inf)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Data
+
+```{r, xlsx}
+library(xlsx)
+options(width = 180)
+class_roll <- "../data/class_roll1902_02.xlsx" %>% 
+  read.xlsx(sheetIndex = 1,
+            startRow = 2, endRow = 39,
+            colIndex = 4:5,
+            header = TRUE,
+            encoding = "UTF-8",
+            stringsAsFactors = FALSE)
+class_roll %<>%
+  `names<-`(c("ID", "Name"))
+class_roll$ID %<>%
+  as.character
+str(class_roll)
+BFI <- "../data/BFI1902_02.xlsx" %>% 
+  read.xlsx(sheetIndex = 1, 
+            startRow = 2, endRow = 30, 
+            colIndex = 3:16, 
+            header = TRUE, 
+            encoding = "UTF-8",
+            stringsAsFactors = FALSE)
+# names(BFI) %<>%
+#   `[<-`(1, "ID")
+# names(BFI)[1] <- "ID"
+## 엑셀 파일의 E!을 E1으로 수정하였기 때문에 다음 코드는 큰 의미는 없습니다.
+BFI %<>%
+  `names<-`(c("ID", "Name", "E1", "A1", "O1", "C1", "N1", "E2", "A2", "O2", "C2", "N2", "O3", "A3"))
+BFI$ID %<>%
+  as.character
+BFI %>% 
+  head %>%
+  kable
+# pander(head(BFI))
+duplicated(BFI$ID)
+# BFI <- BFI[-7, ]
+str(BFI)
+MI <- "../data/MI1902_02.xlsx" %>%
+  read.xlsx(sheetIndex = 1, 
+            startRow = 2, endRow = 31, 
+            colIndex = 3:60, 
+            header = TRUE, 
+            encoding = "UTF-8",
+            stringsAsFactors = FALSE)
+MI %<>%
+  `names<-`(c("ID", "Name", paste0("Q", 1:56)))
+# names(MI) <- c("ID", paste0("Q", 1:56))
+MI$ID %<>% 
+  as.character
+duplicated(MI$ID)
+MI <- unique(MI)
+kable(head(MI[c(1, 3:16)]))
+kable(head(MI[c(1, 17:30)]))
+kable(head(MI[c(1, 31:44)]))
+kable(head(MI[c(1, 45:58)]))
+setdiff(class_roll$Name, BFI$Name)
+setdiff(class_roll$Name, MI$Name)
+MI$Name
+class_roll$Name
+MI[MI$Name == "이예진 ", "Name"] <- "이예진"
+str(MI)
+MI <- MI[, -2]
+## piping을 이용한 다음 대안들을 개선해 보세요.
+# lapply(list(1:15, c(1, 16:29), c(1, 30:43), c(1, 44:57)), 
+#        function(x) MI %>% `[`(x) %>% head %>% kable)
+# list(1:15, c(1, 16:29), c(1, 30:43), c(1, 44:57)) %>%
+#   lapply(function(x) MI %>% `[`(x) %>% head %>% kable)
+# list(1:15, c(1, 16:29), c(1, 30:43), c(1, 44:57)) %>%
+#   lapply(. %>% {kable(head(MI[.]))})
+```
+
+### Save Data
+
+```{r, save.image}
+save.image("./BFI_MI_1902_02.RData")
+```
+

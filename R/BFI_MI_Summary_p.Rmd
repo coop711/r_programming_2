@@ -1,0 +1,52 @@
+---
+title: "Big Five Personality and Multiple Intelligence : Template"
+author: "coop711"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+<!--### Data Reading
+
+`join()`을 사용하기 위하여 `plyr` 패키지는 사전에 등록
+
+```{r}
+library(knitr)
+library(pander)
+library(plyr)
+library(magrittr)
+panderOptions("table.split.table", Inf)
+```
+필수 자료 읽어들이기
+
+```{r}
+load("./BFI_MI_report_1701.RData")
+```
+-->
+
+## 성격특성별 분포
+
+```{r, table, echo = FALSE}
+BFI_level_kr %>%
+  sapply(FUN = table) %>%
+  `[`(4:1, ) %>%
+  rbind(., "계" = colSums(.)) %>%
+  kable(align = "c")
+```
+
+## 3대 강점지능 분포
+
+```{r, MI table, echo = FALSE}
+BFI_MI_full %>%
+  .[c("제1순위", "제2순위", "제3순위")] %>%
+  sapply(FUN = table) %>%
+  t %>%
+  rbind(., "계" = colSums(.)) %>%
+  kable
+```
+
+## 개별 BFP와 3대 강점지능
+
+```{r, one data frame, echo = FALSE}
+BFI_MI_full %>%
+  kable(align = "c")
+```
