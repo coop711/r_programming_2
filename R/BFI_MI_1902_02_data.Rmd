@@ -30,9 +30,9 @@ class_roll %<>%
 class_roll$ID %<>%
   as.character
 str(class_roll)
-BFI <- "../data/BFI1902_02.xlsx" %>% 
+BFI <- "../data/BFI1902_02v2.xlsx" %>% 
   read.xlsx(sheetIndex = 1, 
-            startRow = 2, endRow = 30, 
+            startRow = 1, endRow = 37, 
             colIndex = 3:16, 
             header = TRUE, 
             encoding = "UTF-8",
@@ -52,9 +52,9 @@ BFI %>%
 duplicated(BFI$ID)
 # BFI <- BFI[-7, ]
 str(BFI)
-MI <- "../data/MI1902_02.xlsx" %>%
+MI <- "../data/MI1902_02v2.xlsx" %>%
   read.xlsx(sheetIndex = 1, 
-            startRow = 2, endRow = 31, 
+            startRow = 1, endRow = 38, 
             colIndex = 3:60, 
             header = TRUE, 
             encoding = "UTF-8",
@@ -66,6 +66,7 @@ MI$ID %<>%
   as.character
 duplicated(MI$ID)
 MI <- unique(MI)
+duplicated(MI$ID)
 kable(head(MI[c(1, 3:16)]))
 kable(head(MI[c(1, 17:30)]))
 kable(head(MI[c(1, 31:44)]))
@@ -75,7 +76,12 @@ setdiff(class_roll$Name, MI$Name)
 MI$Name
 class_roll$Name
 MI[MI$Name == "이예진 ", "Name"] <- "이예진"
+setdiff(class_roll$Name, BFI$Name)
+setdiff(class_roll$Name, MI$Name)
 str(MI)
+MI[7, "Q37"]
+table(MI$Q37)
+MI[7, "Q37"] <- 3
 MI <- MI[, -2]
 ## piping을 이용한 다음 대안들을 개선해 보세요.
 # lapply(list(1:15, c(1, 16:29), c(1, 30:43), c(1, 44:57)), 

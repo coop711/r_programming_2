@@ -30,9 +30,9 @@ class_roll %<>%
 class_roll$ID %<>%
   as.character
 str(class_roll)
-BFI <- "../data/BFI1902_01.xlsx" %>% 
+BFI <- "../data/BFI1902_01v2.xlsx" %>% 
   read.xlsx(sheetIndex = 1, 
-            startRow = 2, endRow = 38, 
+            startRow = 1, endRow = 40, 
             colIndex = 3:16, 
             header = TRUE, 
             encoding = "UTF-8",
@@ -50,11 +50,12 @@ BFI %>%
   kable
 # pander(head(BFI))
 duplicated(BFI$ID)
-BFI <- BFI[-7, ]
+# BFI <- BFI[-7, ]
+BFI <- BFI[-c(8, 32, 33), ]
 str(BFI)
-MI <- "../data/MI1902_01.xlsx" %>%
+MI <- "../data/MI1902_01v2.xlsx" %>%
   read.xlsx(sheetIndex = 1, 
-            startRow = 2, endRow = 35, 
+            startRow = 2, endRow = 39, 
             colIndex = 3:60, 
             header = TRUE, 
             encoding = "UTF-8",

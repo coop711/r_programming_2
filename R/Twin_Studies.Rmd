@@ -6,35 +6,89 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
+library(knitr)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+흡연과 건강의 논쟁 가운데 관찰로 수행된 연구 결과가 인과 관계를 이끌어내기 어렵다는 피셔선생님과 버어크슨 선생님의 반론에서 흡연과 건강의 양 쪽에 영향을 미치는 요인으로 유전이 거론되었다. 그에 따라 여러 가지의 쌍둥이연구가 수행되었는데 그 중 1958년 Nature 지에 실린 자료들을 소개한다.
+
 ## Nature 1958 version 1
+
+```{r, out.width = "33%", fig.align = "left"}
+include_graphics("../pics/Nature_1958v1.png")
+```
+
+첫번째 자료는 R.A. Fisher 선생님이 Nature 지에 기고한 논문에 인용된 것으로 일란성쌍둥이 51쌍과 이란성쌍둥이 33쌍에게 흡연습관을 묻고 얼마나 닮았는지를 집계하였다. 일란성 쌍둥이 51쌍 중에 39쌍의 흡연 습관이 닮거나 약간 닮았던 데 비하여 이란성 쌍둥이 33쌍 중에는 17쌍의 흡연습관이 많이 닮거나 약간 닮은 것으로 조사되었다. 이로부터 유전적 요인을 흡연과 폐암 연구에서 중요한 요소로 간주해야 한다고 결론을 내리고 있다.   
+
+### 막대그래프
 
 ```{r, fig.width = 8, fig.height = 6}
 library(magrittr)
 library(tidyverse)
+#> 제시된 표와 닮은 행열 생성
 Nature1 <- matrix(c(33, 11, 6, 6, 12, 16), nrow = 2)
 rownames(Nature1) <- c("Identical", "Fraternal")
 colnames(Nature1) <- c("Alike", "Somewhat_Alike", "Not_Alike")
 Nature1
+```
+
+```{r, out.width = "75%", fig.align = "center"}
 options(digits = 3)
+#> RColorBrewer 패키지를 이용하여 컬러 생성
 library(RColorBrewer)
+#> "Accent" palette 채택
 cols <- brewer.pal(8, "Accent")
-Nature1_p <- prop.table(Nature1, margin = 1) * 100
-c1 <- ncol(Nature1)
-b1 <- barplot(t(Nature1_p), width = 0.5, xlim = c(0, 2), space = 0.5, col = cols[1:3], yaxt = "n")
-# b1 <- barplot(t(Nature1_p), width = matrix(rep(0.1, 6), nrow = 3), space = 1.2, col = cols[1:3], yaxt = "n")
+#> 유전형질(일란성/이란성) 별로 흡연습관 구분 백분률 계산
+Nature1_p <- Nature1 %>%
+  prop.table(margin = 1) %>%
+  `*`(100)
+# Nature1_p <- prop.table(Natrue1, margin = 1) * 100
+#> 열의 갯수 저장
+c1 <- Nature1 %>%
+  ncol
+# c1 <- ncol(Nature1)
+#> 쌓여있는 막대그래프를 그리고 막대의 가운데 좌표를 저장한다.
+#> `width`를 설정하려면 `xlim`도 함께 설정하여야 함에 유의한다.
+#> 아래 예시의 경우 막대그래프의 범위를 0에서 4까지로 하면서 첫번째 막대의 중심은 1.5,
+#> 두번째 막대의 중심은 3.5에 위치한다.(b1 값으로 파악) 막대의 폭(width)을 1, 
+#> 두 막대 간의 간격(space) 또한 1로 하여 width, xlim, space 간의 쉽게 알 수 있도록 하였다.
+#> 유전형질별로 비교하여야 하므로 행렬을 전치시켜서 막대그래프를 그려야 한다.
+#>  `yaxt = "n" `을 설정하여 y축에 추가 정보를 손으로 넣을 수 있도록 하였다/ 
+# b1 <- barplot(t(Nature1_p), 
+```
+
+```{r, out.width = "75%", fig.align = "center"}
+b1 <- Nature1_p %>% 
+  t %>%
+  barplot(width = 1, 
+          xlim = c(0, 4), 
+          space = 1, 
+          col = cols[1:3], 
+          yaxt = "n")
+#> 유전형질 별로 한 막대에 흡연습관의 닮음 정도를 나타낼 것이므로 `cumsum`함수를 이용하여 막대들이 위치할 좌표를 계산한다. 일란성과 이란성을 각각 100%로 하고 닮음 정도의 백분율을 막대 높이로 비교할 수 있도록 하되, 막대 중심에는 해당 속성의 돗수를 표시한다. 원점을 나타내기 위하여 0을 `c`함수 안에 추가하였다. 이를 추가하지 않으면 축이 어떻게 표시되는지 비교한다.
+#> `format`함수의 용법에 익숙해지고, `las = 2`가 왜 필요한지 여러 경우를 비교하라.
 axis(side = 2,
      at = c(0, apply(t(Nature1_p), MARGIN = 2, cumsum)),
-     labels = format(c(0, apply(t(Nature1_p), MARGIN = 2, cumsum)), digits = 3, nsmall = 1), las = 2)
-y_text <- c(t(Nature1_p)[1, ] / 2, 
-            t(Nature1_p)[1, ]  + t(Nature1_p)[2, ] / 2, 
-            t(Nature1_p)[1, ]  + t(Nature1_p)[2, ] + t(Nature1_p)[3, ] / 2)
-text(rep(b1, 3), y_text, labels = c(Nature1))
-legend("topright", inset = 0.01, fill = cols[3:1], legend = rev(colnames(Nature1)), bty = "n")
+     labels = format(c(0, apply(t(Nature1_p), MARGIN = 2, cumsum)), digits = 3, nsmall = 1), 
+     las = 2)
+#> 막대의 가운데에 추가 정보를 넣기 위한 좌표 설정 함수. 
+pos <- function(x){
+  cumsum(x) - x / 2
+}
+#> 텍스트 정보 넣을 좌표를 계산한다. 
+y_text <- apply(Nature1_p, MARGIN = 1, pos)
+# y_text <- c(t(Nature1_p)[1, ] / 2, 
+#             t(Nature1_p)[1, ]  + t(Nature1_p)[2, ] / 2, 
+#             t(Nature1_p)[1, ]  + t(Nature1_p)[2, ] + t(Nature1_p)[3, ] / 2)
+#> 막대그래프 작성 과정에서 나온 막대의 좌표와 `pos`함수로 계산한 y좌표를 이용하여 실제 관찰된 쌍둥이 페어의 수효를 표시한다.
+text(x = rep(b1, each = 3), y = y_text, labels = c(Nature1))
+#> 범례 표시
+legend("topleft", inset = 0.01, fill = cols[3:1], legend = rev(colnames(Nature1)), bty = "n")
+#> 메인 타이틀 
 title(main = "Smoking Habits of Twins", cex.main = 1.5)
 ```
+
+### Mosaic Plot
 
 ```{r, fig.width = 6, fig.height = 6}
 mosaicplot(Nature1, 
@@ -48,6 +102,15 @@ mosaicplot(Nature1,
 
 ## Nature 1958 version 2
 
+피셔의 논문이 실려 있는 Nature 지의 596쪽에서는 그와 비슷한 연구 결과가 실려 있었다. 피셔가 인용한 보고서가 흡연습관을 세 단계로 구분한 것과는 달리 닮았거나 그렇지 않거나의 이분법으로 나누었다.
+이 보고서가 흥미로운 것은 단순히 일란성 쌍둥이와 이란성 쌍둥이의 흡연습관을 비교한 것이 아니라 일란성 쌍둥이들을 다시 어려서 헤어진 경우와 함께 산 경우로 나눠 본 것이다. 일란성 쌍둥이들은 함께 살았든, 헤어져 살았든 흡연습관에 있어서도 놀라울 정도로 닮은 점을 보여 준다. 
+
+```{r, out.width = "50%", fig.align = "left"}
+include_graphics("../pics/Nature_1958v2.png")
+```
+
+### 막대그래프
+
 ```{r}
 Nature2 <- matrix(c(44, 9, 9, 9), nrow = 2)
 rownames(Nature2) <- c("Identical", "Fraternal")
@@ -55,15 +118,28 @@ colnames(Nature2) <- c("Alike", "Not_Alike")
 Nature2
 Nature2_p <- prop.table(Nature2, margin = 1) * 100
 c2 <- ncol(Nature2)
-b2 <- barplot(t(Nature2_p), space = 0.8, col = cols[1:2], yaxt = "n")
+# b2 <- barplot(t(Nature2_p), space = 0.8, col = cols[1:2], yaxt = "n")
+b2 <- barplot(t(Nature2_p),
+              width = 1,
+              xlim = c(0, 4),
+              space = 1, 
+              col = cols[1:2], 
+              yaxt = "n")
 axis(side = 2,
-     at = apply(t(Nature2_p), MARGIN = 2, cumsum),
-     labels = format(apply(t(Nature2_p), MARGIN = 2, cumsum), digits = 3, nsmall = 1), las = 2)
-y_text2 <- c(t(Nature2_p)[1, ] / 2, 
-            t(Nature2_p)[1, ]  + t(Nature2_p)[2, ] / 2)
-text(rep(b2, 2), y_text2, labels = c(Nature2))
-legend("top", fill = cols[2:1], legend = rev(colnames(Nature2)))
+     at = c(0, apply(t(Nature2_p), MARGIN = 2, cumsum)),
+     labels = format(c(0, apply(t(Nature2_p), MARGIN = 2, cumsum)), digits = 3, nsmall = 1), 
+     las = 2)
+y_text2 <- apply(Nature2_p, MARGIN = 1, pos)
+# y_text2 <- c(t(Nature2_p)[1, ] / 2, 
+#             t(Nature2_p)[1, ]  + t(Nature2_p)[2, ] / 2)
+text(rep(b2, each = 2), y_text2, labels = c(Nature2))
+legend("topleft", inset = 0.01, fill = cols[2:1], legend = rev(colnames(Nature2)))
 title(main = "Smoking Habits of Twins 2")
+```
+
+### Mosaic Plot
+
+```{r, fig.width = 6, fig.height = 6}
 mosaicplot(Nature2, 
            col = cols[1:2], 
            main = "Smoking Habits of Twins 2", 
@@ -71,7 +147,9 @@ mosaicplot(Nature2,
            ylab = "Resemblance")
 ```
 
-## Nature 1958 version 2
+## Nature 1958 version 2 
+
+일란성 쌍둥이들만을 대상으로 어렸을 때 헤어졌는지, 함께 살았는지 여부와 흡연습관을 비교한 결과는 놀라울 정도 닮았다는 것을 보여준다.
 
 ```{r}
 Nature3 <- matrix(c(23, 21, 4, 5), nrow = 2)
@@ -80,15 +158,27 @@ colnames(Nature3) <- c("Alike", "Not_Alike")
 Nature3
 Nature3_p <- prop.table(Nature3, margin = 1) * 100
 c3 <- ncol(Nature3)
-b3 <- barplot(t(Nature3_p), space = 0.8, col = cols[1:2], yaxt = "n")
+b3 <- barplot(t(Nature3_p),
+              width = 1,
+              xlim = c(0, 4),
+              space = 1, 
+              col = cols[1:2], 
+              yaxt = "n")
 axis(side = 2,
-     at = apply(t(Nature3_p), MARGIN = 2, cumsum),
-     labels = format(apply(t(Nature3_p), MARGIN = 2, cumsum), digits = 3, nsmall = 1), las = 2)
-y_text3 <- c(t(Nature3_p)[1, ] / 2, 
-             t(Nature3_p)[1, ]  + t(Nature3_p)[2, ] / 2)
-text(rep(b3, 2), y_text3, labels = c(Nature3))
-legend("top", fill = cols[2:1], legend = rev(colnames(Nature2)))
+     at = c(0, apply(t(Nature3_p), MARGIN = 2, cumsum)),
+     labels = format(c(0, apply(t(Nature3_p), MARGIN = 2, cumsum)), digits = 3, nsmall = 1), 
+     las = 2)
+y_text3 <- apply(Nature3_p, MARGIN = 1, pos)
+# y_text3 <- c(t(Nature3_p)[1, ] / 2, 
+#              t(Nature3_p)[1, ]  + t(Nature3_p)[2, ] / 2)
+text(rep(b3, each = 2), y_text3, labels = c(Nature3))
+legend("topleft", inset = 0.01, fill = cols[2:1], legend = rev(colnames(Nature2)))
 title(main = "Smoking Habits of Identical Twins")
+```
+
+### Mosaic Plot
+
+```{r, out.width = "75%", fig.align = "center"}
 mosaicplot(Nature3, 
            col = cols[3:2], 
            main = "Smoking Habits of Identical Twins", 
@@ -97,6 +187,10 @@ mosaicplot(Nature3,
 ```
 
 ## Doll and Hill
+
+```{r, out.width = "50%", fig.align = "left"}
+include_graphics("../pics/DollnHill.png")
+```
 
 ```{r}
 DollnHill <- matrix(c(24, 38, 208, 242, 196, 201, 164, 118, 45, 23), nrow = 2)
@@ -108,12 +202,13 @@ b4 <- barplot(t(DollnHill_p), space = 0.8, col = cols[1:5], yaxt = "n")
 axis(side = 2,
      at = apply(t(DollnHill_p), MARGIN = 2, cumsum),
      labels = format(apply(t(DollnHill_p), MARGIN = 2, cumsum), digits = 2, nsmall = 1), las = 2)
-y_text4 <- c(t(DollnHill_p)[1, ] / 2, 
-            t(DollnHill_p)[1, ]  + t(DollnHill_p)[2, ] / 2, 
-            t(DollnHill_p)[1, ]  + t(DollnHill_p)[2, ] + t(DollnHill_p)[3, ] / 2,
-            t(DollnHill_p)[1, ]  + t(DollnHill_p)[2, ] + t(DollnHill_p)[3, ] + t(DollnHill_p)[4, ] / 2,
-            t(DollnHill_p)[1, ]  + t(DollnHill_p)[2, ] + t(DollnHill_p)[3, ] + t(DollnHill_p)[4, ] + t(DollnHill_p)[5, ] / 2)
-text(rep(b4, 5), y_text4, labels = c(DollnHill))
+y_text4 <- apply(DollnHill_p, MARGIN = 1, pos)
+# y_text4 <- c(t(DollnHill_p)[1, ] / 2, 
+#             t(DollnHill_p)[1, ]  + t(DollnHill_p)[2, ] / 2, 
+#             t(DollnHill_p)[1, ]  + t(DollnHill_p)[2, ] + t(DollnHill_p)[3, ] / 2,
+#             t(DollnHill_p)[1, ]  + t(DollnHill_p)[2, ] + t(DollnHill_p)[3, ] + t(DollnHill_p)[4, ] / 2,
+#             t(DollnHill_p)[1, ]  + t(DollnHill_p)[2, ] + t(DollnHill_p)[3, ] + t(DollnHill_p)[4, ] + t(DollnHill_p)[5, ] / 2)
+text(rep(b4, each = 5), y_text4, labels = t(DollnHill), col = c(rep("black", 4), "white"))
 legend("top", fill = cols[5:1], legend = rev(colnames(DollnHill)))
 title(main = "Retrospective Study : Doll & Hill")
 mosaicplot(DollnHill, 
@@ -126,6 +221,10 @@ chisq.test(DollnHill)
 
 ## Doll and Hill : Inhale
 
+```{r, out.width = "50%", fig.align = "left"}
+include_graphics("../pics/DollnHill_Inhale.png")
+```
+
 ```{r}
 DollnHill2 <- matrix(c(7, 17, 141, 162, 133, 157, 96, 74, 21, 16), nrow = 2)
 rownames(DollnHill2) <- c("Lung Cancer", "Control")
@@ -133,12 +232,16 @@ colnames(DollnHill2) <- c("1-4", "5-14", "15-24", "25-49", "50 more")
 DollnHill2_p <- DollnHill2 / DollnHill * 100
 c5 <- ncol(DollnHill2)
 b5 <- barplot(t(DollnHill2_p), space = 0.8, col = cols[1:5], yaxt = "n")
-y_text5 <- c(t(DollnHill2_p)[1, ] / 2, 
-             t(DollnHill2_p)[1, ]  + t(DollnHill2_p)[2, ] / 2, 
-             t(DollnHill2_p)[1, ]  + t(DollnHill2_p)[2, ] + t(DollnHill2_p)[3, ] / 2,
-             t(DollnHill2_p)[1, ]  + t(DollnHill2_p)[2, ] + t(DollnHill2_p)[3, ] + t(DollnHill2_p)[4, ] / 2,
-             t(DollnHill2_p)[1, ]  + t(DollnHill2_p)[2, ] + t(DollnHill2_p)[3, ] + t(DollnHill2_p)[4, ] + t(DollnHill2_p)[5, ] / 2)
-text(rep(b5, 5), y_text5, labels = paste0(format(c(DollnHill2_p), digits = 3, nsmall = 1), "%"))
+y_text5 <- apply(DollnHill2_p, MARGIN = 1, pos)
+# y_text5 <- c(t(DollnHill2_p)[1, ] / 2, 
+#              t(DollnHill2_p)[1, ]  + t(DollnHill2_p)[2, ] / 2, 
+#              t(DollnHill2_p)[1, ]  + t(DollnHill2_p)[2, ] + t(DollnHill2_p)[3, ] / 2,
+#              t(DollnHill2_p)[1, ]  + t(DollnHill2_p)[2, ] + t(DollnHill2_p)[3, ] + t(DollnHill2_p)[4, ] / 2,
+#              t(DollnHill2_p)[1, ]  + t(DollnHill2_p)[2, ] + t(DollnHill2_p)[3, ] + t(DollnHill2_p)[4, ] + t(DollnHill2_p)[5, ] / 2)
+text(rep(b5, each = 5), 
+     y_text5, 
+     labels = paste0(format(t(DollnHill2_p), digits = 3, nsmall = 1), "%"),
+     col = c(rep("black", 4), "white"))
 legend("top", fill = cols[5:1], legend = rev(colnames(DollnHill2)))
 title(main = "Percentage of Inhalers")
 ```
@@ -182,14 +285,19 @@ DollnHill_tbl <- DollnHill %>%
 ## geom_bar
 
 ```{r}
-y1_text <- c(t(Nature1)[1, ] / 2, 
-            t(Nature1)[1, ]  + t(Nature1)[2, ] / 2, 
-            t(Nature1)[1, ]  + t(Nature1)[2, ] + t(Nature1)[3, ] / 2)
-y1_fill <- y1_text / (t(Nature1)[1, ]  + t(Nature1)[2, ] + t(Nature1)[3, ])
+# y1_text <- c(t(Nature1)[1, ] / 2, 
+#             t(Nature1)[1, ]  + t(Nature1)[2, ] / 2, 
+#             t(Nature1)[1, ]  + t(Nature1)[2, ] + t(Nature1)[3, ] / 2)
+y1_text <- apply(Nature1, MARGIN = 1, pos) %>%
+  t %>%
+  c
+# y1_fill <- y1_text / (t(Nature1)[1, ]  + t(Nature1)[2, ] + t(Nature1)[3, ])
+y1_fill <- y1_text / apply(Nature1, MARGIN = 1, sum)
 Nature1_tbl %>%
   ggplot(data = ., mapping = aes(x = Twins, y = Counts, fill = Resemblance)) +
   geom_bar(stat = "identity", width = 0.5, position = position_stack(reverse = TRUE)) +
-  geom_text(aes(y = y1_text), label = Nature1_tbl$Counts, position = "identity") +
+#  geom_text(aes(y = c(y_text)), label = Nature1_tbl$Counts, position = "identity") +
+  geom_text(aes(y = c(y1_text)), label = Nature1_tbl$Counts, position = "identity") +
   scale_fill_brewer(type = "qual", palette = "Accent", direction = -1) +
   scale_y_continuous(breaks = apply(t(Nature1), MARGIN = 2, cumsum), 
                      labels = apply(t(Nature1), MARGIN = 2, cumsum))

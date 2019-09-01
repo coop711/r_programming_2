@@ -25,6 +25,7 @@ load("./BFI_MI_1902_02.RData")
 str(BFI)
 # str(BFI_self)
 str(MI)
+table(MI$Q37)
 str(class_roll)
 options(width = 180)
 ```
