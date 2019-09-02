@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Nature 1958 version 1
 
-```{r, out.width = "33%", fig.align = "left"}
+```{r, out.width = "50%", fig.align = "left"}
 include_graphics("../pics/Nature_1958v1.png")
 ```
 
@@ -81,9 +81,9 @@ y_text <- apply(Nature1_p, MARGIN = 1, pos)
 #             t(Nature1_p)[1, ]  + t(Nature1_p)[2, ] / 2, 
 #             t(Nature1_p)[1, ]  + t(Nature1_p)[2, ] + t(Nature1_p)[3, ] / 2)
 #> 막대그래프 작성 과정에서 나온 막대의 좌표와 `pos`함수로 계산한 y좌표를 이용하여 실제 관찰된 쌍둥이 페어의 수효를 표시한다.
-text(x = rep(b1, each = 3), y = y_text, labels = c(Nature1))
+text(x = rep(b1, each = 3), y = y_text, labels = t(Nature1))
 #> 범례 표시
-legend("topleft", inset = 0.01, fill = cols[3:1], legend = rev(colnames(Nature1)), bty = "n")
+legend("topleft", inset = 0.01, fill = cols[3:1], legend = rev(colnames(Nature1)), bty = "o")
 #> 메인 타이틀 
 title(main = "Smoking Habits of Twins", cex.main = 1.5)
 ```
