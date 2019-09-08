@@ -1,0 +1,56 @@
+---
+title: "Presidential Election Poll 1987"
+author: "coop711"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+Data Read-in
+------------
+
+`table` 구조를 가지므로 우선 `matrix`로 읽어들인다.
+
+```{r}
+options(digits = 0)
+load("./poll87_data.RData")
+# poll87_counts<-matrix(c(289, 84, 26, 361, 154, 139, 53, 292, 126, 145, 57, 287, 61, 29, 11, 80), nrow=4, ncol=4)
+poll87_counts
+class(poll87_counts)
+str(poll87_counts)
+```
+
+`table` 구조의 변수명을 정한다.
+
+```{r}
+dimnames(poll87_counts) <- list(Religion = c("Buddhism", "Protestant", "Catholic", "None"), Candidates = c("Roh", "YS", "DJ", "JP", "etc"))
+poll87_counts
+```
+
+`table` 구조로 강제 변환.
+
+```{r}
+poll87_counts_tbl<-as.table(poll87_counts)
+str(poll87_counts_tbl)
+```
+
+`table` (실상은 `matrix`) 구조를 가지므로 `barplot()` 으로 막대들을 쌓아놓기 적합.
+
+```{r fig.width = 7, fig.height = 7}
+barplot(poll87_counts_tbl)
+```
+
+범례가 필요하다면 `rownames()`가 설정되어 있으므로 `legend.text = TRUE`로 충분함. 적절한 주제목 설정.
+
+```{r fig.width=7, fig.height=7}
+barplot(poll87_counts_tbl, legend.text = TRUE)
+title(main="Poll 1987")
+```
+
+종교를 색깔로 구분하면,
+
+```{r fig.width=7, fig.height=7}
+barplot(poll87_counts_tbl, legend.text=TRUE, col = rainbow(4))
+title(main="Poll 1987")
+```
+
+

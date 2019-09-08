@@ -1,0 +1,88 @@
+---
+title: "Presidential Election Poll 1987"
+author: "coop711"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Data
+
+`table` 구조를 가지므로 우선 `matrix`로 읽어들인다.
+
+```{r}
+options(digits = 0)
+load("./poll87_data.RData")
+# poll87_counts <- matrix(c(289, 84, 26, 361, 154, 139, 53, 292, 126, 145, 57, 287, 61, 29, 11, 80), 
+#                         nrow = 4, 
+#                         ncol = 4)
+poll87_counts
+class(poll87_counts)
+str(poll87_counts)
+```
+
+`table` 구조의 변수명을 정한다.
+
+```{r}
+dimnames(poll87_counts) <- list(Religion = c("Buddhism", "Protestant", "Catholic", "None"), 
+                                 Candidates = c("Roh", "YS", "DJ", "JP", "etc"))
+poll87_counts
+```
+
+`table` 구조로 강제 변환.
+
+```{r}
+counts_tbl <- as.table(poll87_counts)
+counts_by_rel_df <- as.data.frame(t(counts_tbl))
+str(counts_by_rel_df)
+names(counts_by_rel_df)[1] <- "vote"
+counts_by_rel_df
+```
+
+```{r}
+counts_by_cand_df <- as.data.frame(counts_tbl)
+str(counts_by_cand_df)
+names(counts_by_cand_df)[1] <- "vote"
+counts_by_cand_df
+```
+
+
+```{r fig.width=7, fig.height=7}
+library(ggplot2)
+source("./barplot_gg.R")
+```
+
+```{r}
+ggplot(data = poll87_tbl, mapping = aes(x = Candidates, y = Counts, fill = Religion)) +
+  geom_bar(stat = "identity", position = position_stack()) +
+  scale_fill_brewer(type = "div", palette = "Spectral", direction = 1)
+```
+
+```{r}
+ggplot(data = poll87_tbl, mapping = aes(x = Religion, y = Counts, fill = Candidates)) +
+  geom_bar(stat = "identity", position = position_stack()) +
+  scale_fill_brewer(type = "div", palette = "Spectral", direction = -1)
+```
+
+후보를 색깔로 구분하고 
+
+```{r,  fig.width = 7, fig.height = 7}
+barplot_gg_stack(counts_by_rel_df, 
+                 base_family = "HCR Dotum LVT",
+                 ggtitle = "1987 대선 갤럽 여론조사",
+                 xlab = "종교",
+                 ylab = "표본 지지인원", 
+                 fill_name = "후보")
+```
+
+종교를 색깔로 구분하면,
+
+```{r,  fig.width = 7, fig.height = 7}
+barplot_gg_stack(counts_by_cand_df, 
+                 base_family = "HCR Dotum LVT",
+                 ggtitle = "1987 대선 갤럽 여론조사",
+                 xlab = "후보",
+                 ylab = "표본 지지인원", 
+                 fill_name = "종교")
+```
+
+

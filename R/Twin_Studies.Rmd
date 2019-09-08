@@ -62,7 +62,7 @@ b1 <- Nature1_p %>%
   t %>%
   barplot(width = 1, 
           xlim = c(0, 4), 
-          space = 1, 
+          space = 0.3, 
           col = cols[1:3], 
           yaxt = "n")
 #> 유전형질 별로 한 막대에 흡연습관의 닮음 정도를 나타낼 것이므로 `cumsum`함수를 이용하여 막대들이 위치할 좌표를 계산한다. 일란성과 이란성을 각각 100%로 하고 닮음 정도의 백분율을 막대 높이로 비교할 수 있도록 하되, 막대 중심에는 해당 속성의 돗수를 표시한다. 원점을 나타내기 위하여 0을 `c`함수 안에 추가하였다. 이를 추가하지 않으면 축이 어떻게 표시되는지 비교한다.
@@ -83,7 +83,7 @@ y_text <- apply(Nature1_p, MARGIN = 1, pos)
 #> 막대그래프 작성 과정에서 나온 막대의 좌표와 `pos`함수로 계산한 y좌표를 이용하여 실제 관찰된 쌍둥이 페어의 수효를 표시한다.
 text(x = rep(b1, each = 3), y = y_text, labels = t(Nature1))
 #> 범례 표시
-legend("topleft", inset = 0.01, fill = cols[3:1], legend = rev(colnames(Nature1)), bty = "o")
+legend("topright", inset = 0.01, fill = cols[3:1], legend = rev(colnames(Nature1)), bty = "o")
 #> 메인 타이틀 
 title(main = "Smoking Habits of Twins", cex.main = 1.5)
 ```
@@ -99,6 +99,8 @@ mosaicplot(Nature1,
            cex.axis = 1,
            las = 1)
 ```
+
+<P style = "page-break-before:always">
 
 ## Nature 1958 version 2
 
@@ -122,7 +124,7 @@ c2 <- ncol(Nature2)
 b2 <- barplot(t(Nature2_p),
               width = 1,
               xlim = c(0, 4),
-              space = 1, 
+              space = 0.5, 
               col = cols[1:2], 
               yaxt = "n")
 axis(side = 2,
@@ -132,8 +134,8 @@ axis(side = 2,
 y_text2 <- apply(Nature2_p, MARGIN = 1, pos)
 # y_text2 <- c(t(Nature2_p)[1, ] / 2, 
 #             t(Nature2_p)[1, ]  + t(Nature2_p)[2, ] / 2)
-text(rep(b2, each = 2), y_text2, labels = c(Nature2))
-legend("topleft", inset = 0.01, fill = cols[2:1], legend = rev(colnames(Nature2)))
+text(rep(b2, each = 2), y_text2, labels = t(Nature2))
+legend("topright", inset = 0.01, fill = cols[2:1], legend = rev(colnames(Nature2)))
 title(main = "Smoking Habits of Twins 2")
 ```
 
@@ -146,6 +148,8 @@ mosaicplot(Nature2,
            xlab = "Twins", 
            ylab = "Resemblance")
 ```
+
+<P style = "page-break-before:always">
 
 ## Nature 1958 version 2 
 
@@ -161,7 +165,7 @@ c3 <- ncol(Nature3)
 b3 <- barplot(t(Nature3_p),
               width = 1,
               xlim = c(0, 4),
-              space = 1, 
+              space = 0.5, 
               col = cols[1:2], 
               yaxt = "n")
 axis(side = 2,
@@ -171,8 +175,8 @@ axis(side = 2,
 y_text3 <- apply(Nature3_p, MARGIN = 1, pos)
 # y_text3 <- c(t(Nature3_p)[1, ] / 2, 
 #              t(Nature3_p)[1, ]  + t(Nature3_p)[2, ] / 2)
-text(rep(b3, each = 2), y_text3, labels = c(Nature3))
-legend("topleft", inset = 0.01, fill = cols[2:1], legend = rev(colnames(Nature2)))
+text(rep(b3, each = 2), y_text3, labels = t(Nature3))
+legend("topright", inset = 0.01, fill = cols[2:1], legend = rev(colnames(Nature2)))
 title(main = "Smoking Habits of Identical Twins")
 ```
 
@@ -246,6 +250,8 @@ legend("top", fill = cols[5:1], legend = rev(colnames(DollnHill2)))
 title(main = "Percentage of Inhalers")
 ```
 
+<P style = "page-break-before:always">
+
 # ggplot
 
 ## tidyverse
@@ -281,6 +287,8 @@ DollnHill_tbl <- DollnHill %>%
                         labels = c("Lung_Cancer", "Control")),
          Smoking = factor(Smoking, labels = c("1-4", "5-14", "15-24", "25-49", "50_more")))
 ```
+
+<P style = "page-break-before:always">
 
 ## geom_bar
 
