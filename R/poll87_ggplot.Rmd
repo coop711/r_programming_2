@@ -67,7 +67,7 @@ ggplot(data = poll87_tbl, mapping = aes(x = Religion, y = Counts, fill = Candida
 
 ```{r,  fig.width = 7, fig.height = 7}
 barplot_gg_stack(counts_by_rel_df, 
-                 base_family = "HCR Dotum LVT",
+                 base_family = "",
                  ggtitle = "1987 대선 갤럽 여론조사",
                  xlab = "종교",
                  ylab = "표본 지지인원", 
@@ -78,7 +78,7 @@ barplot_gg_stack(counts_by_rel_df,
 
 ```{r,  fig.width = 7, fig.height = 7}
 barplot_gg_stack(counts_by_cand_df, 
-                 base_family = "HCR Dotum LVT",
+                 base_family = "",
                  ggtitle = "1987 대선 갤럽 여론조사",
                  xlab = "후보",
                  ylab = "표본 지지인원", 
