@@ -52,7 +52,9 @@ addmargins(poll87, margin = 2)
 
 ```{r}
 options(digits = 3)
-cbind(poll87, N_Religion)
+poll87 %>%
+  cbind(N_Religion)
+# cbind(poll87, N_Religion)
 ```
 
 `N_Religion`의 이름을 표본 크기를 상징하는 `Size`로 교체
@@ -130,6 +132,7 @@ poll87_tbl <- poll87_counts %>%
   gather(key = Candidates, value = Counts, -Religion) %>%
   mutate(Religion = factor(Religion, levels = rownames(poll87_counts)),
          Candidates = factor(Candidates, levels = colnames(poll87_counts)))
+poll87_tbl
 str(poll87_tbl)
 ```
 
