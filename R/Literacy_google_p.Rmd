@@ -269,12 +269,6 @@ b <- barplot(literacy_tbl,
 pos <- {. %>% {cumsum(.) - `/`(., 2)}}
 x_text <- apply(literacy_tbl, MARGIN = 2, FUN = pos)
 text(x = x_text, y = rep(b, each = 4), labels = label_ptbl)
-# text(x = literacy_tbl[1, ] / 2, y = b, labels = label_ptbl[1, ])
-# text(x = literacy_tbl[1, ] + literacy_tbl[2, ] / 2 , y = b, labels = label_ptbl[2, ])
-# text(x = literacy_tbl[1, ] + literacy_tbl[2, ] + literacy_tbl[3, ] / 2, y = b, 
-#      labels = label_ptbl[3, ])
-# text(x = literacy_tbl[1, ] + literacy_tbl[2, ] + literacy_tbl[3, ] + literacy_tbl[4, ]/ 2, y = b, 
-#      labels = label_ptbl[4, ])
 ```
 
 ## 문해력 점수 계산
@@ -421,13 +415,11 @@ grade <- ifelse(score <= 24, "I",
 grade_tbl <- grade %>%
   table("문해력 등급 분포" = ., exclude = NULL) %>%
   c("계" = sum(.))
-# names(grade_tbl)[5] <- "결석"
 grade_tbl %>%
   t %>%
   kable(caption = "문해력 등급 분포")
 grade_tbl_group <- literacy %$%
   table("Group" = .$group, "문해력 등급 분포" = grade, exclude = NULL)
-# colnames(grade_tbl_group)[5] <- "결석"
 grade_tbl_group %>%
   cbind("계" = rowSums(.)) %>%
   rbind("계" = colSums(.)) %>%
