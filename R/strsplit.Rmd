@@ -1,0 +1,56 @@
+---
+title: "strsplit"
+author: "coop711"
+date: "10/8/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(magrittr)
+library(knitr)
+```
+
+## strsplit(fixed = TRUE)
+
+### poll_SBS_170331 
+
+다음 코드에서 `"[.]"`를 `fixed = TRUE` 로 바꾸어도 됨. 그러나 `"."` 만 설정하면 
+특수문자의 취급 과정에서 빈 글자가 나오게 됨. 두 조건을 동시에 적용하면 엉뚱한 결과가 나오게 됨.
+
+```{r}
+rates <- c(35.2, 17.4, 12.0, 9.5, 7.7, 5.3, 3.4, 2.6)
+c_rates <- format(rates, nsmall = 1, justify = "right")
+(a <- sapply(strsplit(c_rates, "."), `[`, 1))
+(b <- sapply(strsplit(c_rates, "."), `[`, 2))
+(a <- sapply(strsplit(c_rates, "[.]"), `[`, 1))
+(b <- sapply(strsplit(c_rates, "[.]"), `[`, 2))
+(a <- sapply(strsplit(c_rates, ".", fixed = TRUE), `[`, 1))
+(b <- sapply(strsplit(c_rates, ".", fixed = TRUE), `[`, 2))
+(a <- sapply(strsplit(c_rates, "[.]", fixed = TRUE), `[`, 1))
+(b <- sapply(strsplit(c_rates, "[.]", fixed = TRUE), `[`, 2))
+(b_perc <- paste0(".", b, "%"))
+```
+
+### Red_and_Black_id_masked
+
+그러나 다음 코드에서 `"@"`는 특수문자가 아니므로 `fixed = TRUE`로 설정할 필요가 없음.
+
+```{r}
+class_roll <- readRDS("class_roll_group.RDS")
+class_roll$email %>%
+#   strsplit("@", fixed = TRUE) %>%
+  strsplit("@") %>%
+  sapply(`[`, 2) %>%
+  table("그룹" = class_roll$group, "e-mail" = .) %>%
+  kable
+```
+
+### Help 파일의 예제
+
+```{r}
+strsplit("a.b.c", ".")
+strsplit("a.b.c", "[.]")
+strsplit("a.b.c", ".", fixed = TRUE)
+strsplit("a.b.c", "[.]", fixed = TRUE)
+```

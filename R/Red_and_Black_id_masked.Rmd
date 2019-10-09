@@ -228,6 +228,7 @@ sample(1:6, size = 2)
 
 <!--
 ```{r, save}
+saveRDS(class_roll, file = "class_roll_group.RDS")
 save.image("../R/red_and_black_data_masked.RData")
 ```
 -->

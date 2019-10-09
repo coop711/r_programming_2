@@ -56,9 +56,11 @@ literacy_roll$group <- literacy_roll %>%
 # literacy_roll$id %in% class_roll$id
 literacy_roll[-c(1, 27)] %>%
   sapply(table)
-literacy_roll[2:26] %<>% 
-  sapply(FUN = {. %>% substr(start = 1, stop = 1)})
+# literacy_roll[2:26] %<>% 
+#   sapply(FUN = {. %>% substr(start = 1, stop = 1)})
 # sapply(FUN = function(x) substr(x, 1, 1))
+literacy_roll[2:26] %<>% 
+  sapply(FUN = {. %>% strsplit(split = "[.]") %>% sapply(`[`, 1)})
 ```
 
 ```{r, echo = FALSE, eval = FALSE}
@@ -257,7 +259,7 @@ b <- barplot(literacy_tbl,
              col = brewer.pal(4, "Accent"),
              names.arg = colnames(literacy_tbl), 
              las = 1, 
-             xpd = TRUE, 
+#             xpd = TRUE, 
              legend.text = rownames(literacy_tbl), 
              args.legend = list(x = 180, y = 25))
 # max(b)
