@@ -317,18 +317,18 @@ VADeaths_df # 데이터 프레임 출력 </code></pre>
 <p>다음 코드를 차례대로 실행하면서 어떤 흐름이 잡히는 지 살펴보시오.</p>
 <p>경고문의 <code>Conflicts ...</code>이하는 <code>R Base</code>에 있는 <code>filter()</code>나 <code>lag()</code>함수를 사용하려면 구체적으로 <code>stats::filter()</code> 나 <code>stats::lag()</code>라고 하여야 한다는 것을 의미한다.</p>
 <pre class="r"><code>library(tidyverse) # `tidyverse`를 검색 경로에 올려 놓음. 함께 불러들이는 패키지들과 경고문에 유의.</code></pre>
-<pre><code>## ── Attaching packages ────────</code></pre>
+<pre><code>## ── Attaching packages ────────────────────────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
 <pre><code>## ✔ ggplot2 3.2.0     ✔ purrr   0.3.2
 ## ✔ tibble  2.1.3     ✔ dplyr   0.8.3
 ## ✔ tidyr   0.8.3     ✔ stringr 1.4.0
 ## ✔ readr   1.3.1     ✔ forcats 0.4.0</code></pre>
-<pre><code>## ── Conflicts ─────────────────
+<pre><code>## ── Conflicts ───────────────────────────────────────────────────────── tidyverse_conflicts() ──
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()</code></pre>
 <pre class="r"><code>VADeaths_tbl &lt;- VADeaths %&gt;% # 최종 결과물을 `tibble` 형식으로 지정.
   as_tibble() %&gt;% # 행렬 구조를 `tibble`구조로 변환. `tbl_df()`는 더 이상 사용되지 않음. 
   mutate(Age = row.names(VADeaths)) %&gt;% # 행 이름으로 주어진 연령대를 글자벡터로 생성 
-  gather(key = Place_Gender, # `Age`를 제외한 나머지 뱐수를 `key, value`쌍으로 정리하면서 새로운 변수명 부여.
+  gather(key = Place_Gender, # `Age`를 제외한 나머지 변수를 `key, value`쌍으로 정리하면서 새로운 변수명 부여.
          value = Rates, 
          -Age) %&gt;%
   separate(Place_Gender, c(&quot;Place&quot;, &quot;Gender&quot;), # `Place_Gender`를 `Place`와 `Gender`로 분리.

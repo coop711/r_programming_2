@@ -77,11 +77,13 @@ literacy_df <- literacy[1:25] %>%
 str(literacy_df)
 ```
 
-## barplot
+## 막대그래프
 
 막대그래프로 답안 분포를 시각적으로 살핀다. 차후 나오는 정답률과 함께 어느 문항에서 어느 답안을 많이 고르는지 파악하는 데 활용한다.
 
-```{r, echo = FALSE, fig.width = 9, fig.height = 12}
+### Data
+
+```{r, echo = FALSE}
 library(RColorBrewer)
 par(family = "", mar = c(5.1, 4.1, 4.1, 8.1))
 literacy_tbl <- literacy_df %>%
@@ -97,6 +99,11 @@ label_ptbl <- literacy_ptbl %>%
   paste0("%") %>%
   ifelse(. %in% c("  0%", "  1%", "  2%"), "", .) %>%
   matrix(nrow = 4)
+```
+
+### `barplot`
+
+```{r, echo = FALSE, fig.width = 9, fig.height = 12}
 b <- barplot(literacy_tbl, 
 # b <- barplot(matrix(literacy_tbl, nrow = 4), 
              horiz = TRUE, 
@@ -119,11 +126,9 @@ x_text <- apply(literacy_tbl, MARGIN = 2, FUN = pos)
 text(x = x_text, y = rep(b, each = 4), labels = label_ptbl)
 ```
 
+### `ggplot`
 
-
-## ggplot
-
-```{r, echo = FALSE, fig.width = 9, fig.height = 12}
+```{r, echo = FALSE, message = FALSE, fig.width = 9, fig.height = 9}
 library(tidyverse)
 literacy_tbl2 <- literacy_tbl %>%
   as_tibble %>%
@@ -138,10 +143,14 @@ ggplot(data = literacy_tbl2, mapping = aes(x = Questions, y = Counts, fill = Ite
   xlab("문제") +
   ylab("백분율") +
   theme_minimal(base_family = "HCR Dotum LVT") +
-  theme(legend.title = element_text(family = "HCR Dotum LVT"),
- #       axis.text.x = element_blank(),
+  theme(panel.grid.major = element_blank(),
+        legend.background = element_rect(),
+        legend.title = element_text(family = "HCR Dotum LVT"),
         axis.title.x = element_text(family = "HCR Dotum LVT"),
-        axis.title.y = element_text(family = "HCR Dotum LVT")) +
+        axis.text.x = element_blank(),
+        axis.title.y = element_text(family = "HCR Dotum LVT"),
+        axis.text.y = element_blank()) +
+  geom_text(aes(x = literacy_tbl2$Questions, y = -3), label = literacy_tbl2$Questions) +
   coord_flip()
 ```
 

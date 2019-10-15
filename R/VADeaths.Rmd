@@ -65,7 +65,7 @@ library(tidyverse) # `tidyverse`를 검색 경로에 올려 놓음. 함께 불�
 VADeaths_tbl <- VADeaths %>% # 최종 결과물을 `tibble` 형식으로 지정.
   as_tibble() %>% # 행렬 구조를 `tibble`구조로 변환. `tbl_df()`는 더 이상 사용되지 않음. 
   mutate(Age = row.names(VADeaths)) %>% # 행 이름으로 주어진 연령대를 글자벡터로 생성 
-  gather(key = Place_Gender, # `Age`를 제외한 나머지 뱐수를 `key, value`쌍으로 정리하면서 새로운 변수명 부여.
+  gather(key = Place_Gender, # `Age`를 제외한 나머지 변수를 `key, value`쌍으로 정리하면서 새로운 변수명 부여.
          value = Rates, 
          -Age) %>%
   separate(Place_Gender, c("Place", "Gender"), # `Place_Gender`를 `Place`와 `Gender`로 분리.
