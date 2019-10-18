@@ -171,15 +171,15 @@ ggplot(data = literacy_tbl2, mapping = aes(x = Questions)) +
         legend.title = element_text(family = "KoPubWorldDotum Medium"),
 #> x축 라벨의 폰트 설정
         axis.title.x = element_text(family = "KoPubWorldDotum Medium"),
-#> x축 텍스트를 없앰 (너무 떨어져 있어서 새로 설정할 예정)
+#> x축 눈금 텍스트를 없앰 (너무 떨어져 있어서 새로 설정할 예정)
         axis.text.x = element_blank(),
 #> y축 라벨의 폰트 설정
         axis.title.y = element_text(family = "KoPubWorldDotum Medium"),
-#> y축 텍스트 없애기
+#> y축 눈금 텍스트 없애기
         axis.text.y = element_blank()) +
-#> x축의 라벨을 막대에 보다 가깝게 조정
+#> x축의 라벨을 막대에 보다 가깝게 조정 (flip해서 x축을 수직으로 세울 예정이므로 y = -3)
   geom_text(mapping = aes(y = -3, label = Questions)) +
-#> 좌표를 돌려 막대들을 수평으로 눕히기
+#> 좌표를 90도 회전하여 막대들을 수평으로 눕히기
   coord_flip()
 ```
 
