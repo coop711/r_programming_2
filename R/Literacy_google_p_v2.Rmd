@@ -84,8 +84,6 @@ str(literacy_df)
 ### Data
 
 ```{r, echo = FALSE}
-library(RColorBrewer)
-par(family = "", mar = c(5.1, 4.1, 4.1, 8.1))
 literacy_tbl <- literacy_df %>%
   sapply(FUN = table, useNA = "no")
 kable(literacy_tbl, caption = "Counts")
@@ -104,6 +102,8 @@ label_ptbl <- literacy_ptbl %>%
 ### `barplot`
 
 ```{r, echo = FALSE, fig.width = 9, fig.height = 12}
+library(RColorBrewer)
+par(family = "KoPubWorldDotum Medium", mar = c(5.1, 4.1, 4.1, 8.1))
 b <- barplot(literacy_tbl, 
 # b <- barplot(matrix(literacy_tbl, nrow = 4), 
              horiz = TRUE, 
@@ -124,6 +124,7 @@ b <- barplot(literacy_tbl,
 pos <- {. %>% {cumsum(.) - `/`(., 2)}}
 x_text <- apply(literacy_tbl, MARGIN = 2, FUN = pos)
 text(x = x_text, y = rep(b, each = 4), labels = label_ptbl)
+title(main = "문해력조사 문항별 응답", cex.main = 1.8)
 ```
 
 ### `ggplot`
@@ -138,17 +139,19 @@ literacy_tbl2 <- literacy_tbl %>%
   mutate(Item = factor(Item, levels = 1:4))
 ggplot(data = literacy_tbl2, mapping = aes(x = Questions, y = Counts, fill = Item)) +
   geom_bar(stat = "identity", position = position_stack(reverse = TRUE)) +
-  geom_text(aes(y = c(x_text)), label = c(label_ptbl), position = "identity") +
+  geom_text(aes(y = c(x_text)), label = c(label_ptbl)) +
   scale_fill_brewer(name = "답문항", type = "qual", palette = "Accent") +
   xlab("문제") +
   ylab("백분율") +
-  theme_minimal(base_family = "HCR Dotum LVT") +
+  ggtitle("문해력조사 문항별 응답") + 
+  theme_minimal(base_family = "KoPubWorldDotum Medium") +
   theme(panel.grid.major = element_blank(),
-        legend.background = element_rect(),
-        legend.title = element_text(family = "HCR Dotum LVT"),
-        axis.title.x = element_text(family = "HCR Dotum LVT"),
+        plot.title = element_text(family = "KoPubWorldDotum Medium", size = 18, hjust = 0.5),
+        legend.background = element_rect(fill = "transparent"),
+        legend.title = element_text(family = "KoPubWorldDotum Medium"),
+        axis.title.x = element_text(family = "KoPubWorldDotum Medium"),
         axis.text.x = element_blank(),
-        axis.title.y = element_text(family = "HCR Dotum LVT"),
+        axis.title.y = element_text(family = "KoPubWorldDotum Medium"),
         axis.text.y = element_blank()) +
   geom_text(aes(x = literacy_tbl2$Questions, y = -3), label = literacy_tbl2$Questions) +
   coord_flip()
