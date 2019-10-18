@@ -114,46 +114,72 @@ b <- barplot(literacy_tbl,
              las = 1, 
 #             xpd = TRUE, 
              legend.text = rownames(literacy_tbl), 
-             args.legend = list(x = 75, y = 25))
+             args.legend = list(x = 75, y = 25, title = "답문항"))
 # max(b)
 # literacy_tbl[1, ]
 # pos <- function(x){
 #   cumsum(x) - x / 2
 # }
-#> 텍스트 라벨이 붙는 위치 계산하는 사용자 함수 설정
+#> 텍스트 라벨이 붙는 좌표를 계산하는 사용자 함수 설정
 pos <- {. %>% {cumsum(.) - `/`(., 2)}}
 x_text <- apply(literacy_tbl, MARGIN = 2, FUN = pos)
 text(x = x_text, y = rep(b, each = 4), labels = label_ptbl)
-title(main = "문해력조사 문항별 응답", cex.main = 1.8)
+title(main = "문해력조사 문항별 응답", cex.main = 1.8, line = -0.5)
 ```
 
 ### `ggplot`
 
-```{r, echo = FALSE, message = FALSE, fig.width = 9, fig.height = 9}
+```{r, echo = FALSE, message = FALSE, fig.width = 9, fig.height = 10}
 library(tidyverse)
+#> literacy_tbl을 깔끔한 데이터로 변환
 literacy_tbl2 <- literacy_tbl %>%
   as_tibble %>%
+#> Item 변수 설정
   mutate(Item = row.names(literacy_tbl)) %>%
+#> Item은 빼고, key, value 쌍으로 변환, 
   gather(key = Questions, value = Counts, -Item) %>%
+#> factor로 변환
   mutate(Questions = factor(Questions, levels = paste0("Q", 1:25))) %>%
-  mutate(Item = factor(Item, levels = 1:4))
-ggplot(data = literacy_tbl2, mapping = aes(x = Questions, y = Counts, fill = Item)) +
-  geom_bar(stat = "identity", position = position_stack(reverse = TRUE)) +
-  geom_text(aes(y = c(x_text)), label = c(label_ptbl)) +
+  mutate(Item = factor(Item)) %>%
+#> 라벨의 좌표와 라벨을 컬럼 단위로 펴서, 깔끔한 tibble에 별도의 벡터로 추가
+  mutate(x_text = c(x_text), label_ptbl = c(label_ptbl))
+#> ggplot layout 설정. 공통적으로 등장하는 x 좌표도  포함시킨다.
+ggplot(data = literacy_tbl2, mapping = aes(x = Questions)) +
+#> Counts 를 Item별로 막대그래프에 쌓아올린다. 순서는 1, 2, 3, 4 순 (reverse = TRUE).
+#> stat = "identity" 는 디폴트이므로 굳이 설정하지 않아도 무방. 
+  geom_bar(aes(y = Counts, fill = Item),
+           col = "black", size = 0.3,
+           stat = "identity", position = position_stack(reverse = TRUE)) +
+#> 퍼센티지를 추가 정보로 각 막대의 중점에 표시. mapping = aes() 에서 공통되는 x 좌표 설정은 생략 가능.
+  geom_text(aes(y = x_text, label = label_ptbl)) +
+#> fill 의 색깔과 레전드 제목 설정.
   scale_fill_brewer(name = "답문항", type = "qual", palette = "Accent") +
-  xlab("문제") +
-  ylab("백분율") +
-  ggtitle("문해력조사 문항별 응답") + 
+#> 제목과 x축 라벨, y축 라벨 설정.
+  labs(title = "문해력조사 문항별 응답", x = "문제", y = "백분율") +
+#  xlab("문제") +
+#  ylab("백분율") +
+#  ggtitle("문해력조사 문항별 응답") + 
+#> 플롯 배경에 설정된 격자를 최소로 theme 설정
   theme_minimal(base_family = "KoPubWorldDotum Medium") +
-  theme(panel.grid.major = element_blank(),
+#> 격자의 주요 선 없애고,
+  theme(panel.grid = element_blank(),
+#> 플롯 제목의 폰트, 폰트 크기, 가운데 정렬 설정
         plot.title = element_text(family = "KoPubWorldDotum Medium", size = 18, hjust = 0.5),
+#> 레전드에 박스 두르기
         legend.background = element_rect(fill = "transparent"),
+#> 레전드의 제목 폰트 설정
         legend.title = element_text(family = "KoPubWorldDotum Medium"),
+#> x축 라벨의 폰트 설정
         axis.title.x = element_text(family = "KoPubWorldDotum Medium"),
+#> x축 텍스트를 없앰 (너무 떨어져 있어서 새로 설정할 예정)
         axis.text.x = element_blank(),
+#> y축 라벨의 폰트 설정
         axis.title.y = element_text(family = "KoPubWorldDotum Medium"),
+#> y축 텍스트 없애기
         axis.text.y = element_blank()) +
-  geom_text(aes(x = literacy_tbl2$Questions, y = -3), label = literacy_tbl2$Questions) +
+#> x축의 라벨을 막대에 보다 가깝게 조정
+  geom_text(mapping = aes(y = -3, label = Questions)) +
+#> 좌표를 돌려 막대들을 수평으로 눕히기
   coord_flip()
 ```
 
