@@ -1,0 +1,238 @@
+---
+title: "TED 191020"
+# author: "coop711"
+# date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# install.packages("pander", repos = "https://cran.rstudio.com")
+# install.packages("xlsx", repos = "https://cran.rstudio.com")
+# install.packages("readr", repos = "https://cran/rstudio.com")
+library(xlsx)
+library(pander)
+library(knitr)
+library(dplyr)
+library(magrittr)
+panderOptions('table.split.table', Inf)
+options(width = 180)
+```
+
+<!--
+# Data
+-->
+
+```{r, data, echo = FALSE, results = "hide"}
+load("./red_and_black_190923_data.RData")
+ted <- read.xlsx("../data/TED191020.xlsx", 
+                        sheetIndex = 1, 
+                        startRow = 1, 
+                        endRow = 145, 
+                        colIndex = 1:7,
+ #                        colClasses = rep("character", 6), 
+                        encoding = "UTF-8",
+                        stringsAsFactors = FALSE)
+names(ted) <- c("serial_no", "title", "name", "id", "time", "views", "contents")
+str(ted)
+class(ted$id) <- "character"
+ted$group <- class_roll$group[match(ted$id, class_roll$id)]
+ted[, c("serial_no", "id", "name", "group")] 
+ted1020 <- left_join(class_roll[, c("id", "name", "group")], ted, by = c("id", "name", "group"))
+dup_id <- ted1020$id %>% 
+  duplicated %>% 
+  which
+ted1020 <- ted1020[-dup_id, ]
+ted1020$submit <- ifelse(is.na(ted1020$time), "미제출", "제출")
+ted1020$hours_passed <- as.numeric(difftime(Sys.time(), ted1020$time, units = 'days'))
+## 학교 정보시스템이 GMT로 표기되어 있어서 9시간의 타임갭을 감안하여야 함.
+ted1020$days <- as.numeric(difftime("2019-10-21 09:00:00", ted1020$time, units = 'days'))
+ted1020$hours <- as.numeric(difftime("2019-10-21 09:00:00", ted1020$time, units = 'hours'))
+ted1020$bird <- factor(ifelse(ted1020$days >= 1, "Early", "Late"), 
+                      labels = c("마감일 이전 제출", "마감일 제출"))
+ted1020$n_chars <- ted1020$contents %>% nchar
+str(ted1020)
+```
+
+
+# 제출/미제출
+
+제출시간이 기록되지 않은 사람은 미제출.
+
+```{r, echo = FALSE, results = "markup"}
+pander(table(ted1020$group, ted1020$submit))
+pander(chisq.test(table(ted1020$group, ted1020$submit)))
+```
+
+# 제출 시간의 분포
+
+마감 시간으로부터 얼마나 일찍 제출하는지 일 단위와 시간 단위로 측정하여 살펴보았다. 
+
+## 시간 단위 기초통계량
+
+```{r, echo = FALSE}
+# ted1020$hours
+summary(ted1020$hours)
+stem(ted1020$hours)
+max(ted1020$hours, na.rm = TRUE)
+```
+
+## 일 단위 마감 시간으로부터 제출 시간의 분포
+
+```{r, echo = FALSE}
+par(family = "HCR Dotum LVT")
+pander(table(cut(ted1020$days, breaks = c(0:14), include.lowest = TRUE)), caption = "일 단위")
+barplot(rev(table(cut(ted1020$days, breaks = c(0:14), include.lowest = TRUE))), 
+        space = 0,
+        names.arg = rep(c("월", "화","수", "목", "금", "토","일"), 2))
+title(main = "일 단위 퀴즈 제출 횟수")
+```
+
+## 시간 단위 마감 시간으로부터 제출 시간의 분포
+
+```{r, echo = FALSE}
+breaks <- c(seq(0, 48, by = 24), 49:54, seq(72, 168, by = 24))
+breaks2 <- c(seq(0, 48, by = 24), 49:58, seq(72, 168, by = 24))
+breaks3 <- c(0:10, seq(24, 336, by = 24))
+pander(table(cut(ted1020$hours, breaks = breaks3, include.lowest = TRUE)), caption = "시간 단위")
+```
+
+## 시간 당 제출 건수의 분포
+
+```{r, echo = FALSE}
+par(family = "HCR Dotum LVT")
+widths <- c(rep(24, 4), 16, rep(1, 10), rep(24, 1), 14, rep(1, 10))
+widths2 <- c(rep(24, 4), 16, rep(1, 10), rep(24, 2))
+widths3 <- c(rep(24, 13), 14, rep(1, 10))
+# freqs <- table(cut(ted1020$hours, breaks = breaks2, include.lowest = TRUE))
+freqs2 <- table(cut(ted1020$hours, breaks = breaks2, include.lowest = TRUE))
+freqs3 <- table(cut(ted1020$hours, breaks = breaks3, include.lowest = TRUE))
+# heights <- freqs / diff(breaks)
+heights2 <- freqs2 / diff(breaks2)
+heights3 <- freqs3 / diff(breaks3)
+# names_args <- c("수", "목", "금", "토", "일", rep("", 10), "월", "화", rep("", 10))
+names_args2 <- c("수", "목", "금", "토", "일", rep("", 10), "월", "화")
+names_args3 <- c(rep(c("월", "화", "수", "목", "금", "토", "일"), 2), rep("", 10))
+# barplot(height = rev(heights), width = widths, 
+#         space = 0,
+#         names.arg = names_args)
+# barplot(height = rev(heights2), width = widths2, 
+#         space = 0,
+#         names.arg = names_args2)
+barplot(height = rev(heights3), width = widths3, 
+        space = 0,
+        names.arg = names_args3)
+title(main = "시간당 TED 댓글 제출 분포")
+# arrows(x0 = 8, y0 = 3.6, x1 = 16, y1 = 1.2, length = 0.16, code = 2, col = "red", lwd = 1.5)
+# text(x = 5, y = 4, labels = "오후 6시", srt = 16, col = "red")
+arrows(x0 = 308, y0 = 4.6, x1 = 324, y1 = 0.8, length = 0.16, code = 2, col = "red", lwd = 1.5)
+text(x = 300, y = 5.6, labels = "오후\n2시", srt = 16, col = "red")
+# arrows(x0 = 128, y0 = 3.6, x1 = 136, y1 = 1.2, length = 0.16, code = 2, col = "red", lwd = 1.5)
+# text(x = 125, y = 4, labels = "오후 6시", srt = 16, col = "red")
+# arrows(x0 = 152, y0 = 3.6, x1 = 160, y1 = 1.2, length = 0.16, code = 2, col = "red", lwd = 1.5)
+# text(x = 149, y = 4, labels = "오후 6시", srt = 16, col = "red")
+```
+
+# 급히 제출한 사람과 일찍 낸 사람 비교
+
+마감일 전에 제출한 사람과 마감일에 제출한 사람들의 특성 비교
+
+## 랜덤화 효과
+
+```{r, echo = FALSE}
+pander(table(ted1020$group, ted1020$bird))
+pander(chisq.test(table(ted1020$group, ted1020$bird)))
+```
+
+# 댓글의 양 
+
+```{r, echo = FALSE}
+stem(ted1020$n_chars, scale = 0.5)
+```
+
+## 그룹별 댓글 크기 비교
+
+### 댓글의 양 비교
+
+```{r, echo = FALSE}
+pander(tapply(ted1020$n_chars, ted1020$group, summary))
+```
+
+### Box Plot
+
+```{r, echo = FALSE}
+par(family = "HCR Dotum LVT")
+plot(n_chars ~ group, data = ted1020, 
+     main = "그룹별 댓글의 양 비교", 
+     xlab = "제출 시점", ylab = "글자 수")
+```
+
+### t-test
+
+```{r, echo = FALSE}
+pander(t.test(n_chars ~ group, data = ted1020))
+```
+
+## 마감일 기준 댓글의 양 비교
+
+```{r, echo = FALSE}
+pander(tapply(ted1020$n_chars, ted1020$bird, summary))
+```
+
+### Box Plot
+
+```{r, echo = FALSE}
+par(family = "HCR Dotum LVT")
+plot(n_chars ~ bird, data = ted1020, 
+     main = "마감일 이후 제출한 사람과 마감일 전에 낸 사람", 
+     xlab = "제출 시점", ylab = "글자 수")
+```
+
+### t-test
+
+```{r, echo = FALSE}
+pander(t.test(n_chars ~ bird, data = ted1020))
+```
+
+## 댓글의 양이 다소 부족한 사례
+
+### 400자 미만
+
+```{r, echo = FALSE}
+# na.omit(ted1020)$name[na.omit(ted1020)$n_chars < 400]
+na.omit(ted1020)$n_chars[na.omit(ted1020)$n_chars < 400]
+ted1020 %>% 
+  na.omit %$%
+  table(.$group, .$n_chars < 400) %>%
+  `colnames<-`(c(">= 400", "< 400")) %>%
+  pander
+```  
+
+## 댓글의 양이 부족한 사례
+
+### 300자 미만
+
+```{r, echo = FALSE}
+# na.omit(ted1020)$name[na.omit(ted1020)$n_chars < 300]
+na.omit(ted1020)$n_chars[na.omit(ted1020)$n_chars < 300]
+ted1020 %>% 
+  na.omit %$%
+  table(.$group, .$n_chars < 300) %>%
+  `colnames<-`(c(">= 300", "< 300")) %>%
+  pander
+```
+
+## 댓글의 양이 많이 부족한 사례
+
+### 200자 미만
+
+```{r, echo = FALSE}
+# na.omit(ted1020)$name[na.omit(ted1020)$n_chars < 200]
+na.omit(ted1020)$n_chars[na.omit(ted1020)$n_chars < 200]
+```
+
+## Save
+
+```{r, echo = FALSE}
+saveRDS(ted1020, file = "ted1020.RDs")
+```

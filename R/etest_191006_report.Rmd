@@ -1,0 +1,177 @@
+---
+title: "Online Quiz 191006 Submission Time"
+# author: "coop711"
+# date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# install.packages("pander", repos = "https://cran.rstudio.com")
+# install.packages("xlsx", repos = "https://cran.rstudio.com")
+# install.packages("readr", repos = "https://cran/rstudio.com")
+library(xlsx)
+library(pander)
+library(knitr)
+library(readr)
+panderOptions('table.split.table', Inf)
+options(width = 180)
+```
+
+<!--
+### Data
+-->
+
+```{r, data, echo = FALSE, results = "hide"}
+load("./red_and_black_190923_data.RData")
+quiz09 <- read.xlsx("../data/etest191006.xlsx", 
+                        sheetIndex = 1, 
+                        startRow = 3, 
+                        endRow = 161, 
+                        colIndex = 2:7, 
+#                        colClasses = rep("character", 6), 
+                        encoding = "UTF-8",
+                        stringsAsFactors = FALSE)
+names(quiz09) <- c("name", "id", "dept", "score1", "score2", "time")
+quiz09$group <- class_roll$group[match(quiz09$id, class_roll$id)]
+quiz09$submit <- ifelse(is.na(quiz09$time), "미제출", "제출")
+quiz09$hours_passed <- as.numeric(difftime(Sys.time(), quiz09$time, units = 'days'))
+## 학교 정보시스템이 GMT로 표기되어 있어서 9시간의 타임갭을 감안하여야 함.
+quiz09$days <- as.numeric(difftime("2019-10-07 09:00:00", quiz09$time, units = 'days'))
+quiz09$hours <- as.numeric(difftime("2019-10-07 09:00:00", quiz09$time, units = 'hours'))
+quiz09$bird <- factor(ifelse(quiz09$hours >= 10, "Early", "Late"), 
+                      labels = c("마감일 오후2시 전 제출", "마감일 오후2시 이후 제출"))
+str(quiz09)
+```
+
+
+### 제출/미제출
+
+제출시간이 기록되지 않은 사람은 미제출.
+
+```{r, echo = FALSE, results = "markup"}
+pander(table(quiz09$group, quiz09$submit))
+pander(chisq.test(table(quiz09$group, quiz09$submit)))
+```
+
+## 제출 시간의 분포
+
+마감 시간으로부터 얼마나 일찍 제출하는지 일 단위와 시간 단위로 측정하여 살펴보았다. 
+
+### 시간 단위 기초통계량
+
+```{r, echo = FALSE}
+# quiz09$hours
+summary(quiz09$hours)
+stem(quiz09$hours)
+max(quiz09$hours, na.rm = TRUE)
+```
+
+### 일 단위 마감 시간으로부터 제출 시간의 분포
+
+```{r, echo = FALSE}
+par(family = "HCR Dotum LVT")
+pander(table(cut(quiz09$days, breaks = c(0:7), include.lowest = TRUE)), caption = "일 단위")
+barplot(rev(table(cut(quiz09$days, breaks = c(0:7), include.lowest = TRUE))), 
+        space = 0,
+        names.arg = c("월", "화", "수", "목", "금", "토", "일"))
+title(main = "일 단위 퀴즈 제출 횟수")
+```
+
+### 시간 단위 마감 시간으로부터 제출 시간의 분포
+
+```{r, echo = FALSE}
+breaks <- c(0:6, seq(24, 168, by = 24))
+breaks2 <- c(0:10, seq(24, 144, by = 24), 145:158, 168)
+breaks3 <- c(0:6, 24:30, 48:54, seq(72, 144, by = 24), 145:150, 168)
+breaks4 <- c(0:10, seq(24, 96, by = 24), 109:111, 120, 144, 157, 158, 168)
+breaks5 <- c(0:10, seq(24, 144, by = 24), 157, 158, 168)
+breaks6 <- c(0:10, seq(24, 96, by = 24), 109:111, 120, 144, 168)
+breaks7 <- c(0:10, seq(24, 96, by = 24), 109:111, 120, 144:158, 168)
+pander(table(cut(quiz09$hours, breaks = breaks6, include.lowest = TRUE)), caption = "시간 단위")
+```
+
+### 시간 당 제출 건수의 분포
+
+```{r, echo = FALSE}
+par(family = "HCR Dotum LVT")
+widths <- c(rep(24, 6), 18, rep(1, 6))
+widths2 <- c(10, rep(1, 14), rep(24, 5), 14, rep(1, 10))
+widths3 <- c(18, rep(1, 6), rep(24, 3), 18, rep(1, 6),  18, rep(1, 6), 18, rep(1, 6))
+widths4 <- c(10, 1, 13, 24, 9, rep(1, 2), 13, rep(24, 3), 14, rep(1, 10))
+widths5 <- c(10, 1, 13, rep(24, 5), 14, rep(1, 10))
+widths6 <- rev(diff(breaks6))
+widths7 <- rev(diff(breaks7))
+freqs <- table(cut(quiz09$hours, breaks = c(0:6, seq(24, 168, by = 24)), include.lowest = TRUE))
+freqs2 <- table(cut(quiz09$hours, breaks = breaks2, include.lowest = TRUE))
+freqs3 <- table(cut(quiz09$hours, breaks = breaks3, include.lowest = TRUE))
+freqs4 <- table(cut(quiz09$hours, breaks = breaks4, include.lowest = TRUE))
+freqs5 <- table(cut(quiz09$hours, breaks = breaks5, include.lowest = TRUE))
+freqs6 <- table(cut(quiz09$hours, breaks = breaks6, include.lowest = TRUE))
+freqs7 <- table(cut(quiz09$hours, breaks = breaks7, include.lowest = TRUE))
+heights <- freqs / diff(breaks)
+heights2 <- freqs2 / diff(breaks2)
+heights3 <- freqs3 / diff(breaks3)
+heights4 <- freqs4 / diff(breaks4)
+heights5 <- freqs5 / diff(breaks5)
+heights6 <- freqs6 / diff(breaks6)
+heights7 <- freqs7 / diff(breaks7)
+names_args <- c("월", "화", "수", "목", "금", "토", "일", rep("", 6))
+names_args2 <- c("월", rep("", 14),"화", "수", "목", "금", "토", "일", rep("", 10))
+names_args3 <- c("수", rep("", 6),"목", "금", "토", "일", rep("", 6), "월", rep("", 6), "화", rep("", 6))
+names_args4 <- c("월", rep("", 2), "화", "수", rep("", 3), "목", "금", "토", "일", rep("", 10))
+names_args5 <- c("월", rep("", 2), "화", "수", "목", "금", "토", "일", rep("", 10))
+names_args6 <- c("월", "화", "수", rep("", 3), "목", "금", "토", "일", rep("", 10))
+names_args7 <- c("월", rep("", 14),"화", "수", rep("", 3), "목", "금", "토", "일", rep("", 10))
+# barplot(height = rev(heights), width = widths, 
+#         space = 0,
+#         names.arg = names_args)
+barplot(height = rev(heights7), width = widths7, 
+        space = 0,
+        names.arg = names_args7)
+title(main = "시간당 퀴즈 제출 분포")
+arrows(x0 = 0, y0 = 3.2, x1 = 9, y1 = 0.2, length = 0.16, code = 2, col = "red", lwd = 1.5)
+text(x = 5, y = 4, labels = "오전 11시", srt = 16, col = "red")
+arrows(x0 = 47, y0 = 3.2, x1 = 56, y1 = 0.4, length = 0.16, code = 2, col = "red", lwd = 1.5)
+text(x = 42, y = 4, labels = "오전 10시", srt = 16, col = "red")
+arrows(x0 = 148, y0 = 4, x1 = 157, y1 = 0.85, length = 0.15, code = 2, col = "red", lwd = 1.5)
+text(x = 145, y = 4.5, labels = "오후 2시", srt = 15, col = "red")
+```
+
+### 급히 제출한 사람과 일찍 낸 사람 비교
+
+마감 당일 오후 2시 이후에 제출한 사람과 그 이전에 제출한 사람들의 특성 비교
+
+#### 랜덤화 효과
+
+```{r, echo = FALSE}
+pander(table(quiz09$group, quiz09$bird))
+pander(chisq.test(table(quiz09$group, quiz09$bird)))
+```
+
+#### 기초통계 비교
+
+```{r, echo = FALSE}
+pander(tapply(quiz09$score1, quiz09$bird, summary))
+```
+
+#### Box Plot
+
+```{r, echo = FALSE}
+par(family = "HCR Dotum LVT")
+plot(score1 ~ bird, data = quiz09, 
+     main = "마감일 오후 6시 전부터 제출한 사람과 그 이후에 낸 사람", 
+     xlab = "제출 시점", ylab = "퀴즈 점수")
+```
+
+#### t test
+
+```{r, echo = FALSE}
+pander(t.test(score1 ~ bird, data = quiz09))
+```
+
+## Save
+
+```{r, echo = FALSE}
+saveRDS(quiz09, file = "quiz09.RDs")
+```
