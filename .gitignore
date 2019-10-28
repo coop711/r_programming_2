@@ -1,7 +1,6 @@
 .Rproj.user/**
 .Rhistory
 .RData
-R/*.RData
 R/*.html
 R/rsconnect/**
 docs/*.pdf
