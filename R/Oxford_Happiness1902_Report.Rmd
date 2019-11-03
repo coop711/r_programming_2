@@ -1,7 +1,7 @@
 ---
 title: "Oxford Happiness Questionnaire"
 author: "coop711"
-date: "2019-10-30"
+date: "2019-10-28"
 output: html_document
 ---
 
@@ -22,7 +22,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(xlsx)
 library(magrittr)
 options(width = 180)
-load("./red_and_black_190923_data.RData")
+# load("./red_and_black_190923_data.RData")
 oxford <- "../data/oxford_happiness191028.xlsx" %>%
   read.xlsx(sheetIndex = 1, 
             startRow = 2, 
@@ -118,27 +118,27 @@ oxford_tbl <- oxford$Levels %>%
   cbind("계" = rowSums(.)) %>%
   rbind("계" = colSums(.)) 
 oxford_tbl %>% 
-  pander
+  kable
 oxford_tbl %>% 
   `[`(-3, -c(1, 6)) %>% 
   chisq.test(simulate.p.value = TRUE) %>%
   pander
 #> 다음에서 `drop = FALSE`을 없애고 `c`를 쓰는 경우와 `drop = FALSE` 하에 `c`를 쓸 때의 차이에 유의하라.
 #> 
-oxford_tbl[3, -6, drop = TRUE] %>%  
+oxford_tbl[3, -6, drop = FALSE] %>%  
   prop.table %>% 
   `*`(100) %>% 
-  c("계" = sum(.)) %>%
-#  cbind("계" = rowSums(.)) %>%
+#  c("계" = sum(.)) %>%
+  cbind("계" = rowSums(.)) %>%
   format(digits = 1, nsmall = 1) %>% 
-  pander
+  kable
 ```
 
 <!--
 ### `boxplot()`
 
 ```{r, echo = FALSE}
-par(family = "HCR Dotum LVT")
+par(family = "")
 boxplot(Scores ~ Group, data = oxford)
 ```
 -->
@@ -147,13 +147,12 @@ boxplot(Scores ~ Group, data = oxford)
 
 ```{r, echo = FALSE, message = FALSE}
 library(tidyverse)
-library(ggplot2)
-source("theme_kr.R")
+# source("theme_kr.R")
 ggplot(data = oxford, 
        mapping = aes(x = Group, y = Scores)) +
   geom_boxplot(outlier.shape = 1, na.rm = TRUE) +
   theme_bw() +
-  theme_kr +
+#  theme_kr +
   scale_x_discrete(name = "질문지 유형") +
   scale_y_continuous(name = "행복 점수")
 ```
@@ -161,8 +160,8 @@ ggplot(data = oxford,
 ### `t.test()` on means
 
 ```{r, echo = FALSE}
-t.test(Scores ~ Group, data = oxford, var.equal = FALSE, alternative = "greater") %>% 
-  pander
+t.test(Scores ~ Group, data = oxford, var.equal = FALSE, alternative = "greater") 
+# %>% pander
 ```
 
 ## 소요시간 비교
@@ -195,7 +194,7 @@ ggplot(data = oxford,
        mapping = aes(x = Group, y = as.numeric(Duration))) +
   geom_boxplot(outlier.shape = 1, na.rm = TRUE) +
   theme_bw() +
-  theme_kr +
+#  theme_kr +
   scale_x_discrete(name = "질문지 유형") +
   scale_y_continuous(name = "소요시간")
 ```
@@ -203,6 +202,7 @@ ggplot(data = oxford,
 ### `t.test()` on means
 
 ```{r, echo = FALSE}
-t.test(as.numeric(Duration) ~ Group, data = oxford, var.equal = FALSE) %>% pander
+t.test(as.numeric(Duration) ~ Group, data = oxford, var.equal = FALSE) 
+# %>% pander
 ```
 
