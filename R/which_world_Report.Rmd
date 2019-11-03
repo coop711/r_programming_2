@@ -134,7 +134,7 @@ tbl_q1_a <- world$Q1 %>%
   rbind("계" = colSums(.))
 rownames(tbl_q1_a)[1:2] <- c("Red('내가 남보다' 먼저)", "Black('남이 나보다' 먼저)")
 tbl_q1_a %>% 
-  pander
+  kable
 ```
 
 #### % 비교.  
@@ -146,7 +146,7 @@ tbl_q1_a %>%
   `*`(100) %>%
   cbind("계" = rowSums(.)) %>%
   format(digits = 2, nsmall = 1) %>%
-  pander
+  kable
 ```
 
 #### 합산(%)
@@ -158,7 +158,7 @@ tbl_q1_a %>%
   `*`(100) %>%
   cbind("계" = rowSums(.)) %>%
   format(digits = 2, nsmall = 1) %>%
-  pander
+  kable
 ```
 
 ### 학력
@@ -176,7 +176,7 @@ tbl_q2_a <- world$Q2 %>%
   rbind("계" = colSums(.))
 rownames(tbl_q2_a)[1:2] <- c("Red('내가 남보다' 먼저)", "Black('남이 나보다' 먼저)")
 tbl_q2_a %>% 
-  pander
+  kable
 ```
 
 #### % 비교.  
@@ -188,7 +188,7 @@ tbl_q2_a %>%
   `*`(100) %>%
   cbind("계" = rowSums(.)) %>%
   format(digits = 2, nsmall = 1) %>%
-  pander
+  kable
 ```
 
 #### 합산(%)
@@ -200,7 +200,7 @@ tbl_q2_a %>%
   `*`(100) %>%
   cbind("계" = rowSums(.)) %>%
   format(digits = 2, nsmall = 1) %>%
-  pander
+  kable
 ```
 
 ### 휴가 기간 
@@ -219,7 +219,7 @@ tbl_q3_a <- world$Q3 %>%
   rbind("계" = colSums(.))
 rownames(tbl_q3_a)[1:2] <- c("Red('내가 남보다' 먼저)", "Black('남이 나보다' 먼저)")
 tbl_q3_a %>% 
-  pander
+  kable
 ```
 
 #### % 비교.  
@@ -231,7 +231,7 @@ tbl_q3_a %>%
   `*`(100) %>%
   cbind("계" = rowSums(.)) %>%
   format(digits = 2, nsmall = 1) %>%
-  pander
+  kable
 ```
 
 #### 합산(%)
@@ -243,7 +243,7 @@ tbl_q3_a %>%
   `*`(100) %>%
   cbind("계" = rowSums(.)) %>%
   format(digits = 2, nsmall = 1) %>%
-  pander
+  kable
 ```
 
 ### 지능
@@ -261,7 +261,7 @@ tbl_q4_a <- world$Q4 %>%
   rbind("계" = colSums(.))
 rownames(tbl_q4_a)[1:2] <- c("Red('내가 남보다' 먼저)", "Black('남이 나보다' 먼저)")
 tbl_q4_a %>% 
-  pander
+  kable
 ```
 
 #### % 비교.  
@@ -273,7 +273,7 @@ tbl_q4_a %>%
   `*`(100) %>%
   cbind("계" = rowSums(.)) %>%
   format(digits = 2, nsmall = 1) %>%
-  pander
+  kable
 ```
 
 #### 합산(%)
@@ -285,7 +285,7 @@ tbl_q4_a %>%
   `*`(100) %>%
   cbind("계" = rowSums(.)) %>%
   format(digits = 2, nsmall = 1) %>%
-  pander
+  kable
 ```
 
 ### 신체적 매력
@@ -303,7 +303,7 @@ tbl_q5_a <- world$Q5 %>%
   rbind("계" = colSums(.))
 rownames(tbl_q5_a)[1:2] <- c("Red('내가 남보다' 먼저)", "Black('남이 나보다' 먼저)")
 tbl_q5_a %>% 
-  pander
+  kable
 ```
 
 #### % 비교.  
@@ -315,7 +315,7 @@ tbl_q5_a %>%
   `*`(100) %>%
   cbind("계" = rowSums(.)) %>%
   format(digits = 2, nsmall = 1) %>%
-  pander
+  kable
 ```
 
 #### 합산(%)
@@ -327,7 +327,7 @@ tbl_q5_a %>%
   `*`(100) %>%
   cbind("계" = rowSums(.)) %>%
   format(digits = 2, nsmall = 1) %>%
-  pander
+  kable
 ```
 
 ```{r, save, echo = FALSE}
