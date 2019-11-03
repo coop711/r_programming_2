@@ -28,8 +28,6 @@ oxford <- "../data/oxford_happiness191028.xlsx" %>%
             startRow = 2, 
             endRow = 137, 
             colIndex = 1:64, 
-#            colClasses = "character",
-#            colClasses = "character",
             colClasses = c("POSIXct", rep("character", 3), "POSIXct", 
                            "character", rep("numeric", 58)),
             header = FALSE, 
@@ -84,10 +82,6 @@ oxford[, paste0("Q", c(1, 5, 6, 10, 13, 14, 24, 27:29))] %<>%
 oxford$Scores <- oxford[ , 66:94] %>% 
 #  apply(MARGIN = 1, FUN = function(x) sum(x) / 29) 
   apply(MARGIN = 1, FUN = {. %>% sum %>% `/`(29)})
-# oxford$Diff <- round(oxford$Scores_M - oxford$Scores, digits = 3)
-# oxford$Diff <- oxford %$% 
-#   `-`(Scores_M, Scores) %>% 
-#   round(digits = 3)
 oxford$Duration <- ifelse(oxford$Duration >= 600, NA, oxford$Duration)
 oxford$Duration_m <- as.numeric(oxford$Duration) %/% 60
 oxford$Duration_s <- as.numeric(oxford$Duration) %% 60
@@ -129,10 +123,13 @@ oxford_tbl %>%
   `[`(-3, -c(1, 6)) %>% 
   chisq.test(simulate.p.value = TRUE) %>%
   pander
-oxford_tbl[3, -6] %>%  
+#> 다음에서 `drop = FALSE`을 없애고 `c`를 쓰는 경우와 `drop = FALSE` 하에 `c`를 쓸 때의 차이에 유의하라.
+#> 
+oxford_tbl[3, -6, drop = TRUE] %>%  
   prop.table %>% 
   `*`(100) %>% 
   c("계" = sum(.)) %>%
+#  cbind("계" = rowSums(.)) %>%
   format(digits = 1, nsmall = 1) %>% 
   pander
 ```
