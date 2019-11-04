@@ -60,8 +60,10 @@ str(ted1027)
 제출시간이 기록되지 않은 사람은 미제출.
 
 ```{r, echo = FALSE, results = "markup"}
-pander(table(ted1027$group, ted1027$submit))
-pander(chisq.test(table(ted1027$group, ted1027$submit)))
+table(ted1027$group, ted1027$submit) %>%
+  kable
+chisq.test(table(ted1027$group, ted1027$submit)) %>%
+  pander
 ```
 
 # 제출 시간의 분포
@@ -80,8 +82,10 @@ max(ted1027$hours, na.rm = TRUE)
 ## 일 단위 마감 시간으로부터 제출 시간의 분포
 
 ```{r, echo = FALSE}
-par(family = "HCR Dotum LVT")
-pander(table(cut(ted1027$days, breaks = c(0:14), include.lowest = TRUE)), caption = "일 단위")
+par(family = "")
+table(cut(ted1027$days, breaks = c(0:14), include.lowest = TRUE)) %>%
+  t %>%
+  kable
 barplot(rev(table(cut(ted1027$days, breaks = c(0:14), include.lowest = TRUE))), 
         space = 0,
         names.arg = rep(c("월", "화","수", "목", "금", "토","일"), 2))
@@ -94,13 +98,15 @@ title(main = "일 단위 퀴즈 제출 횟수")
 breaks <- c(seq(0, 48, by = 24), 49:54, seq(72, 168, by = 24))
 breaks2 <- c(seq(0, 48, by = 24), 49:58, seq(72, 168, by = 24))
 breaks3 <- c(0:10, seq(24, 336, by = 24))
-pander(table(cut(ted1027$hours, breaks = breaks3, include.lowest = TRUE)), caption = "시간 단위")
+table(cut(ted1027$hours, breaks = breaks3, include.lowest = TRUE)) %>%
+  t %>%
+  kable
 ```
 
 ## 시간 당 제출 건수의 분포
 
 ```{r, echo = FALSE}
-par(family = "HCR Dotum LVT")
+par(family = "")
 widths <- c(rep(24, 4), 16, rep(1, 10), rep(24, 1), 14, rep(1, 10))
 widths2 <- c(rep(24, 4), 16, rep(1, 10), rep(24, 2))
 widths3 <- c(rep(24, 13), 14, rep(1, 10))
@@ -140,7 +146,8 @@ text(x = 300, y = 5.6, labels = "오후\n2시", srt = 16, col = "red")
 ## 랜덤화 효과
 
 ```{r, echo = FALSE}
-pander(table(ted1027$group, ted1027$bird))
+table(ted1027$group, ted1027$bird) %>%
+  kable
 pander(chisq.test(table(ted1027$group, ted1027$bird)))
 ```
 
@@ -161,7 +168,7 @@ pander(tapply(ted1027$n_chars, ted1027$group, summary))
 ### Box Plot
 
 ```{r, echo = FALSE}
-par(family = "HCR Dotum LVT")
+par(family = "")
 plot(n_chars ~ group, data = ted1027, 
      main = "그룹별 댓글의 양 비교", 
      xlab = "제출 시점", ylab = "글자 수")
@@ -170,7 +177,8 @@ plot(n_chars ~ group, data = ted1027,
 ### t-test
 
 ```{r, echo = FALSE}
-pander(t.test(n_chars ~ group, data = ted1027))
+t.test(n_chars ~ group, data = ted1027) 
+# %>% pander
 ```
 
 ## 마감일 기준 댓글의 양 비교
@@ -182,7 +190,7 @@ pander(tapply(ted1027$n_chars, ted1027$bird, summary))
 ### Box Plot
 
 ```{r, echo = FALSE}
-par(family = "HCR Dotum LVT")
+par(family = "")
 plot(n_chars ~ bird, data = ted1027, 
      main = "마감일 이후 제출한 사람과 마감일 전에 낸 사람", 
      xlab = "제출 시점", ylab = "글자 수")
@@ -191,7 +199,8 @@ plot(n_chars ~ bird, data = ted1027,
 ### t-test
 
 ```{r, echo = FALSE}
-pander(t.test(n_chars ~ bird, data = ted1027))
+t.test(n_chars ~ bird, data = ted1027) 
+# %>% pander  
 ```
 
 ## 댓글의 양이 다소 부족한 사례
@@ -215,11 +224,11 @@ ted1027 %>%
 ```{r, echo = FALSE, eval = FALSE}
 # na.omit(ted1027)$name[na.omit(ted1027)$n_chars < 300]
 na.omit(ted1027)$n_chars[na.omit(ted1027)$n_chars < 300]
-ted1027 %>% 
-  na.omit %$%
-  table(.$group, .$n_chars < 300) %>%
-  `colnames<-`(c(">= 300", "< 300")) %>%
-  pander
+# ted1027 %>% 
+#   na.omit %$%
+#   table(.$group, .$n_chars < 300) %>%
+#   `colnames<-`(c(">= 300", "< 300")) %>%
+#   pander
 ```
 
 ## 댓글의 양이 많이 부족한 사례

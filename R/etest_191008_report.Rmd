@@ -53,8 +53,10 @@ str(quiz10)
 제출시간이 기록되지 않은 사람은 미제출.
 
 ```{r, echo = FALSE, results = "markup"}
-pander(table(quiz10$group, quiz10$submit))
-pander(chisq.test(table(quiz10$group, quiz10$submit)))
+table(quiz10$group, quiz10$submit) %>%
+ kable
+chisq.test(table(quiz10$group, quiz10$submit)) %>%
+  pander
 ```
 
 ## 제출 시간의 분포
@@ -73,8 +75,10 @@ max(quiz10$hours, na.rm = TRUE)
 ### 일 단위 마감 시간으로부터 제출 시간의 분포
 
 ```{r, echo = FALSE}
-par(family = "HCR Dotum LVT")
-pander(table(cut(quiz10$days, breaks = c(0:7), include.lowest = TRUE)), caption = "일 단위")
+par(family = "")
+table(cut(quiz10$days, breaks = c(0:7), include.lowest = TRUE)) %>%
+  t %>%
+  kable
 barplot(rev(table(cut(quiz10$days, breaks = c(0:7), include.lowest = TRUE))), 
         space = 0,
         names.arg = c("수", "목", "금", "토","일","월", "화"))
@@ -89,13 +93,15 @@ breaks2 <- c(seq(0, 48, by = 24), 49:58, seq(72, 168, by = 24))
 breaks3 <- c(0:6, 24:30, 48:54, seq(72, 144, by = 24), 145:150, 168)
 breaks4 <- c(0:6, 24, 48:58, seq(72, 144, by = 24), 157:159, 168)
 breaks5 <- c(0:12, 24, 25:40, seq(48, 144, by = 24), 157:159, 168)
-pander(table(cut(quiz10$hours, breaks = breaks4, include.lowest = TRUE)), caption = "시간 단위")
+table(cut(quiz10$hours, breaks = breaks4, include.lowest = TRUE)) %>%
+  t %>%
+  kable
 ```
 
 ### 시간 당 제출 건수의 분포
 
 ```{r, echo = FALSE}
-par(family = "HCR Dotum LVT")
+par(family = "")
 # widths <- c(rep(24, 4), 16, rep(1, 10), rep(24, 1), 14, rep(1, 10))
 widths <- rev(diff(breaks))
 # widths2 <- c(rep(24, 4), 16, rep(1, 10), rep(24, 2))
@@ -147,8 +153,10 @@ text(x = 153, y = 4, labels = "오후 6시", srt = 16, col = "red")
 #### 랜덤화 효과
 
 ```{r, echo = FALSE}
-pander(table(quiz10$group, quiz10$bird))
-pander(chisq.test(table(quiz10$group, quiz10$bird)))
+table(quiz10$group, quiz10$bird) %>%
+  kable
+chisq.test(table(quiz10$group, quiz10$bird)) %>%
+  pander
 ```
 
 #### 기초통계 비교
@@ -160,7 +168,7 @@ pander(tapply(quiz10$score1, quiz10$bird, summary))
 #### Box Plot
 
 ```{r, echo = FALSE}
-par(family = "HCR Dotum LVT")
+par(family = "")
 plot(score1 ~ bird, data = quiz10, 
      main = "마감 2일 전 0시부터 제출한 사람과 그 전에 낸 사람", 
      xlab = "제출 시점", ylab = "퀴즈 점수")
@@ -169,7 +177,8 @@ plot(score1 ~ bird, data = quiz10,
 #### t test
 
 ```{r, echo = FALSE}
-pander(t.test(score1 ~ bird, data = quiz10))
+t.test(score1 ~ bird, data = quiz10)
+# %>% pander
 ```
 
 ### quiz09 와 quiz10
