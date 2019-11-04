@@ -1,0 +1,208 @@
+---
+title: "Oxford Happiness Questionnaire"
+author: "coop711"
+date: "2019-11-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(pander)
+panderOptions("table.split.table", Inf)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+옥스포드 행복 설문지 실험결과를 분석한다. 이 실험에는 두 가지 목적이 있다.
+첫째는 있는 그대로 옥스포드 행복 설문지로 측정하는 여러분의 행복 수준은 어느 정도인지,
+둘째는 영문판으로 응답할 때와 국문판으로 응답할 때 어떤 차이가 있는지, 특히 응답에 소요되는 시간을 측정해 보았다. 
+
+## Data
+
+```{r, echo = FALSE, message = FALSE}
+library(xlsx)
+library(magrittr)
+options(width = 180)
+# load("./red_and_black_190923_data.RData")
+oxford <- "../data/oxford_r_prog1902.xlsx" %>%
+  read.xlsx(sheetIndex = 1, 
+            startRow = 2, 
+            endRow = 58, 
+            colIndex = 1:64, 
+            colClasses = c("POSIXct", rep("character", 3), "POSIXct", 
+                           "character", rep("numeric", 58)),
+            header = FALSE, 
+            stringsAsFactors = FALSE)
+names(oxford) <- c("Time1", "Dept", "ID", "Name", "Time2", "Group", paste0("Q", 1:29, "_R"), paste0("Q", 1:29, "_B"))
+b <- format(as.POSIXct(oxford$Time2, format = "%Y-%m-%d %H:%M:%S"), format = "%H:%M:%S")
+a <- format(as.POSIXct(oxford$Time1, format = "%Y-%m-%d %H:%M:%S"), format = "%H:%M:%S")
+oxford$Duration <- difftime(as.POSIXct(a, format = "%H:%M:%S"), as.POSIXct(b, format = "%H:%M:%S"))
+oxford$Group %<>% factor(levels = c("Red", "Black"), 
+                         labels = c("국문", "영문"))
+oxford %<>% cbind(mapply(function(x, y){ifelse(is.na(x), y, x)}, oxford[7:35], oxford[36:64], 
+                         USE.NAMES = FALSE))
+names(oxford)[66:94] <- paste0("Q", 1:29)
+```
+
+```{r, echo = FALSE, eval= FALSE}
+oxford$Q1 <- ifelse(is.na(oxford$Q1_R), oxford$Q1_B, oxford$Q1_R)
+oxford$Q2 <- ifelse(is.na(oxford$Q2_R), oxford$Q2_B, oxford$Q2_R)
+oxford$Q3 <- ifelse(is.na(oxford$Q3_R), oxford$Q3_B, oxford$Q3_R)
+oxford$Q4 <- ifelse(is.na(oxford$Q4_R), oxford$Q4_B, oxford$Q4_R)
+oxford$Q5 <- ifelse(is.na(oxford$Q5_R), oxford$Q5_B, oxford$Q5_R)
+oxford$Q6 <- ifelse(is.na(oxford$Q6_R), oxford$Q6_B, oxford$Q6_R)
+oxford$Q7 <- ifelse(is.na(oxford$Q7_R), oxford$Q7_B, oxford$Q7_R)
+oxford$Q8 <- ifelse(is.na(oxford$Q8_R), oxford$Q8_B, oxford$Q8_R)
+oxford$Q9 <- ifelse(is.na(oxford$Q9_R), oxford$Q9_B, oxford$Q9_R)
+oxford$Q10 <- ifelse(is.na(oxford$Q10_R), oxford$Q10_B, oxford$Q10_R)
+oxford$Q11 <- ifelse(is.na(oxford$Q11_R), oxford$Q11_B, oxford$Q11_R)
+oxford$Q12 <- ifelse(is.na(oxford$Q12_R), oxford$Q12_B, oxford$Q12_R)
+oxford$Q13 <- ifelse(is.na(oxford$Q13_R), oxford$Q13_B, oxford$Q13_R)
+oxford$Q14 <- ifelse(is.na(oxford$Q14_R), oxford$Q14_B, oxford$Q14_R)
+oxford$Q15 <- ifelse(is.na(oxford$Q15_R), oxford$Q15_B, oxford$Q15_R)
+oxford$Q16 <- ifelse(is.na(oxford$Q16_R), oxford$Q16_B, oxford$Q16_R)
+oxford$Q17 <- ifelse(is.na(oxford$Q17_R), oxford$Q17_B, oxford$Q17_R)
+oxford$Q18 <- ifelse(is.na(oxford$Q18_R), oxford$Q18_B, oxford$Q18_R)
+oxford$Q19 <- ifelse(is.na(oxford$Q19_R), oxford$Q19_B, oxford$Q19_R)
+oxford$Q20 <- ifelse(is.na(oxford$Q20_R), oxford$Q20_B, oxford$Q20_R)
+oxford$Q21 <- ifelse(is.na(oxford$Q21_R), oxford$Q21_B, oxford$Q21_R)
+oxford$Q22 <- ifelse(is.na(oxford$Q22_R), oxford$Q22_B, oxford$Q22_R)
+oxford$Q23 <- ifelse(is.na(oxford$Q23_R), oxford$Q23_B, oxford$Q23_R)
+oxford$Q24 <- ifelse(is.na(oxford$Q24_R), oxford$Q24_B, oxford$Q24_R)
+oxford$Q25 <- ifelse(is.na(oxford$Q25_R), oxford$Q25_B, oxford$Q25_R)
+oxford$Q26 <- ifelse(is.na(oxford$Q26_R), oxford$Q26_B, oxford$Q26_R)
+oxford$Q27 <- ifelse(is.na(oxford$Q27_R), oxford$Q27_B, oxford$Q27_R)
+oxford$Q28 <- ifelse(is.na(oxford$Q28_R), oxford$Q28_B, oxford$Q28_R)
+oxford$Q29 <- ifelse(is.na(oxford$Q29_R), oxford$Q29_B, oxford$Q29_R)
+```
+
+```{r, echo = FALSE}
+#> (역) 또는 (R) 항목은 7에서 뺀 점수로 
+oxford[, paste0("Q", c(1, 5, 6, 10, 13, 14, 24, 27:29))] %<>% 
+  `-` (7, .)
+oxford$Scores <- oxford[ , 66:94] %>% 
+#  apply(MARGIN = 1, FUN = function(x) sum(x) / 29) 
+  apply(MARGIN = 1, FUN = {. %>% sum %>% `/`(29)})
+oxford$Duration <- ifelse(oxford$Duration >= 600, NA, oxford$Duration)
+oxford$Duration_m <- as.numeric(oxford$Duration) %/% 60
+oxford$Duration_s <- as.numeric(oxford$Duration) %% 60
+oxford$Duration_2 <- paste0(oxford$Duration_m, "분", oxford$Duration_s, "초")
+oxford_labels <- c("행복하지 않다", "다소 행복하지 않다", "그저 그렇다",
+                   "꽤 행복하다", "매우 행복하다")
+oxford$Levels <- oxford$Scores %>% 
+  cut(breaks = 1:6, right = FALSE) %>%
+  factor(levels = levels(.), labels = oxford_labels)
+oxford$Duration_2[oxford$Levels %>% is.na] <- NA
+col_names <- c("학번", "컴퓨터점수", "행복 수준", "소요 시간", "질문지 유형")
+oxford[, c("ID", "Scores", "Levels", "Duration_2", "Group")] %>% 
+  format(digits = 3, nsmall = 2) %>%
+  kable(align = c("c", "c", "r", "r", "c"), col.names = col_names)
+```
+
+## 행복 점수 비교
+
+국문 설문지와 영문 설문지의 행복점수를 비교한다. 행복점수 단계별로 비교했을 때는 국문과 영문 설문지의 차이는 기초통계를 비교해 보았을 때 영문이 오래 걸리는 것으로나오고, 카이제곱 테스트로 그룹별 척도의 빈도의 차이를 검증하였을 때나 평균 점수에 대해서 t-test를 수행한 결과는 통계적으로 유의하다고 나온다. 
+
+### `summary()`
+
+```{r, echo = FALSE}
+oxford$Scores %>% 
+  tapply(INDEX = oxford$Group, FUN = summary) %>%
+  pander
+```
+
+### `table()`
+
+```{r, echo = FALSE}
+oxford_tbl <- oxford$Levels %>% 
+  table(oxford$Group, ., useNA = "ifany") %>% 
+  cbind("계" = rowSums(.)) %>%
+  rbind("계" = colSums(.)) 
+oxford_tbl %>% 
+  kable
+oxford_tbl %>% 
+  `[`(-3, -c(1, 6)) %>% 
+  chisq.test(simulate.p.value = TRUE) %>%
+  pander
+#> 다음에서 `drop = FALSE`을 없애고 `c`를 쓰는 경우와 `drop = FALSE` 하에 `c`를 쓸 때의 차이에 유의하라.
+#> 
+oxford_tbl[3, -6, drop = FALSE] %>%  
+  prop.table %>% 
+  `*`(100) %>% 
+#  c("계" = sum(.)) %>%
+  cbind("계" = rowSums(.)) %>%
+  format(digits = 1, nsmall = 1) %>% 
+  kable
+```
+
+<!--
+### `boxplot()`
+
+```{r, echo = FALSE}
+par(family = "")
+boxplot(Scores ~ Group, data = oxford)
+```
+-->
+
+### `geom_boxplot()`
+
+```{r, echo = FALSE, message = FALSE}
+library(tidyverse)
+# source("theme_kr.R")
+ggplot(data = oxford, 
+       mapping = aes(x = Group, y = Scores)) +
+  geom_boxplot(outlier.shape = 1, na.rm = TRUE) +
+  theme_bw() +
+#  theme_kr +
+  scale_x_discrete(name = "질문지 유형") +
+  scale_y_continuous(name = "행복 점수")
+```
+
+### `t.test()` on means
+
+```{r, echo = FALSE}
+t.test(Scores ~ Group, data = oxford, var.equal = FALSE, alternative = "greater") 
+# %>% pander
+```
+
+## 소요시간 비교
+
+초 단위로 측정한 소요시간에서는 예상한 바와 달리 커다란 차이가 관찰되지 않고 있다. 평균, 중위수에서도 영문이 국문보다 크기는 하나 통계적으로 유의한 차이는 아닌 것으로 나온다. 
+평균적으로 `r oxford %$% Duration %>% tapply(INDEX = oxford$Group, FUN = mean, na.rm = TRUE) %>% diff %>% round(1)`초, 즉 `r oxford %$% Duration %>% tapply(INDEX = oxford$Group, FUN = mean, na.rm = TRUE) %>% diff %>% "%/%"(60)`분 `r oxford %$% Duration %>% tapply(INDEX = oxford$Group, FUN = mean, na.rm = TRUE) %>% diff %>% "%%"(60) %>% round`초정도 국문 질문지에 더 빨리 응답한다. 소요시간의 중위값을 비교해 보면 `r oxford %$% Duration %>% tapply(INDEX = oxford$Group, FUN = median, na.rm = TRUE) %>% diff %>% round(1)` 초, 약 `r oxford %$% Duration %>% tapply(INDEX = oxford$Group, FUN = median, na.rm = TRUE) %>% diff %>% "%/%"(60) `분 `r oxford %$% Duration %>% tapply(INDEX = oxford$Group, FUN = median, na.rm = TRUE) %>% diff %>% "%%"(60)  %>% round`초 만큼 국문 질문지에 더 빨리 응답하지만 통계적으로 유의한 수준은 아니다.
+
+### `summary()`
+
+```{r, echo = FALSE}
+oxford$Duration %>% 
+  as.numeric %>%
+  tapply(INDEX = oxford$Group, FUN = summary) %>%
+  pander
+```
+
+<!--
+### `boxplot()`
+
+```{r, echo = FALSE, eval = FALSE}
+par(family = "HCR Dotum LVT")
+boxplot(Duration ~ Group, data = oxford)
+```
+-->
+
+### `geom_boxplot()`
+
+```{r, echo = FALSE, message = FALSE}
+ggplot(data = oxford, 
+       mapping = aes(x = Group, y = as.numeric(Duration))) +
+  geom_boxplot(outlier.shape = 1, na.rm = TRUE) +
+  theme_bw() +
+#  theme_kr +
+  scale_x_discrete(name = "질문지 유형") +
+  scale_y_continuous(name = "소요시간")
+```
+
+### `t.test()` on means
+
+```{r, echo = FALSE}
+t.test(as.numeric(Duration) ~ Group, data = oxford, var.equal = FALSE) 
+# %>% pander
+```
+
