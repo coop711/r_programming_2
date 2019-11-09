@@ -5,11 +5,12 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
+<!--
 ### Data Reading
 
-`join()`을 사용하기 위하여 `plyr` 패키지는 사전에 등록
+`join()`을 사용하기 위하여 `dplyr` 패키지는 사전에 등록
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, message = FALSE}
 library(knitr)
 library(pander)
 library(dplyr)
@@ -22,6 +23,7 @@ panderOptions("table.split.table", Inf)
 ```{r, echo = FALSE}
 load("./BFI_MI_report_191106.RData")
 ```
+-->
 
 ## 성격특성별 분포
 
