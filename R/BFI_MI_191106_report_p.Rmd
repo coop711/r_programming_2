@@ -126,12 +126,14 @@ kable(head(BFI_level_kr))
 
 ```{r, anonymous function}
 criteria <- function(x, a = c(4, 6, 8)){
-  ifelse(x <= a[1], "낮음", ifelse(x <= a[2], "중하", ifelse(x <= a[3], "중상", "높음")))
+  ifelse(x <= a[1], "낮음", 
+         ifelse(x <= a[2], "중하", 
+                ifelse(x <= a[3], "중상", "높음")))
 }
 a <- list(c(4, 6, 8), c(4, 6, 8), c(4, 6, 8), c(10, 12, 13), c(8, 10, 12)) 
 BFI_level_kr <- BFI_score %>%
   mapply(criteria, ., a = a) %>%
-  data.frame %>%
+  data.frame(stringsAsFactors = FALSE) %>%
   lapply(. %>% factor(., levels = c("낮음", "중하", "중상", "높음"), ordered = TRUE)) %>%
   data.frame
 # BFI_level <- data.frame(mapply(criteria, BFI_score, a = a))
@@ -281,7 +283,7 @@ setdiff(BFI_full_kr$ID, MI_sort_full_kr$ID)
 #> 이름은 제외
 MI_sort_full_kr <- MI_sort_full_kr[-2]
 MI_sort_full_kr %>%
-  head %>%
+#  head %>%
   kable(align = "c")
 ```
 
