@@ -141,7 +141,7 @@ tbl_q1_a %>%
 
 ```{r, social comparison in percentage, echo = FALSE}
 tbl_q1_a %>% 
-  `[`(-3, -(3:5)) %>%
+  `[`(-3, -3) %>%
   prop.table(margin = 1) %>%
   `*`(100) %>%
   cbind("계" = rowSums(.)) %>%
@@ -153,11 +153,13 @@ tbl_q1_a %>%
 
 ```{r, percentage in sum, echo = FALSE}
 tbl_q1_a %>% 
-  `[`(3, -(3:5), drop = FALSE) %>%
-  prop.table(margin = 1) %>%
+  `[`(3, -3) %>%
+  prop.table %>%
   `*`(100) %>%
-  cbind("계" = rowSums(.)) %>%
+  c("계" = sum(.)) %>%
+#  cbind("계" = rowSums(.)) %>%
   format(digits = 2, nsmall = 1) %>%
+  t %>%
   kable
 ```
 
