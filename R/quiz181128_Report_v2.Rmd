@@ -32,7 +32,7 @@ quiz1128$group %<>% factor(levels = c("Red", "Black"))
 
 ##> 생일이 같은 사람을 찾아 날짜 순으로 늘어세우기.
 ##1> 입력된 데이터 살피기
-#> strsplit(quiz1128$Q1, ",") 하면 나오는 리스트의 요소를 month와 date 로 나웠다 다시 합치기
+#> strsplit(quiz1128$Q1, ",") 하면 나오는 리스트의 요소를 month와 date 로 나눴다 다시 합치기
 #> Q1의 생김새
 quiz1128$Q1
 #> pipe를 이용하여 고쳐쓰면
