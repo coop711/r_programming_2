@@ -20,9 +20,9 @@ options(width = 132)
 ```
 
 ```{r, data, echo = FALSE, results = 'hide'}
-quiz1118 <- "../data/quiz181128v3.xlsx" %>% 
+quiz1118 <- "../data/quiz181128v4.xlsx" %>% 
   read.xlsx(sheetIndex = 1, 
-            startRow = 1, endRow = 43, 
+            startRow = 1, endRow = 45, 
             colIndex = c(2:10, 12:13), colClasses = rep("character", 11),
             header = TRUE,
             encoding = "UTF-8",

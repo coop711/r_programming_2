@@ -83,7 +83,8 @@ y_text <- apply(Nature1_p, MARGIN = 1, pos)
 #> 막대그래프 작성 과정에서 나온 막대의 좌표와 `pos`함수로 계산한 y좌표를 이용하여 실제 관찰된 쌍둥이 페어의 수효를 표시한다.
 text(x = rep(b1, each = 3), y = y_text, labels = t(Nature1))
 #> 범례 표시
-legend("topright", inset = 0.01, fill = cols[3:1], legend = rev(colnames(Nature1)), bty = "o")
+legend("topright", inset = 0.01, fill = cols[3:1], 
+       legend = rev(colnames(Nature1)), bty = "o")
 #> 메인 타이틀 
 title(main = "Smoking Habits of Twins", cex.main = 1.5)
 ```
@@ -134,8 +135,10 @@ axis(side = 2,
 y_text2 <- apply(Nature2_p, MARGIN = 1, pos)
 # y_text2 <- c(t(Nature2_p)[1, ] / 2, 
 #             t(Nature2_p)[1, ]  + t(Nature2_p)[2, ] / 2)
-text(rep(b2, each = 2), y_text2, labels = t(Nature2))
-legend("topright", inset = 0.01, fill = cols[2:1], legend = rev(colnames(Nature2)))
+text(rep(b2, each = 2), y_text2, 
+     labels = t(Nature2))
+legend("topright", inset = 0.01, fill = cols[2:1], 
+       legend = rev(colnames(Nature2)))
 title(main = "Smoking Habits of Twins 2")
 ```
 
@@ -176,7 +179,8 @@ y_text3 <- apply(Nature3_p, MARGIN = 1, pos)
 # y_text3 <- c(t(Nature3_p)[1, ] / 2, 
 #              t(Nature3_p)[1, ]  + t(Nature3_p)[2, ] / 2)
 text(rep(b3, each = 2), y_text3, labels = t(Nature3))
-legend("topright", inset = 0.01, fill = cols[2:1], legend = rev(colnames(Nature2)))
+legend("topright", inset = 0.01, fill = cols[2:1], 
+       legend = rev(colnames(Nature2)))
 title(main = "Smoking Habits of Identical Twins")
 ```
 
