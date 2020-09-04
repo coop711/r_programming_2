@@ -345,6 +345,9 @@ title(main = "Percentage of Inhalers")
 
 ## tidyverse
 
+깔끔한 데이터 바꾸는 과정에서 유의할 점은 ggplot으로 그릴 때 어떤 변수가 x, y, fill 역할을 할 것인지를 명확히 하여야 어떤 변수를 맨 앞에 위치시키고, 그 다음 변수를 어느 위치에 그리고 Counts를 위치시킨다.
+즉, fill 에 해당하는 변수를 맨 앞에, 그리고 x에 해당하는 변수를 그 다음에, 마지막으로 세번째 변수로 Freq 또는 Counts가 위치하도록 tidy를 적용하면 ggplot으로 그릴 때 상당히 체계적인 접근이 가능해진다. 특히, 막대들의 중간에 추가적인 정보를 삽입하기 위하여 좌표를 계산할 필요가 있을 때 크게 도움이 된다.
+
 ```{r}
 Nature1_tbl <- Nature1 %>% 
   t %>%
@@ -360,28 +363,37 @@ Nature1_tbl <- Nature1 %>%
                         levels = c("Identical", "Fraternal")))
 Nature1_tbl
 Nature2_tbl <- Nature2 %>%
+  t %>%
   as_tibble %>%
-  mutate(Twins = row.names(Nature2)) %>%
-  gather(key = "Resemblance", 
-         value = "Counts", -Twins) %>%
-  mutate(Twins = factor(Twins, levels = c("Identical", "Fraternal")),
+  mutate(Resemblance = row.names(t(Nature2))) %>%
+  gather(key = "Twins", 
+         value = "Counts", -Resemblance) %>%
+  mutate(Twins = factor(Twins, 
+                        levels = c("Identical", "Fraternal")),
          Resemblance = factor(Resemblance)) %>%
   print
 Nature3_tbl <- Nature3 %>%
+  t %>%
   as_tibble %>%
-  mutate(Separation = row.names(Nature3)) %>%
-  gather(key = "Resemblance", 
-         value = "Counts", -Separation) %>%
+  mutate(Resemblance = row.names(t(Nature3))) %>%
+  gather(key = "Separation", 
+         value = "Counts", -Resemblance) %>%
   mutate(Separation = factor(Separation),
-         Resemblance = factor(Resemblance) )
+         Resemblance = factor(Resemblance))
 DollnHill_tbl <- DollnHill %>%
+  t %>%
   as_tibble %>%
-  mutate(Group = row.names(DollnHill)) %>%
-  gather(key = "Smoking", value = "Counts", -Group) %>%
+  mutate(Smoking = row.names(t(DollnHill))) %>%
+  gather(key = "Group", value = "Counts", -Smoking) %>%
   mutate(Group = factor(Group, 
                         levels = c("Lung Cancer", "Control"), 
                         labels = c("Lung_Cancer", "Control")),
-         Smoking = factor(Smoking, labels = c("1-4", "5-14", "15-24", "25-49", "50_more")))
+         Smoking = factor(Smoking, 
+                          labels = c("1-4", 
+                                     "5-14", 
+                                     "15-24", 
+                                     "25-49", 
+                                     "50_more")))
 ```
 
 <P style = "page-break-before:always">
