@@ -22,6 +22,8 @@ include_graphics("../pics/Nature_1958v1.png")
 
 ### 막대그래프
 
+막대그래프로 표현하는 데 있어서 현재의 테이블 구조가 어떻게 나오는지 `barplot()` 의 도움말을 반드시 읽어볼 필요가 있다. 매트릭스를 막대그래프로 그릴 때 매트릭스 모양 그대로 표현하려 함에 유의하여야 한다. 즉, 각 열을 각 막대에 대응시키면서 행으로 주어지는 각각의 값들을 각 막대에 나누어 배분하는 디폴트로 한다(`beside = FALSE`). 따라서 흡연 습관에 대한 쌍둥이 연구의 집계 표를 우리가 원하는 막대 그래프로 표현하려면, 즉 쌍둥이의 유형에 따라 닮은 정도를 표현하려면, 현재 나와 있는 표 구조를 전치(transpose)시켜야 한다. 
+
 ```{r, message = FALSE}
 library(magrittr)
 library(tidyverse)
@@ -31,7 +33,14 @@ Nature1 <- matrix(c(33, 11, 6, 6, 12, 16),
 rownames(Nature1) <- c("Identical", "Fraternal")
 colnames(Nature1) <- c("Alike", "Little_Alike", "Not_Alike")
 Nature1
+Nature1 %>%
+  barplot
+Nature1 %>% 
+  t %>%
+  barplot
 ```
+
+`Nature1`의 구조가 
 
 ```{r, out.width = "75%", fig.align = "center"}
 options(digits = 3)
@@ -39,7 +48,7 @@ options(digits = 3)
 library(RColorBrewer)
 #> "Accent" palette 채택
 cols <- brewer.pal(8, "Accent")
-#> 유전형질(일란성/이란성) 별로 흡연습관 구분 백분률 계산
+#> 쌍둥이유형(일란성/이란성) 별로 흡연습관을 구분하여 각 습관의 백분율 계산한다. 일란성 쌍둥이와 이란성 쌍둥이의 숫자가 다르기 때문에 공평하게 비교하려면 백분율을 비교하는 것이 타당하다.
 Nature1_p <- Nature1 %>%
   prop.table(margin = 1) %>%
   `*`(100)
@@ -48,14 +57,13 @@ Nature1_p <- Nature1 %>%
 c1 <- Nature1 %>%
   ncol
 # c1 <- ncol(Nature1)
-#> 쌓여있는 막대그래프를 그리고 막대의 가운데 좌표를 저장한다.
+#> 차곡차곡 쌓아놓은 막대그래프를 그리고(`beside = FALSE`가 디폴트) 추가 정보를 표시할 부분 막대의 가운데 좌표를 저장한다.
 #> `width`를 설정하려면 `xlim`도 함께 설정하여야 함에 유의한다.
 #> 아래 예시의 경우 막대그래프의 범위를 0에서 4까지로 하면서 첫번째 막대의 중심은 1.5,
 #> 두번째 막대의 중심은 3.5에 위치한다.(b1 값으로 파악) 막대의 폭(width)을 1, 
-#> 두 막대 간의 간격(space) 또한 1로 하여 width, xlim, space 간의 쉽게 알 수 있도록 하였다.
-#> 유전형질별로 비교하여야 하므로 행렬을 전치시켜서 막대그래프를 그려야 한다.
-#>  `yaxt = "n" `을 설정하여 y축에 추가 정보를 손으로 넣을 수 있도록 하였다/ 
-# b1 <- barplot(t(Nature1_p), 
+#> 두 막대 간의 간격(space) 또한 1로 하여 width, xlim, space 간의 관계를 쉽게 알 수 있도록 하였다.
+#> 쌍둥이유형별로 비교하여야 하므로 행렬을 전치시켜서 막대그래프를 그려야 한다.
+#>  `yaxt = "n" `을 설정하여 y축에 추가 정보를 넣을 수 있도록 하였다.
 ```
 
 ```{r, out.width = "75%", fig.align = "center"}
@@ -66,7 +74,7 @@ b1 <- Nature1_p %>%
           space = 0.3, 
           col = cols[1:3], 
           yaxt = "n")
-#> 유전형질 별로 한 막대에 흡연습관의 닮음 정도를 나타낼 것이므로 `cumsum`함수를 이용하여 막대들이 위치할 좌표를 계산한다. 일란성과 이란성을 각각 100%로 하고 닮음 정도의 백분율을 막대 높이로 비교할 수 있도록 하되, 막대 중심에는 해당 속성의 돗수를 표시한다. 원점을 나타내기 위하여 0을 `c`함수 안에 추가하였다. 이를 추가하지 않으면 축이 어떻게 표시되는지 비교한다.
+#> 쌍둥이유형 별로 한 막대에 흡연습관의 닮음 정도를 나타낼 것이므로 `cumsum`함수를 이용하여 막대들이 위치할 좌표를 계산한다. 일란성과 이란성을 각각 100%로 하고 닮음 정도의 백분율을 막대 높이로 비교할 수 있도록 하되, 막대 중심에는 해당 속성의 돗수를 표시한다. 원점을 나타내기 위하여 0을 `c`함수 안에 추가하였다. 이를 추가하지 않으면 축이 어떻게 표시되는지 비교한다.
 #> `format`함수의 용법에 익숙해지고, `las = 2`가 왜 필요한지 여러 경우를 비교하라.
 axis(side = 2,
      at = c(0, apply(t(Nature1_p),
@@ -79,9 +87,10 @@ axis(side = 2,
                      nsmall = 1), 
      las = 2)
 #> 막대의 가운데에 추가 정보를 넣기 위한 좌표 설정 함수. 
-pos <- function(x){
-  cumsum(x) - x / 2
-}
+# pos <- function(x){
+#   cumsum(x) - x / 2
+# }
+pos <- . %>% {`-`(cumsum(.), . / 2)}
 #> 텍스트 정보 넣을 좌표를 계산한다. 
 y_text <- apply(Nature1_p, 
                 MARGIN = 1, 
@@ -89,7 +98,7 @@ y_text <- apply(Nature1_p,
 # y_text <- c(t(Nature1_p)[1, ] / 2, 
 #             t(Nature1_p)[1, ]  + t(Nature1_p)[2, ] / 2, 
 #             t(Nature1_p)[1, ]  + t(Nature1_p)[2, ] + t(Nature1_p)[3, ] / 2)
-#> 막대그래프 작성 과정에서 나온 막대의 좌표와 `pos`함수로 계산한 y좌표를 이용하여 실제 관찰된 쌍둥이 페어의 수효를 표시한다.
+#> 막대그래프 작성 과정에서 나온 막대의 좌표와 `pos`함수로 계산한 y좌표를 이용하여 실제 관찰된 쌍둥이 페어의 수효를 표시한다.`y_text`의 구조에 맞추어 `rep()`에서 `each = 3`으로 설정하였다. `bty = ` `"o" 또는 "n"으로 정할 수 있다. 
 text(x = rep(b1, each = 3), 
      y = y_text, 
      labels = t(Nature1))
@@ -114,7 +123,7 @@ mosaicplot(Nature1,
            off = 1,
            color = cols[1:3], 
            cex.axis = 1,
-           las = 1)
+           las = 0)
 ```
 
 <P style = "page-break-before:always">
@@ -124,7 +133,7 @@ mosaicplot(Nature1,
 피셔의 논문이 실려 있는 Nature 지의 596쪽에서는 그와 비슷한 연구 결과가 실려 있었다. 피셔가 인용한 보고서가 흡연습관을 세 단계로 구분한 것과는 달리 닮았거나 그렇지 않거나의 이분법으로 나누었다.
 이 보고서가 흥미로운 것은 단순히 일란성 쌍둥이와 이란성 쌍둥이의 흡연습관을 비교한 것이 아니라 일란성 쌍둥이들을 다시 어려서 헤어진 경우와 함께 산 경우로 나눠 본 것이다. 일란성 쌍둥이들은 함께 살았든, 헤어져 살았든 흡연습관에 있어서도 놀라울 정도로 닮은 점을 보여 준다. 
 
-```{r, out.width = "50%", fig.align = "left"}
+```{r, out.width = "35%", fig.align = "left"}
 include_graphics("../pics/Nature_1958v2.png")
 ```
 
@@ -337,15 +346,18 @@ title(main = "Percentage of Inhalers")
 ## tidyverse
 
 ```{r}
-Nature1_tbl <- Nature1 %>%
+Nature1_tbl <- Nature1 %>% 
+  t %>%
   as_tibble %>%
-  mutate(Twins = row.names(Nature1)) %>%
-  gather(key = "Resemblance", 
-         value = "Counts", -Twins) %>%
-  mutate(Twins = factor(Twins, 
-                        levels = c("Identical", "Fraternal")),
-         Resemblance = factor(Resemblance, 
-                              levels = c("Alike", "Little_Alike", "Not_Alike")))
+  mutate(Resemblance = row.names(t(Nature1))) %>%
+  gather(key = "Twins", 
+         value = "Counts", -Resemblance) %>%
+  mutate(Resemblance = factor(Resemblance, 
+                              levels = c("Alike", 
+                                         "Little_Alike",
+                                         "Not_Alike")),
+         Twins = factor(Twins, 
+                        levels = c("Identical", "Fraternal")))
 Nature1_tbl
 Nature2_tbl <- Nature2 %>%
   as_tibble %>%
@@ -376,6 +388,8 @@ DollnHill_tbl <- DollnHill %>%
 
 ## geom_bar
 
+### stack
+
 ```{r}
 # y_stack <- Nature1_tbl %$%
 #   tapply(Counts,
@@ -387,14 +401,11 @@ y_breaks <- Nature1_tbl %$%
          INDEX = Twins,
          FUN = cumsum) %>%
   unlist
-y1_text <- Nature1 %>%
-  apply(MARGIN = 1, 
-        FUN = pos) %>%
-  t %>% c
-# y1_fill <- y1_text / (t(Nature1)[1, ]  + t(Nature1)[2, ] + t(Nature1)[3, ])
-y1_fill <- y1_text / apply(Nature1, 
-                           MARGIN = 1, 
-                           FUN = sum) 
+y1_text <- Nature1_tbl %$%
+  tapply(Counts,
+         INDEX = Twins,
+         FUN = pos) %>%
+  unlist
 Nature1_tbl %>%
   ggplot(data = ., 
          mapping = aes(x = Twins, 
@@ -412,6 +423,17 @@ Nature1_tbl %>%
                     direction = -1) +
   scale_y_continuous(breaks = y_breaks, 
                      labels = y_breaks)
+```
+
+### fill
+
+```{r}
+# y1_fill <- y1_text / (t(Nature1)[1, ]  + t(Nature1)[2, ] + t(Nature1)[3, ])
+y1_fill <- y1_text / (Nature1 %>% 
+                        apply(MARGIN = 1, 
+                              FUN = sum) %>%
+                        rep(each = 3))
+# y1_fill <- y1_text / rep(c(51, 33), each = 3)
 Nature1_tbl %>%
   ggplot(data = ., 
          mapping = aes(x = Twins, 
