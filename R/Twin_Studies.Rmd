@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Nature 1958 version 1
 
-```{r, out.width = "50%", fig.align = "left"}
+```{r, out.width = "35%", fig.align = "left"}
 include_graphics("../pics/Nature_1958v1.png")
 ```
 
@@ -252,7 +252,7 @@ mosaicplot(Nature3,
 
 ## Doll and Hill
 
-```{r, out.width = "50%", fig.align = "left"}
+```{r, out.width = "35%", fig.align = "left"}
 include_graphics("../pics/DollnHill.png")
 ```
 
@@ -305,7 +305,7 @@ chisq.test(DollnHill)
 
 ## Doll and Hill : Inhale
 
-```{r, out.width = "50%", fig.align = "left"}
+```{r, out.width = "35%", fig.align = "left"}
 include_graphics("../pics/DollnHill_Inhale.png")
 ```
 
