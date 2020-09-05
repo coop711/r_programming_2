@@ -376,13 +376,15 @@ mosaicplot(Nature3,
 
 ## Doll and Hill
 
+흡연과 건강의 관계에 대한 대표적인 회고 연구(Retrospective Study) 중 하나인 Doll & Hill의 보고서에 등장하는 데이터를 살펴본다. 회고 연구의 경우 먼저 폐암 환자와 대조군을 선정하고 그들의 흡연습관을 묻는 방식으로 진행된다. 데이터로부터 대조군과 비교했을 때, 폐암환자군에서 과다 흡연자의 비율이 높게 나타난다는 것을 알 수 있다.대조군은 폐암환자군보다 소량의 흡연자 비율이 높게 나타난다.그렇다고 해서 이 연구 결과가 바로 흡연이 폐암을 일으킨다고 결론을 내려서는 안 된다. 바로 위에서 살펴본 쌍둥이연구가 등장한 배경이다.
+
 ```{r, out.width = "35%", fig.align = "left"}
 include_graphics("../pics/DollnHill.png")
 ```
 
 ### 막대그래프 : stack
 
-```{r, out.width = "75%", fig.align = "center"}
+```{r, fig.width = 6, fig.height = 6, fig.align = "center"}
 DollnHill <- matrix(c(24, 38, 208, 242, 196, 201, 164, 118, 45, 23),
                     nrow = 2)
 rownames(DollnHill) <- c("Lung Cancer", "Control")
@@ -405,11 +407,6 @@ axis(side = 2,
 y4_text <- apply(DollnHill, 
                  MARGIN = 1, 
                  FUN = pos)
-# y_text4 <- c(t(DollnHill_p)[1, ] / 2, 
-#             t(DollnHill_p)[1, ]  + t(DollnHill_p)[2, ] / 2, 
-#             t(DollnHill_p)[1, ]  + t(DollnHill_p)[2, ] + t(DollnHill_p)[3, ] / 2,
-#             t(DollnHill_p)[1, ]  + t(DollnHill_p)[2, ] + t(DollnHill_p)[3, ] + t(DollnHill_p)[4, ] / 2,
-#             t(DollnHill_p)[1, ]  + t(DollnHill_p)[2, ] + t(DollnHill_p)[3, ] + t(DollnHill_p)[4, ] + t(DollnHill_p)[5, ] / 2)
 text(x = rep(b4, each = 5), 
      y = y4_text, 
      labels = t(DollnHill), 
@@ -422,7 +419,7 @@ title(main = "Retrospective Study : Doll & Hill")
 
 ### 막대그래프 : Fill
 
-```{r, out.width = "75%", fig.align = "center"}
+```{r, fig.width = 6, fig.height = 6, fig.align = "center"}
 DollnHill_p <- prop.table(DollnHill, 
                           margin = 1) * 100
 c4 <- ncol(DollnHill)
@@ -443,14 +440,11 @@ axis(side = 2,
 y4_text_p <- apply(DollnHill_p, 
                    MARGIN = 1, 
                    FUN = pos)
-# y_text4 <- c(t(DollnHill_p)[1, ] / 2, 
-#             t(DollnHill_p)[1, ]  + t(DollnHill_p)[2, ] / 2, 
-#             t(DollnHill_p)[1, ]  + t(DollnHill_p)[2, ] + t(DollnHill_p)[3, ] / 2,
-#             t(DollnHill_p)[1, ]  + t(DollnHill_p)[2, ] + t(DollnHill_p)[3, ] + t(DollnHill_p)[4, ] / 2,
-#             t(DollnHill_p)[1, ]  + t(DollnHill_p)[2, ] + t(DollnHill_p)[3, ] + t(DollnHill_p)[4, ] + t(DollnHill_p)[5, ] / 2)
 text(x = rep(b4_p, each = 5), 
      y = y4_text_p, 
-     labels = t(DollnHill), 
+     labels = paste0(format(t(DollnHill_p), 
+                            digits = 3, 
+                            nsmall = 1), "%"), 
      col = c(rep("black", 4), "white"))
 legend("top", 
        fill = cols[5:1], 
@@ -477,73 +471,84 @@ chisq.test(DollnHill)
 include_graphics("../pics/DollnHill_Inhale.png")
 ```
 
-### 막대그래프 : beside = TRUE
+### 막대그래프 : frequency, beside = TRUE, par(new = TRUE)
 
-```{r, out.width = "75%", fig.align = "left"}
-DollnHill2 <- matrix(c(7, 17, 141, 162, 133, 157, 96, 74, 21, 16), nrow = 2)
+```{r, fig.width = 8, fig.height = 6, fig.align = "left"}
+opar <- par(no.readonly = TRUE)
+par(mai = c(1.02, 0.82, 0.82, 1.02))
+DollnHill2 <- matrix(c(7, 17, 141, 162, 133, 157, 96, 74, 21, 16), 
+                     nrow = 2)
 rownames(DollnHill2) <- c("Lung Cancer", "Control")
 colnames(DollnHill2) <- c("1-4", "5-14", "15-24", "25-49", "50 more")
 c5 <- ncol(DollnHill2)
 b4_d <- barplot(DollnHill, 
                 beside = TRUE,
-#                space = 0.8, 
-                col = cols[3:4],
+                col = cols[c(1, 3)],
                 ylim = c(0, 250),
                 yaxt = "n")
+axis(side = 2, 
+     at = c(0, DollnHill),
+     labels = c(0, DollnHill),
+     las = 2)
+title(main = "Frequency of Inhalers among All",
+      xlab = "Cigarettes Smoked", 
+      ylab = "All",
+      cex.main = 2)
 par(new = "TRUE")
 b5 <- barplot(DollnHill2,
               beside = TRUE,
-#              space = 0.8, 
-              col = cols[1:2], 
+              col = cols[c(8, 7)], 
               ylim = c(0, 250),              
               yaxt = "n")
-y_text5 <- apply(DollnHill2_p, 
-                 MARGIN = 1, 
-                 FUN = pos)
-# y_text5 <- c(t(DollnHill2_p)[1, ] / 2, 
-#              t(DollnHill2_p)[1, ]  + t(DollnHill2_p)[2, ] / 2, 
-#              t(DollnHill2_p)[1, ]  + t(DollnHill2_p)[2, ] + t(DollnHill2_p)[3, ] / 2,
-#              t(DollnHill2_p)[1, ]  + t(DollnHill2_p)[2, ] + t(DollnHill2_p)[3, ] + t(DollnHill2_p)[4, ] / 2,
-#              t(DollnHill2_p)[1, ]  + t(DollnHill2_p)[2, ] + t(DollnHill2_p)[3, ] + t(DollnHill2_p)[4, ] + t(DollnHill2_p)[5, ] / 2)
-text(rep(b5, each = 5), 
-     y_text5, 
-     labels = paste0(format(t(DollnHill2_p), 
-                            digits = 3, 
-                            nsmall = 1), "%"),
-     col = c(rep("black", times = 4), "white"))
-legend("top", 
-       fill = cols[5:1], 
-       legend = rev(colnames(DollnHill2)))
-title(main = "Percentage of Inhalers")
+axis(side = 4, 
+     at = c(0, DollnHill2),
+     labels = c(0, DollnHill2),
+     las = 2)
+y5_text_d <- c(DollnHill2 / 2)
+y4_text_d <- c((DollnHill2 + DollnHill) / 2)
+text(x = c(b5), 
+     y = y4_text_d, 
+     labels = c(DollnHill))
+text(x = c(b5), 
+     y = y5_text_d, 
+     labels = c(DollnHill2))
+mtext("Inhaler", 
+      side = 4, 
+      line = 3)
+legend("topright", 
+       inset = 0.01,
+       fill = cols[c(1, 3, 8, 7)], 
+       legend = c("Lung Cancer : All", 
+                  "Control : All",
+                  "Lung Cancer : Inhaler",
+                  "Control : Inhaler"))
+par(opar)
 ```
-### 막대그래프 : Fill
 
-```{r, out.width = "75%", fig.align = "left"}
+### 막대그래프 : Fill, beside = TRUE
+
+```{r, fig.width = 8, fig.height = 6, fig.align = "left"}
 DollnHill2_p <- DollnHill2 / DollnHill * 100
 c5 <- ncol(DollnHill2)
-b5 <- barplot(t(DollnHill2_p), 
-              space = 0.8, 
-              col = cols[1:5], 
-              yaxt = "n")
-y_text5 <- apply(DollnHill2_p, 
-                 MARGIN = 1, 
-                 FUN = pos)
-# y_text5 <- c(t(DollnHill2_p)[1, ] / 2, 
-#              t(DollnHill2_p)[1, ]  + t(DollnHill2_p)[2, ] / 2, 
-#              t(DollnHill2_p)[1, ]  + t(DollnHill2_p)[2, ] + t(DollnHill2_p)[3, ] / 2,
-#              t(DollnHill2_p)[1, ]  + t(DollnHill2_p)[2, ] + t(DollnHill2_p)[3, ] + t(DollnHill2_p)[4, ] / 2,
-#              t(DollnHill2_p)[1, ]  + t(DollnHill2_p)[2, ] + t(DollnHill2_p)[3, ] + t(DollnHill2_p)[4, ] + t(DollnHill2_p)[5, ] / 2)
-text(rep(b5, each = 5), 
-     y_text5, 
-     labels = paste0(format(t(DollnHill2_p), 
+b5_p <- barplot(DollnHill2_p, 
+                beside = TRUE,
+                col = cols[c(8, 7)], 
+                ylim = c(0, 100),
+                yaxt = "n")
+y5_text_p <- c(DollnHill2_p / 2)
+text(x = c(b5_p), 
+     y = c(y5_text_p), 
+     labels = paste0(format(c(DollnHill2_p), 
                             digits = 3, 
-                            nsmall = 1), "%"),
-     col = c(rep("black", times = 4), "white"))
-legend("top", 
-       fill = cols[5:1], 
-       legend = rev(colnames(DollnHill2)))
-title(main = "Percentage of Inhalers")
+                            nsmall = 1), "\n%"))
+legend("topright", 
+       fill = cols[c(8, 7)], 
+       legend = c("Lung Cancer", "Control"))
+title(main = "Percentage of Inhalers",
+      xlab = "Cigarettes Smoked",
+      cex.main = 2)
 ```
+
 <P style = "page-break-before:always">
 
 # ggplot
