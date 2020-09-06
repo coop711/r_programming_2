@@ -122,9 +122,9 @@ Nature1_p <- Nature1 %>%
 #> 쌍둥이유형별로 비교하여야 하므로 행렬을 전치시켜서 막대그래프를 그려야 한다.
 #>  `yaxt = "n" `을 설정하여 y축에 추가 정보를 넣을 수 있도록 하였다.
 #> 텍스트 정보 넣을 좌표를 계산한다. 
-y1_text_p <- apply(Nature1_p, 
-                   MARGIN = 1, 
-                   FUN = pos)
+y1_text_p <- Nature1_p %>% 
+  apply(MARGIN = 1, 
+        FUN = pos)
 ```
 
 ```{r, out.width = "75%", fig.align = "center"}
@@ -169,7 +169,7 @@ mosaicplot(Nature1,
            main = "Smoking Habits of Twins", 
            xlab = "Twins", 
            ylab = "Resemblance",
-           off = 1,
+           off = c(0.5, 1),
            color = cols[1:3], 
            cex.axis = 1,
            las = 0)
@@ -302,7 +302,7 @@ axis(side = 2,
                                 MARGIN = 2, 
                                 FUN = cumsum)), 
                      digits = 3, 
-                     nsmall = 1), 
+                     nsmall = 0), 
      las = 2)
 y3_text <- apply(Nature3, 
                  MARGIN = 1, 
@@ -353,13 +353,13 @@ title(main = "Smoking Habits of Identical Twins")
 
 ### Mosaic Plot
 
-```{r, out.width = "75%", fig.align = "left"}
+```{r, out.width = "50%", fig.align = "left"}
 mosaicplot(Nature3, 
            main = "Smoking Habits of Identical Twins", 
            xlab = "Lived Together?", 
            ylab = "Resemblance",
            off = 1,
-           color = cols[3:2],
+           color = cols[2:1],
            cex.axis = 1)
 ```
 
