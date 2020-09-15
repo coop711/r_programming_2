@@ -20,14 +20,14 @@ library(ggplot2)
 library(grid)
 library(gridExtra)
 library(extrafont)
-load("Titanic_1801.RData")
+load("Titanic_Base.RData")
 ls()
 ```
 
 ## Source User Defined Functions
 
 ```{r}
-source("barplot_gg.R")
+source("barplot_gg_v2.R")
 source("mosaic_gg.R")
 ```
 

@@ -466,6 +466,6 @@ dev.off()
 ## Save
 
 ```{r, echo = FALSE}
-save.image("./Titanic_1801.RData")
+save.image("./Titanic_Base.RData")
 ```
 
