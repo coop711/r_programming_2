@@ -28,7 +28,7 @@ ls()
 
 ```{r}
 source("barplot_gg_v2.R")
-source("mosaic_gg.R")
+source("mosaic_gg_new.R")
 ```
 
 ## Data Manipulation
@@ -88,7 +88,9 @@ grid.arrange(b1_stack, b1_fill, ncol = 2, top = top1)
 #### Mosaic Plots
 
 ```{r, fig.width = 7.2, fig.height = 6, warning = FALSE, message = FALSE}
-mosaic_gg(as.table(Surv_Class)[2:1, ]) +
+m1_list <- 
+  mosaic_gg_new(as.data.frame(as.table(Surv_Class)[2:1, ]))
+m1_list$m +
   theme_bw() +
   labs(x = "객실 등급 누적(%)", y = "백분율(%)") + 
   ggtitle("객실 등급별 생존/사망") + 
@@ -134,7 +136,9 @@ grid.arrange(b2_stack, b2_fill, ncol = 2, top = top2)
 #### Mosaic Plots
 
 ```{r, fig.width = 7.2, fig.height = 6, warning = FALSE, message = FALSE}
-mosaic_gg(as.table(Surv_Sex)[2:1, ]) +
+m2_list <- 
+  mosaic_gg_new(as.data.frame(as.table(Surv_Sex)[2:1, ]))
+m2_list$m +
   theme_bw() +
   labs(x = "남녀별 누적(%)", y = "백분율(%)") + 
   ggtitle("남녀별 생존/사망") + 
@@ -179,7 +183,9 @@ grid.arrange(b3_stack, b3_fill, ncol = 2, top = top3)
 #### Mosaic Plots
 
 ```{r, fig.width = 7.2, fig.height = 6, warning = FALSE, message = FALSE}
-mosaic_gg(as.table(Surv_Age)[2:1, ]) +
+m3_list <- 
+  mosaic_gg_new(as.data.frame(as.table(Surv_Age)[2:1, ]))
+m3_list$m +
   theme_bw() +
   labs(x = "어린이/어른 누적(%)", y = "백분율(%)") + 
   ggtitle("어린이/어른 생존/사망") + 
@@ -224,7 +230,9 @@ grid.arrange(b4_stack, b4_fill, ncol = 2, top = top4)
 #### Mosaic Plots
 
 ```{r, fig.width = 7.2, fig.height = 6, warning = FALSE, message = FALSE}
-mosaic_gg(as.table(Female_Class)[2:1, ]) +
+m4_list <- 
+  mosaic_gg_new(as.data.frame(as.table(Female_Class)[2:1, ]))
+m4_list$m +
   theme_bw() +
   labs(x = "객실 등급 누적(%)", y = "백분율(%)") + 
   ggtitle("객실 등급별 여성 생존/사망") + 
@@ -269,7 +277,9 @@ grid.arrange(b5_stack, b5_fill, ncol = 2, top = top5)
 #### Mosaic Plots
 
 ```{r, fig.width = 7.2, fig.height = 6}
-mosaic_gg(as.table(Child_Class)[2:1, -4]) +
+m5_list <- 
+  mosaic_gg_new(as.data.frame(as.table(Child_Class)[2:1, -4]))
+m5_list$m +
   theme_bw() +
   labs(x = "객실 등급 누적(%)", y = "백분율(%)") + 
   ggtitle("객실 등급별 어린이 생존/사망") + 
