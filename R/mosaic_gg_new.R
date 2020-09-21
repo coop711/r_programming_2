@@ -9,7 +9,8 @@ N <- length(levels(tbl_df[, 1]))
   }
   tbl_p_df <- tbl_df %>%
   `[`(, 3) %>%
-  proportions %>%
+  prop.table %>%
+#  proportions %>%
   data.frame(tbl_df[1:2], "Prop" = .)
   tbl_p_df$width <- tapply(tbl_p_df[, 3], 
                            INDEX = tbl_p_df[, 2], 
