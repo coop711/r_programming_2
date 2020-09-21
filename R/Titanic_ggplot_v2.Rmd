@@ -61,7 +61,7 @@ Child_Class %>%
 
 #### Barplots
 
-```{r, fig.width = 12, fig.height = 6, warning = FALSE, message = FALSE}
+```{r, fig.width = 12, fig.height = 6, warning = TRUE, message = FALSE}
 b1_stack <- barplot_gg_stack(as.data.frame(as.table(Surv_Class)[2:1, ])) + 
   theme_bw() +
   labs(x = "객실 등급", y = "인원(명)") +
@@ -77,9 +77,9 @@ b1_fill <- barplot_gg_fill(as.data.frame(as.table(Surv_Class)[2:1, ])) +
   scale_fill_manual(name = "", 
                     labels = c("생존", "사망"), 
                     values = rainbow(2)[2:1]) +
-  theme(axis.title.x = element_text(family = "KoPubWorldDotum Ligh"),
-        axis.title.y = element_text(family = "KoPubWorldDotum Ligh"),
-        legend.text = element_text(family = "KoPubWorldDotum Ligh"))
+  theme(axis.title.x = element_text(family = "KoPubWorldDotum Light"),
+        axis.title.y = element_text(family = "KoPubWorldDotum Light"),
+        legend.text = element_text(family = "KoPubWorldDotum Light"))
 top1 <- textGrob("객실 등급별 생존/사망", 
                  gp = gpar(cex = 1.5, fontfamily = "KoPubWorldDotum Bold"))
 grid.arrange(b1_stack, b1_fill, ncol = 2, top = top1)
@@ -87,7 +87,7 @@ grid.arrange(b1_stack, b1_fill, ncol = 2, top = top1)
 
 #### Mosaic Plots
 
-```{r, fig.width = 7.2, fig.height = 6, warning = FALSE, message = FALSE}
+```{r, fig.width = 7.2, fig.height = 6, warning = TRUE, message = FALSE}
 m1_list <- 
   mosaic_gg_new(as.data.frame(as.table(Surv_Class)[2:1, ]))
 m1_list$m +
@@ -109,7 +109,7 @@ ggsave("../pics/Titanic_mosaic_ggplot01.png", width = 8, height = 6, dpi = 72)
 
 #### Barplots
 
-```{r, fig.width = 12, fig.height = 6, warning = FALSE, message = TRUE}
+```{r, fig.width = 12, fig.height = 6, warning = TRUE, message = TRUE}
 b2_stack <- barplot_gg_stack(as.data.frame(as.table(Surv_Sex)[2:1, ])) + 
   theme_bw() +
   labs(x = "남녀", y = "인원(명)") +
@@ -135,7 +135,7 @@ grid.arrange(b2_stack, b2_fill, ncol = 2, top = top2)
 
 #### Mosaic Plots
 
-```{r, fig.width = 7.2, fig.height = 6, warning = FALSE, message = FALSE}
+```{r, fig.width = 7.2, fig.height = 6, warning = TRUE, message = FALSE}
 m2_list <- 
   mosaic_gg_new(as.data.frame(as.table(Surv_Sex)[2:1, ]))
 m2_list$m +
@@ -156,7 +156,7 @@ ggsave("../pics/Titanic_mosaic_ggplot02.png", width = 8, height = 6, dpi = 72)
 
 #### Barplots
 
-```{r, fig.width = 12, fig.height = 6, warning = FALSE, message = FALSE}
+```{r, fig.width = 12, fig.height = 6, warning = TRUE, message = FALSE}
 b3_stack <- barplot_gg_stack(as.data.frame(as.table(Surv_Age)[2:1, ])) + 
   theme_bw() +
   labs(x = "어린이와 어른", y = "인원(명)") +
@@ -182,7 +182,7 @@ grid.arrange(b3_stack, b3_fill, ncol = 2, top = top3)
 
 #### Mosaic Plots
 
-```{r, fig.width = 7.2, fig.height = 6, warning = FALSE, message = FALSE}
+```{r, fig.width = 7.2, fig.height = 6, warning = TRUE, message = FALSE}
 m3_list <- 
   mosaic_gg_new(as.data.frame(as.table(Surv_Age)[2:1, ]))
 m3_list$m +
@@ -203,7 +203,7 @@ ggsave("../pics/Titanic_mosaic_ggplot03.png", width = 8, height = 6, dpi = 72)
 
 #### Barplots
 
-```{r, fig.width = 12, fig.height = 6, warning = FALSE, message = FALSE}
+```{r, fig.width = 12, fig.height = 6, warning = TRUE, message = FALSE}
 b4_stack <- barplot_gg_stack(as.data.frame(as.table(Female_Class)[2:1, ])) + 
   theme_bw() +
   labs(x = "객실 등급", y = "인원(명)") +
@@ -229,7 +229,7 @@ grid.arrange(b4_stack, b4_fill, ncol = 2, top = top4)
 
 #### Mosaic Plots
 
-```{r, fig.width = 7.2, fig.height = 6, warning = FALSE, message = FALSE}
+```{r, fig.width = 7.2, fig.height = 6, warning = TRUE, message = FALSE}
 m4_list <- 
   mosaic_gg_new(as.data.frame(as.table(Female_Class)[2:1, ]))
 m4_list$m +
