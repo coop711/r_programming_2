@@ -14,12 +14,14 @@ library(knitr)
 library(magrittr)
 ```
 
-<!--img src = "../pics/quetelet_soldiers.png" width = "480"/-->
+<!--
+<img src = "../pics/quetelet_soldiers.png" width = "480"/>
 
-<!--![Quetelet's frequency table](../pics/quetelet_soldiers.png)-->
+![Quetelet's frequency table](../pics/quetelet_soldiers.png)
+-->
 
-```{r, out.width = "50%"}
-include_graphics("../pics/quetelet_soldiers.png")
+```{r, out.width = "50%", fig.align = "left"}
+knitr::include_graphics("../pics/quetelet_soldiers.png")
 ```
 
 
@@ -64,8 +66,8 @@ str(chest_df["Freq"]$Freq)
 chest_df["Freq"][[1]]
 chest_df %>%
   `[`("Freq") %>%
-  `[[`(1) %>%
-#   `[`(, 1) 
+  `[[`(1) 
+#  `[`(, 1) 
 #   `[`(1)
 str(chest_df["Freq"][[1]])
 chest_df[2]
@@ -103,9 +105,9 @@ chest_df$Freq %>%
   `/`(., sum(.)) %>%
   barplot
 chest_df$Freq %>% 
-  prop.table %>%
+#  prop.table %>%
 #> R 4.0.0 부터는 proportions 사용 가능
-#  proportions %>%
+  proportions %>%
   barplot
 #> 조심! 다음 두 표현은 원하는 그림이 나오지 않음.
 chest_df$Freq %>%
@@ -170,7 +172,8 @@ chest_vec %>%
 * 정규분포와 비교하기 위해서 $y$축을 확률로 나타내려면
 
 ```{r, probability histogram, fig.width = 8, fig.height = 4.5}
-hist(chest_vec, probability = TRUE)
+hist(chest_vec, 
+     probability = TRUE)
 chest_vec %>%
   hist(probability = TRUE)
 ```
@@ -290,7 +293,10 @@ abline(v = c(x_lower, x_upper),
        lty = 2, 
        col = "red")
 # polygon(x_coord, y_coord, density = 20)
-polygon(poly_df, density = 20)
+polygon(poly_df, 
+#        col = "grey",
+#        border = NA)
+        density = 20)
 ```
 
 * 이론적으로 빗금친 부분의 면적은 `pnorm(1) - pnorm(-1) = ``r pnorm(1) - pnorm(-1)`에 가까울 것으로 예상. 5개 직사각형의 면적을 구하여 합하는 과정은 다음과 같음.
@@ -374,14 +380,22 @@ g0 <- ggplot(data = data.frame(chest_vec),
 (g1 <- g0 +
   stat_bin(aes(y = ..density..), 
            binwidth = 1, 
-           fill = "white", colour = "black"))
+           fill = "white", 
+           colour = "black"))
 # (g1 <- g0 + 
-#  stat_count(fill = "white", colour = "black"))
+#   stat_count(fill = "white", 
+#              colour = "black"))
 # (g1 <- g0 + 
-#  geom_histogram(aes(y = ..density..), binwidth = 1, fill = "white", colour = "black"))
+#    geom_histogram(aes(y = ..density..), 
+#                   binwidth = 1, 
+#                   fill = "white", 
+#                   colour = "black"))
 # (g1 <- g0 + 
-#  geom_histogram(aes(y = ..density..), binwidth = 1, breaks = 32.5:48.5, fill = "white", colour = "black"))
-
+#  geom_histogram(aes(y = ..density..), 
+#                binwidth = 1, 
+#                breaks = 32.5:48.5, 
+#                fill = "white", 
+#                colour = "black"))
 ```
 
 ####  Mean $\pm$ SD 
@@ -404,7 +418,8 @@ g0 <- ggplot(data = data.frame(chest_vec),
    labs(title = main_title,
         x = x_lab, 
         y = y_lab) + 
-   theme(plot.title = element_text(hjust = 0.5)))
+   theme(plot.title = element_text(hjust = 0.5,
+                                   size = 20)))
 ```
 
 #### Shading the area
@@ -440,5 +455,6 @@ curve_df <- data.frame(x = x_chest, y = y_norm)
 ### Save
 
 ```{r, save}
+getwd()
 save.image(file = "./Quetelet_chest.RData")
 ```
