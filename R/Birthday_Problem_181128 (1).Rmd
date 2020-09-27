@@ -1,0 +1,352 @@
+---
+title: "Quiz 181128 : Birthday Problem, Matching Problem, Money Illusion"
+author: "coop711"
+date: "2018-11-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(xlsx)
+library(pander)
+library(knitr)
+library(magrittr)
+library(tidyverse)
+library(stringr)
+panderOptions('table.split.table', Inf)
+panderOptions('table.alignment.rownames', 'left')
+panderOptions('table.alignment.default', 'right')
+options(width = 132)
+```
+
+```{r, data, echo = FALSE, results = 'hide'}
+quiz0523 <- "../data/quiz181128v2.xlsx" %>% 
+  read.xlsx(sheetIndex = 1, 
+            startRow = 2, endRow = 43, 
+            colIndex = 1:5, colClasses = rep("character", 5),
+            encoding = "UTF-8",
+            stringsAsFactors = FALSE)
+quiz0523 %>% str
+quiz0523$id <- 1:nrow(quiz0523)
+quiz0523 <- quiz0523[, c(6, 1:5)]
+names(quiz0523) <- c("id", "group", "Q1", "Q2", "Q3", "Q4")
+quiz0523$group %<>% factor(levels = c("Red", "Black"))
+
+#> birth_month_date <- strsplit(quiz0523$Q1, ",")
+birth_month_date <- quiz0523 %>%
+  select("Q1") %>%
+  .[[1]]
+#> `[[`(1) 바로 윗 식을 고쳐 쓴 방법
+#> .[, "Q1"] 두 줄을 한 줄로 
+#> 월, 일을 날짜 순으로 정리하기 위하여 글자를 떼어내고 숫자로 변화. 1 => 01 등.
+quiz0523$month <- quiz0523$Q1 %>% 
+  strsplit(split = ",") %>% 
+  sapply(function(.).[1]) 
+quiz0523$month %<>%
+  nchar %>% 
+  `==`(1) %>% 
+  ifelse(paste0(0, quiz0523$month), quiz0523$month)
+quiz0523$date <- quiz0523$Q1 %>% 
+  strsplit(split = ",") %>% 
+  sapply(function(.).[2]) 
+quiz0523$date %<>%
+  nchar %>% 
+  `==`(1) %>% 
+  ifelse(paste0(0, quiz0523$date), quiz0523$date)
+
+# quiz0523$month <- sapply(strsplit(birth_month_date, split = ","), function(x) x[1])
+# quiz0523$month <- ifelse(nchar(quiz0523$month) == 1, paste0(0, quiz0523$month), quiz0523$month)
+# quiz0523$date <- sapply(strsplit(birth_month_date, split = ","), function(x) x[2])
+# quiz0523$date <- ifelse(nchar(quiz0523$date) == 1, paste0(0, quiz0523$date), quiz0523$date)
+quiz0523$Q1_2 <- paste0(quiz0523$month, "월", quiz0523$date, "일")
+quiz0523$Q1_2[quiz0523$Q1_2 == "NA월NA일"] <- NA
+# quiz0523$Q1_2 <- str_c(quiz0523$month, "월", quiz0523$date, "일")
+#> 생일을 날짜 순서대로 정리한 복제본 생성
+quiz0523_2 <- quiz0523 %>%
+  `[`(order(.$month, .$date), )
+# quiz0523_2 <- quiz0523 %>%
+#   `[`(.$month %>% order(quiz0523$date), )
+# quiz0523_2 <- quiz0523[order(quiz0523$month, quiz0523$date), ]
+quiz0523_2[, c("id", "Q1_2")]
+#> NA 아닌 값만 추출
+birthdate <- quiz0523_2$Q1_2 %>%
+  `[`(is.na(.) %>% `!`)
+N1 <- length(birthdate)
+# birthdate <- quiz0523_2$Q1_2[!is.na(quiz0523_2$Q1_2)]
+#> Places where duplicated birthdates appears
+dup_b <- birthdate %>%
+  duplicated
+# dup_b <- duplicated(birthdate)
+#> Duplicated birthdates which appears at least twice (3번 이상 중복되는 값이 나올 수 있음)
+b_dup <- birthdate %>%
+  `[`(duplicated(.))
+# b_dup <- birthdate[duplicated(birthdate)]
+# b_dup <- birthdate[dup_b]
+#> List of duplicated birthdates
+b_dup_b <- birthdate %>%
+  `[`(. %in% (birthdate %>%
+  `[`(duplicated(.)) %>% unique))
+# b_dup_b <- birthdate[birthdate %in% unique(birthdate[duplicated(birthdate)])]
+# b_dup_b <- birthdate[birthdate %in% unique(b_dup_b)]
+#> Where the duplicates appear in Q1_2
+index_dup_b <- quiz0523_2$Q1_2 %>%
+  `%in%`(b_dup_b %>% unique) %>%
+  which
+# index_dup_b <- which(quiz0523$Q1_2 %in% unique(b_dup_b)
+#> List Duplicated birthdates with id and group
+quiz0523_2 %>%
+  `[`(index_dup_b, c("id", "Q1_2", "group"))
+# quiz0523_2[idex_dup_b, c("id", "Q1_2", group)]
+#> To remove 0 counts cells, use `droplevels`. 
+quiz0523_2$Q1_2 %>%
+  `[`(index_dup_b) %>%
+  table %>%
+  as.matrix %>%
+  t %>%
+  cbind(., "계" = rowSums(.)) %>%
+  kable(row.names = NA)
+# table(quiz0523_2$Q1_2[index_dup_b])
+# tbl_b <- t(as.matrix(table(quiz0523_2$Q1_2[index.dup.b])))
+# cbind(tbl_b, "계" = rowSums(tbl_b))
+# kable(t(as.matrix(table(droplevels(quiz0523_2$Q1_2[index.dup.b])))))
+
+#> Matching Data
+#> 데이터 오류 점검
+quiz0523$Q2 %>% table
+quiz0523$Q2[quiz0523$Q2 %>% `%in%`(c("RCFL", "RDGL")) %>% which] <- "RCGL"
+# quiz0523$Q2[which(quiz0523$Q2 %in% c("RCFL", "RDGL"))] <- "RCGL"
+#> 정답 분해
+ans <- "RCGL" %>% strsplit(split = "")
+# ans <- strsplit("RCGL", split = "")
+#> 답안 분해
+matching_score <- quiz0523$Q2 %>% 
+  strsplit(split = "") %>%
+  sapply(. %>% { `==`(., unlist(ans)) %>% ifelse(1, 0)}) %>%
+#   sapply(. %>% {ifelse( . == unlist(ans), 1, 0)}) %>%
+#   sapply(function(x) ifelse(x == unlist(ans), 1, 0)) %>%
+  apply(MARGIN = 2, sum)
+N2 <- matching_score %>%
+  is.na %>%
+  `!` %>%
+  sum
+# matching <- strsplit(quiz0523$Q2, "")
+# matching_count <- mapply(function(x) ifelse(x == unlist(ans), 1, 0), matching)
+# matching_score <- apply(matching_count, 2, sum)
+quiz0523$Q2_2 <- matching_score
+#> Q3
+quiz0523$Q3 %<>% factor(levels = c("가", "나"), 
+                        labels = c("연비 10 => 12", "연비 30 => 40"))
+#> Q4
+quiz0523$Q4 %<>% factor(levels = c("가", "나"),
+                        labels = c("수용가능", "불공정"))
+# str(quiz0523)
+pander(quiz0523[c("Q3", "Q4", "group")])
+```
+
+```{r, randomization, echo = FALSE, results = 'hide'}
+summary(quiz0523)
+```
+
+## 퀴즈 응답
+
+### Birthday Problem
+
+#### 생일이 같은 사람
+
+```{r, echo = FALSE}
+quiz0523_2 %>%
+  `[`(index_dup_b, c("id", "Q1_2", "group")) %>%
+  kable(col.names = c("학번", "생일", "그룹"), align = "c")
+```
+
+#### 어느 날에 몇 명씩 생일이 같은가?
+
+```{r, echo = FALSE}
+quiz0523_2$Q1_2 %>%
+  `[`(index_dup_b) %>%
+  table %>%
+  as.matrix %>%
+  t %>%
+  cbind("계" = rowSums(.)) %>%
+  kable(row.names = NA)
+```
+
+#### 생일이 같은 사람은 몇 명 정도 기대되는가?
+
+```{r, echo = FALSE}
+E_N <- . %>% {. * (1 - (364 / 365) ^ ( . - 1))}
+# E_N <- function(N){N * (1 - (364 / 365) ^ (N - 1))}
+V_N <- . %>% {E_N(.) + . * ( . - 1) * (1 - (363 / 365)) ^ ( . - 2)}
+# V_N <- function(N){N * (1 - (364 / 365) ^ (N - 1)) + N * (N - 1) * (1 - (363 / 365)) ^ (N - 2)}
+```
+
+$N$을 전체 인원이라 할 때, 기대 인원은 $N\times\{1- (\frac{364}{365})^{N-1}\}$, 
+분산은 $N\times\{1- (\frac{364}{365})^{N-1}\} + N\times(N-1)\times\{1-(\frac{363}{365})^{N-2}\}$로 계산된다.
+
+무응답이거나 결석한 학생을 제외한 응답 인원 `r N1`명에 대하여 기대인원을 계산하면 `r N1 %>% E_N %>% round(1)`명,
+표준오차는 `r N1 %>% V_N %>% sqrt %>% round(1)`명으로 계산되어 관찰된 값이 그 범위에 잘 들어감을 알 수 있다.
+
+##### 기대값의 계산
+
+```{r, echo = FALSE}
+N1 %>% 
+  E_N %>%
+  round(digits = 1)
+```
+
+##### 표준오차의 계산
+
+```{r, echo = FALSE}
+N1 %>%
+  V_N %>%
+  sqrt %>%
+  round(digits = 1)
+```
+
+#### 태어난 달의 분포는?
+
+```{r, month of the birthdates, echo = FALSE}
+quiz0523$month <- quiz0523$month %>%
+  factor(levels = unique(quiz0523$month), labels = paste0(1:12, "월"))
+quiz0523$month %>%
+  table(quiz0523$group, .) %>%
+  cbind("계" = rowSums(.)) %>%
+  rbind("계" = colSums(.)) %>%
+  kable(align = "r")
+```
+
+랜덤화 효과 검증
+
+```{r, echo = FALSE}
+quiz0523$month %>%
+  table(quiz0523$group, .) %>%
+  chisq.test(simulate.p.value = TRUE) %>%
+  pander
+```
+
+월별로 고르게 출생하였는가?
+
+```{r, echo = FALSE}
+quiz0523$month %>%
+  table %>%
+  chisq.test(simulate.p.value = TRUE) %>%
+  pander
+```
+
+### Matching Problem
+
+`r knitr::include_graphics("../pics/Quiz171115_Q2.png", dpi = NA)`
+
+#### 정답갯수의 분포
+
+```{r, matching, echo = FALSE}
+quiz0523$Q2_2 %>%
+  factor(levels = c(0, 1, 2, 4)) %>%
+  table(quiz0523$group, .) %>%
+  cbind("계" = rowSums(.)) %>%
+  rbind("계" = colSums(.)) %>%
+  kable
+```
+
+#### 카이제곱 적합도 테스트
+
+랜덤하게 골랐다면, 각각의 확률은 9/24, 8/24, 6/24, 1/24임. 응답인원 `r N2`명을 각 확률에 곱해보면,
+
+```{r, echo = FALSE}
+prob <- c(9, 8, 6, 1) / 24
+Expected <- N2 * prob
+names(Expected) <- paste0(c("0", "1", "2", "4"), "개")
+Expected %>%
+  as.matrix %>%
+  t %>%
+  cbind("계" = rowSums(.)) %>%
+  format(digits = 2, nsmall = 1) %>%
+  kable(align = "c")
+```
+
+```{r, echo = FALSE}
+quiz0523$Q2_2 %>%
+  factor(levels = c(0, 1, 2, 4)) %>%
+  table %>%
+  chisq.test(p = c(9, 8, 6, 1)/24, simulate.p.value = TRUE) %>%
+  pander
+```
+
+### 직관과 어긋나는 용어
+
+#### 연비
+
+`r knitr::include_graphics("../pics/Quiz180523_Q3.png", dpi = NA)`
+
+1,200 킬로미터룰 주행한다고 해 보자. '가'는 120리터에서 100리터로 20리터를 절감하고, '나'는 40리터에서 30리터 10리터를 절감하게 된다. 따라서 '가'운전자가 이전보다 더 절감하게 된다.
+
+```{r, Framing Effect, echo = FALSE}
+tbl_q3_a <- quiz0523$Q3 %>%
+  table(quiz0523$group, ., useNA = "ifany") %>%
+  cbind("계" = rowSums(.)) %>%
+  rbind("계" = colSums(.))
+colnames(tbl_q3_a)[3] <- "결석"
+tbl_q3_a %>% 
+  kable
+tbl_q3_a %>%
+  `[`(-3, -(3:4)) %>% 
+  chisq.test(simulate.p.value = TRUE, B = 20000) %>%
+  pander
+```
+
+#### % 비교.  
+
+```{r, Framing effects in percentage, echo = FALSE}
+tbl_q3_a %>%
+  `[`(3, -(3:4), drop = FALSE) %>%
+  prop.table %>%
+  cbind("계" = rowSums(.)) %>%
+  `*`(100) %>%
+  format(digits = 2, nsmall = 1) %>%
+  kable(align = "c", row.names = FALSE)
+```
+
+### 화폐 착각
+
+#### 인플레이션과 임금인상
+
+#### Red
+
+`r knitr::include_graphics("../pics/Quiz171115_Q4_Red.png", dpi = NA)`
+
+#### Black
+
+`r knitr::include_graphics("../pics/Quiz171115_Q4_Black.png", dpi = NA)`
+
+인플레 없이 7%를 삭감하는 것과 12% 인플레 상황에서 5%임금 인상은 동등한 조건인데도 '임금인상'이라는 말에 '수용가능하다'는 응답 비율이 늘어남에 유의.
+
+```{r, Money illusion, echo = FALSE}
+tbl_q4_a <- quiz0523$Q4 %>%
+  table(quiz0523$group, ., useNA = "ifany") %>%
+  cbind("계" = rowSums(.)) %>%
+  rbind("계" = colSums(.))
+colnames(tbl_q4_a)[3] <- "결석"
+rownames(tbl_q4_a) <- c("실업+인플레0%, 임금삭감7%", "실업+인플레12%, 임금인상5%", "계")
+tbl_q4_a %>% 
+  kable
+tbl_q4_a %>%
+  `[`(-3, -(3:4)) %>%
+  chisq.test(simulate.p.value = FALSE) %>%
+  pander
+```
+
+#### % 비교.  
+
+```{r, Money illusion in percentage, echo = FALSE}
+tbl_q4_a %>% 
+  `[`(-3, -(3:4)) %>%
+  prop.table(margin = 1) %>%
+  `*`(100) %>%
+  cbind("계" = rowSums(.)) %>%
+  format(digits = 2, nsmall = 1) %>%
+  kable
+```
+
+```{r, save, echo = FALSE}
+#save.image("../R/quiz0523.rda")
+```
