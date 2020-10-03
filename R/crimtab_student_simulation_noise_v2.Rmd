@@ -1,0 +1,116 @@
+---
+title: "Crimtab Data (with noise) for Simulation of T-Distribution"
+author: "coop711"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Data Loading
+
+```{r, data loading}
+load("./crimtab_test.RData")
+ls()
+ls.str()
+head(crimtab_long_df_noise, 
+     n = 10)
+```
+
+<P style = "page-break-before:always">
+
+## Student 의 Simulation 재현
+
+### Sample t-values
+
+3,000장의 카드를 잘 섞는 것은 `sample()` 이용.
+ 
+```{r, suffling}
+# set.seed(113)
+crimtab_shuffle_noise <- crimtab_long_df_noise[sample(1:3000), ]
+head(crimtab_shuffle_noise, 
+     n = 10)
+```
+
+표본의 크기가 4인 750개의 표본을 만드는 작업은 `rep()` 이용.
+
+```{r, 750 samples of size 4}
+sample_id <- as.factor(rep(1:750, each = 4))
+head(sample_id, n = 10)
+```
+
+각 표본의 평균과 표준편차 계산에는 `tapply()` 이용. 
+
+```{r, sample mean and sd}
+finger_sample_mean <- tapply(crimtab_shuffle_noise[, "finger"], 
+                             INDEX = sample_id, 
+                             FUN = mean)
+finger_sample_sd <- tapply(crimtab_shuffle_noise[, "finger"], 
+                           INDEX = sample_id, 
+                           FUN = sd)
+str(finger_sample_mean)
+str(finger_sample_sd)
+```
+
+t-통계량 계산. Student는 표준편차 계산에서 분모에 $n$을 사용하고 히스토그램을 그려 비교하였으나 자유도 3인 t-분포와 비교하기 위하여 $t=\frac{\bar{X_n}-\mu}{\hat{SD}/\sqrt{n}}$을 계산함. (여기서 $\hat{SD}$는 표본 표준편차)
+
+```{r, t stats}
+sample_t <- (finger_sample_mean - mean(crimtab_long_df_noise[, "finger"]))/(finger_sample_sd/sqrt(4))
+str(sample_t)
+```
+
+계산한 t-통계량 값들의 평균과 표준편차, 히스토그램을 그리고 자유도 3인 t-분포의 밀도함수 및 표준정규곡선과 비교. 우선 모두 같은 값들이 나와서 분모가 0인 경우가 있는지 파악. 있으면 모평균과 비교하여 양수인 경우 +6, 음수인 경우 -6 값 부여(Student가 한 일)
+
+```{r, extreme values}
+t_inf <- is.infinite(sample_t)
+sample_t[t_inf]
+sample_t[t_inf] <- 6 * sign(sample_t[t_inf])
+```
+
+문제되는 값이 없는 것을 확인하고, 평균과 표준편차 계산. 자유도 $n$인 t-분포의 평균과 표준편차는 각각 0과 $\sqrt{\frac{n}{n-2}}$임을 상기할 것. -6이나 +6보다 큰 값이 상당히 자주 나온다는 점에 유의.
+
+```{r, summary}
+mean(sample_t)
+sd(sample_t)
+summary(sample_t)
+```
+
+<P style = "page-break-before:always">
+
+### Histogram and Density Curves
+
+t-통계량들의 히스토그램을 그리고, 자유도 3인 t의 밀도함수, 표준정규분포 밀도함수와 비교.
+
+```{r, comparison, fig.width = 10, fig.height = 6}
+# hist(sample_t, prob = TRUE, ylim = c(0, 0.5))
+# hist(sample_t, prob = TRUE, nclass = 20, xlim = c(-6, 6), ylim = c(0, 0.5), main = "Histogram of Sample t-statistics", xlab = "Sampled t-values")
+# hist(sample_t, prob = TRUE, nclass = 50, xlim = c(-6, 6), ylim = c(0, 0.5), main = "Histogram of Sample t-statistics", xlab = "Sampled t-values")
+hist(sample_t, 
+     prob = TRUE, 
+     breaks = seq(-20, 20, by = 0.5), 
+     xlim = c(-6, 6), 
+     ylim = c(0, 0.5), 
+     main = "Histogram of Sample t-statistics", 
+     xlab = "Sampled t-values")
+lines(seq(-6, 6, by = 0.01), 
+      dt(seq(-6, 6, by = 0.01), df = 3), 
+      col = "blue")
+lines(seq(-6, 6, by = 0.01), 
+      dnorm(seq(-6, 6, by = 0.01)), 
+      col = "red")
+legend("topright", 
+       inset = 0.05, 
+       legend = c("t with df = 3", "standard normal"),
+       lty = 1, 
+       col = c("blue", "red"))
+```
+
+<P style = "page-break-before:always">
+
+### QQnorm
+
+`qqnorm()` 을 그려보면 정규분포와 꼬리에서 큰 차이가 난다는 것을 알 수 있음.
+
+```{r, qqnorm, fig.width = 7, fig.height = 7}
+qqnorm(sample_t)
+abline(a = 0, b = 1, col = "blue")
+```
+

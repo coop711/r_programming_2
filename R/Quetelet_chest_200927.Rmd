@@ -105,9 +105,9 @@ chest_df$Freq %>%
   `/`(., sum(.)) %>%
   barplot
 chest_df$Freq %>% 
-#  prop.table %>%
+  prop.table %>%
 #> R 4.0.0 부터는 proportions 사용 가능
-  proportions %>%
+#  proportions %>%
   barplot
 #> 조심! 다음 두 표현은 원하는 그림이 나오지 않음.
 chest_df$Freq %>%
