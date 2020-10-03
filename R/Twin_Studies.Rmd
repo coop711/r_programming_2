@@ -64,6 +64,9 @@ cols <- brewer.pal(8, "Accent")
 #   cumsum(x) - x / 2
 # }
 pos <- . %>% {`-`(cumsum(.), . / 2)}
+# pos <- . %>% {cumsum(.) - . / 2}
+#> 아래와 같이 작성하면 오류 발생
+# pos <- . %>% cumsum(.) - . / 2
 #> 텍스트 정보 넣을 좌표를 계산한다. 
 y1_text <- apply(Nature1, 
                  MARGIN = 1, 
