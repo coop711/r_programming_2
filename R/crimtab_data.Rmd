@@ -8,11 +8,14 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(knitr)
+library(magrittr)
 ```
 
 ## Biometrika 1908
 
-`r include_graphics("../pics/biometrika_1908.png")`
+```{r, out.width = "67%"}
+include_graphics("../pics/biometrika_1908.png")
+```
 
 ## Structure of Data
 
@@ -32,7 +35,7 @@ cm 단위로 되어 있는 키의 계급을 인치 단위로 변환하면 숨어
 
 ```{r, viewing the real data structure}
 crimtab_2 <- crimtab
-colnames(crimtab_2) <- as.numeric(colnames(crimtab_2))/2.54
+colnames(crimtab_2) <- as.numeric(colnames(crimtab_2))/ 2.54
 dimnames(crimtab_2) <- list(finger = rownames(crimtab_2), 
                             height = colnames(crimtab_2))
 crimtab_2
@@ -59,17 +62,19 @@ str(crimtab_2)
 crimtab_df <- as.data.frame(crimtab_2, 
                             stringsAsFactors = FALSE)
 str(crimtab_df)
-crimtab_df[1:2] <- sapply(crimtab_df[1:2], as.numeric)
+crimtab_df[1:2] <- sapply(crimtab_df[1:2], FUN = as.numeric)
+# crimtab_df[1:2] %<>%
+#   sapply(FUN = as.numeric)
 str(crimtab_df)
 ```
 
 손가락 길이와 키의 조합이 나타나는 빈도만큼 그 조합을 반복하는 long format으로 변환하기 위하여 `sapply` 활용. `apply`를 사용하는 방법도 주석처리하여 보여 줌.
 
 ```{r, long format}
-# crimtab_long <- apply(crimtab_df[ , 1:2], 2, function(x) rep(x, crimtab_df[ , 3]))
-# crimtab_long <- apply(crimtab_df[, c("finger", "height")], 2, function(x) rep(x, crimtab_df[ , "Freq"]))
-# crimtab_long <- apply(crimtab_df[c("finger", "height")], 2, function(x) rep(x, crimtab_df[ , "Freq"]))
-# crimtab_long <- apply(crimtab_df[1:2], 2, function(x) rep(x, crimtab_df[ , "Freq"]))
+# crimtab_long <- apply(crimtab_df[ , 1:2], MARGIN = 2, function(x) rep(x, crimtab_df[ , 3]))
+# crimtab_long <- apply(crimtab_df[, c("finger", "height")], MARGIN = 2, function(x) rep(x, crimtab_df[ , "Freq"]))
+# crimtab_long <- apply(crimtab_df[c("finger", "height")], MARGIN = 2, function(x) rep(x, crimtab_df[ , "Freq"]))
+# crimtab_long <- apply(crimtab_df[1:2], MARGIN = 2, function(x) rep(x, crimtab_df[ , "Freq"]))
 crimtab_long <- sapply(crimtab_df[c("finger", "height")], 
                        function(x) rep(x, crimtab_df$Freq))
 # crimtab_long <- mapply(function(x) rep(x, crimtab_df$Freq), crimtab_df[c("finger", "height")])

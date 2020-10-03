@@ -18,7 +18,7 @@ function(tbl_df){
     rep(each = N)
   tbl_p_df$height <- unlist(tapply(tbl_p_df[, 3], 
                                    INDEX = tbl_p_df[, 2], 
-                                   FUN = proportions))
+                                   FUN = prop.table))
   tbl_p_df$label_height <- unlist(tapply(tbl_p_df$height, 
                                          INDEX = tbl_p_df[, 2], 
                                          FUN = pos))

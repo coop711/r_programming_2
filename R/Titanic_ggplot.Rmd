@@ -77,9 +77,9 @@ b1_fill <- barplot_gg_fill(as.data.frame(as.table(Surv_Class)[2:1, ])) +
   scale_fill_manual(name = "", 
                     labels = c("생존", "사망"), 
                     values = rainbow(2)[2:1]) +
-  theme(axis.title.x = element_text(family = "KoPubWorldDotum Ligh"),
-        axis.title.y = element_text(family = "KoPubWorldDotum Ligh"),
-        legend.text = element_text(family = "KoPubWorldDotum Ligh"))
+  theme(axis.title.x = element_text(family = "KoPubWorldDotum Light"),
+        axis.title.y = element_text(family = "KoPubWorldDotum Light"),
+        legend.text = element_text(family = "KoPubWorldDotum Light"))
 top1 <- textGrob("객실 등급별 생존/사망", 
                  gp = gpar(cex = 1.5, fontfamily = "KoPubWorldDotum Bold"))
 grid.arrange(b1_stack, b1_fill, ncol = 2, top = top1)
