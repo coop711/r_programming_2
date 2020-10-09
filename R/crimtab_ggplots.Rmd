@@ -8,6 +8,7 @@ output: html_document
 ## Working Data Loading
 
 ```{r, data loading, echo = TRUE}
+library(magrittr)
 load("./crimtab.RData")
 ls()
 ls.str()
@@ -24,7 +25,9 @@ head(crimtab_long_df)
 
 ```{r, scatter diagram, fig.width = 7, fig_height = 7}
 # plot(finger ~ height, data = crimtab_long_df)
-plot(crimtab_long_df[2:1])
+crimtab_long_df[2:1] %>%
+  plot()
+plot(crimtab_long_df[, 2:1])
 ```
 
 * 변수 각각의 히스토그램은?
@@ -37,8 +40,12 @@ hist(crimtab_long_df$height,
 hist(crimtab_long_df$finger, 
      main = "Histogram of Finger Length", 
      xlab = "finger length(cm)")
-# hist(crimtab_long_df["height"], main="Histogram of Height", xlab="height(inches)")
-# hist(crimtab_long_df["finger"], main="Histogram of Finger Length", xlab= "finger length(cm)")
+# hist(crimtab_long_df["height"], 
+#      main="Histogram of Height", 
+#      xlab="height(inches)")
+# hist(crimtab_long_df["finger"], 
+#      main="Histogram of Finger Length", 
+#      xlab= "finger length(cm)")
 ```
 
 * 평균과 표준편차를 한번에 구하려면 다음과 같이 anonymous function을 작성하고 `mapply()` 또는 `sapply()`를 이용하는 게 편함. 이를 모수로 하는 정규곡선을 덧씌워 볼 것.
@@ -49,17 +56,19 @@ hist(crimtab_long_df$finger,
 mean_sd <- function(x) {
   mean <- mean(x, na.rm = TRUE)
   sd <- sd(x)
-  return(c(mean = mean, sd = sd))
+  c(mean = mean, sd = sd)
 # list(mean = mean, sd = sd)
 }
 dump("mean_sd", file = "mean_sd.R")
 ```
 
 ```{r, crimtab_stat}
-crimtab_stat <- sapply(crimtab_long_df, mean_sd)
+# crimtab_long_df %>%
+#   sapply(FUN = mean_sd)
+crimtab_stat <- sapply(crimtab_long_df, FUN = mean_sd)
 # crimtab_stat <- mapply(mean_sd, crimtab_long_df)
-# apply(crimtab.long, 2, mean)
-# apply(crimtab.long, 2, sd)
+# apply(crimtab_long, 2, mean)
+# apply(crimtab_long, 2, sd)
 str(crimtab_stat)
 ```
 
@@ -193,7 +202,8 @@ g2_7
   
 ```{r, position jitter size width, fig.width = 7, fig_height = 7}
 g2_8 <- g1 + 
-  geom_point(position = position_jitter(width = 1, height = 0), size = 0.7)
+  geom_point(position = position_jitter(width = 1, height = 0), 
+             size = 0.7)
 g2_8
 ```
 
@@ -371,6 +381,11 @@ y_height <- dnorm(x_height,
 
 ```{r, side by side, fig.width = 8, fig_height = 8}
 library(gridExtra)
+grid.rect(gp = gpar(col = "white"), draw = FALSE) %>%
+grid.arrange(g_h, ., g3, g_f, 
+             ncol = 2, 
+             widths = c(4, 1), 
+             heights = c(1, 4))
 blank <- grid.rect(gp = gpar(col = "white"), draw = FALSE)
 grid.arrange(g_h, blank, g3, g_f, 
              ncol = 2, 

@@ -62,7 +62,8 @@ str(crimtab_2)
 crimtab_df <- as.data.frame(crimtab_2, 
                             stringsAsFactors = FALSE)
 str(crimtab_df)
-crimtab_df[1:2] <- sapply(crimtab_df[1:2], FUN = as.numeric)
+crimtab_df[1:2] <- sapply(crimtab_df[1:2], 
+                          FUN = as.numeric)
 # crimtab_df[1:2] %<>%
 #   sapply(FUN = as.numeric)
 str(crimtab_df)

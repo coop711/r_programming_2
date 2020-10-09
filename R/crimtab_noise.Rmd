@@ -55,7 +55,8 @@ noise를 넣어 Histogram 과 QQnorm 작성
 
 ```{r, fig.width = 8, fig.height = 6}
 crimtab_long_df_noise <- crimtab_long_df
-crimtab_long_df_noise[, "finger"] <- crimtab_long_df[, "finger"] + r_noise/10
+crimtab_long_df_noise[, "finger"] <- 
+        crimtab_long_df[, "finger"] + r_noise/10
 hist(crimtab_long_df_noise[, "finger"], 
      prob = TRUE, 
      nclass = 42)
