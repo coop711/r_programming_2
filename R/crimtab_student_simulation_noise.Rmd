@@ -20,7 +20,8 @@ head(crimtab_long_df_noise, n = 10)
  
 ```{r, suffling}
 # set.seed(113)
-crimtab_shuffle_noise <- crimtab_long_df_noise[sample(1:3000), ]
+crimtab_shuffle_noise <- 
+  crimtab_long_df_noise[sample(1:3000), ]
 head(crimtab_shuffle_noise, n = 10)
 ```
 
@@ -34,8 +35,10 @@ head(sample_id, n = 10)
 각 표본의 평균과 표준편차 계산에는 `tapply()` 이용. 
 
 ```{r, sample mean and sd}
-finger.sample.mean <- tapply(crimtab_shuffle_noise[, "finger"], sample_id, mean)
-finger.sample.sd <- tapply(crimtab_shuffle_noise[, "finger"], sample_id, sd)
+finger.sample.mean <- 
+  tapply(crimtab_shuffle_noise[, "finger"], sample_id, mean)
+finger.sample.sd <- 
+  tapply(crimtab_shuffle_noise[, "finger"], sample_id, sd)
 str(finger.sample.mean)
 str(finger.sample.sd)
 head(cbind(finger.sample.mean, finger.sample.sd), n = 10)

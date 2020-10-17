@@ -25,7 +25,7 @@ Quetelet의 가슴둘레 자료에서 살핀 바와 같이 이 자료를 그대�
 library(nortest)
 # ad.test(crimtab_long_df[, 1])
 # ad.test(crimtab_long_df[, 2])
-kable(sapply(crimtab_long_df, ad.test))
+kable(sapply(crimtab_long_df, FUN = ad.test))
 ```
 
 <P style = "page-break-before:always">
@@ -80,7 +80,8 @@ par(mfrow = c(1, 1))
 #### Histogram
 
 ```{r, fig.width = 8, fig.height = 6}
-crimtab_long_df_noise[, "height"] <- crimtab_long_df[, "height"] + r_noise
+crimtab_long_df_noise[, "height"] <- 
+        crimtab_long_df[, "height"] + r_noise
 hist(crimtab_long_df_noise[, "height"], 
      prob = TRUE, 
      nclass = 22)
