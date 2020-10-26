@@ -1,0 +1,114 @@
+---
+title: "Student Crimtab Data Graphic Analysis"
+author: "coop711"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Data Manipulation
+
+```{r, loading data}
+load("./crimtab.RData")
+```
+
+산점도를  여러 유형으로 표현하기 위하여 필요한 패키지 설치
+
+```{r, hexbin}
+# install.packages("hexbin", repos = "https://cran.rstudio.com")
+library(hexbin)
+```
+
+`crimtab_bin` 계산
+
+```{r, crimtab_bin}
+crimtab_bin <- hexbin(crimtab_long_df$height, 
+                      crimtab_long_df$finger, 
+                      xbins = 50)
+```
+
+## Plots
+
+```{r, plots, fig.width = 8, fig.height = 8}
+par(mfrow = c(2, 2))
+# plot(x = crimtab_long_df[, 2], y = crimtab_long_df[, "finger"])
+plot(crimtab_long_df[, 2:1])
+plot(crimtab_long_df[, 2:1], 
+     pch = 20)
+# smoothScatter(crimtab_long_df[,"height"], crimtab_long_df[,"finger"], xlab = "height", ylab = "finger")
+# smoothScatter(crimtab_long_df[,"height"], crimtab_long_df[,"finger"], nbin = 32, xlab = "height", ylab = "finger")
+smoothScatter(crimtab_long_df, 
+              xlab = "height", 
+              ylab = "finger")
+smoothScatter(crimtab_long_df, 
+              nbin = 32, 
+              xlab = "height", 
+              ylab = "finger")
+```
+
+<P style = "page-break-before:always">
+
+### Plot crimtab_bin
+
+```{r, plot crimtab_bin, fig.width = 6, fig.height = 6}
+par(mfrow = c(1, 1))
+plot(crimtab_bin, 
+     xlab = "height(inches)", 
+     ylab = "finger length(cm)")
+```
+
+<P style = "page-break-before:always">
+
+### 산점도와 함께 주변분포 표시
+
+```{r, plot with marginals, fig.width = 6, fig.height = 6}
+par(mar = c(4, 4, 1, 1))
+par(fig = c(0, 0.8, 0, 0.8))
+plot(crimtab_long_df, pch = 20)
+par(fig = c(0, 0.8, 0.68, 1), new = TRUE)
+# hist(crimtab_long_df[, "height"], axes = FALSE, ann = FALSE)
+hist(crimtab_long_df$height, axes = FALSE, ann = FALSE)
+par(fig = c(0.68, 1, 0, 0.8), new = TRUE)
+# barplot(table(cut(crimtab_long_df[, "finger"], breaks = 10)), space = 0, col = "white", horiz = TRUE, axes = FALSE, axisnames = FALSE)
+barplot(table(cut(crimtab_long_df$finger, breaks = 10)), 
+        space = 0, col = "white", horiz = TRUE, axes = FALSE, axisnames = FALSE)
+par(fig = c(0, 1, 0, 1))
+par(mar = c(5, 4, 1, 1) + 0.1)
+```
+
+<P style = "page-break-before:always">
+
+### `persp()`
+
+`persp()`를 활용하면 다양한 각도에서 3차원 겨냥도를 그려볼 수 있음. $x$ 축은 행, $y$ 축은 열에 펼쳐진 격자를 0에서 1까지로 조정. `theta`와 `phi`는 박스를 돌려보는 각도이고, `expand`는 박스 높이의 상대적인 비율임. $x$ 축과 $y$ 축의 라벨 이외에는 디폴트값을 적용시킨 겨냥도와 적절히 조정한 겨냥도를 비교해 볼 것,
+
+```{r, perspective plot, fig.width = 12, fig.height = 12}
+par(mfrow = c(2, 2))
+persp(crimtab_2, 
+      xlab = "Finger Length", 
+      ylab = "Height")
+persp(crimtab_2, 
+      xlab = "Finger Length", 
+      ylab = "Height", 
+      theta = 90, 
+      phi = 30, 
+      expand = 0.5, 
+      scale = TRUE)
+persp(crimtab_2, 
+      xlab = "Finger Length", 
+      ylab = "Height", 
+      theta = 135, 
+      phi = 30, 
+      expand = 0.5, 
+      scale = TRUE)
+persp(crimtab_2, 
+      xlab = "Finger Length", 
+      ylab = "Height", 
+      theta = 45, 
+      phi = 45, 
+      expand = 0.5, 
+      scale = TRUE)
+par(mfrow = c(1, 1))
+```
+
+## Comments 
+Student(W.S. Gosset)이 수행한 바 있는 ...

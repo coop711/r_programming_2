@@ -1,0 +1,471 @@
+---
+title: "Women and Children First!"
+author: "coop711"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+타이타닉호의 침몰 과정에서 **여성과 어린이를 먼저 구한다**는 원칙은 지켜졌는가?
+
+## Data
+
+`datasets` 패키지에 들어있으므로 불러들이기만 하면 됨. 자료의 구조 파악.
+
+
+```{r}
+library(magrittr)
+library(knitr)
+library(pander)
+library(ggplot2)
+library(extrafont)
+data(Titanic)
+Titanic %>% str
+```
+
+## Array
+
+4-차원 array table이므로 보기 쉽게 `ftable`(flat table) 적용. **객실 등급**(class)은 1등실부터 선원까지이고 선원 중에 어린이는 없었으며, 
+
+```{r}
+Titanic %>% ftable %>% as.matrix %>% kable(align = "c")
+```
+
+4-dimensional array 인 점을 감안하여 각 변수의 주변합을 구해보면
+
+```{r}
+Titanic %>% apply(MARGIN = 1, FUN = sum) %>% as.matrix %>% t %>% kable(align = "c")
+Titanic %>% apply(MARGIN = 2, FUN = sum) %>% as.matrix %>% t %>% kable(align = "c")
+Titanic %>% apply(MARGIN = 3, FUN = sum) %>% as.matrix %>% t %>% kable(align = "c")
+Titanic %>% apply(MARGIN = 4, FUN = sum) %>% as.matrix %>% t %>% kable(align = "c")
+```
+
+분할표를 구하되 상황 파악이 편하게 열과 행을 조정.
+
+```{r}
+Titanic %>% 
+  apply(MARGIN = 1:2, FUN = sum)
+Titanic %>% 
+  apply(MARGIN = 2:1, FUN = sum)
+Titanic %>% 
+  apply(MARGIN = c(3, 1), FUN = sum)
+Surv_Class <- Titanic %>% 
+  apply(MARGIN = c(4, 1), FUN = sum)
+```
+
+## Proportions
+
+**객실 등급**별 생존률을 비교하려면. (우선, 자릿수를 정해 놓고)
+
+```{r}
+options(digits = 3)
+#> Titanic %>% 
+#>   apply(MARGIN = c(4, 1), FUN = sum) %>%
+Surv_Class %>%
+  prop.table(margin = 2) %>%
+  `*`(100) %>%
+  rbind(., "Sum" = colSums(.))
+```
+
+## Plots 
+
+이를 `barplot`으로 나타내는 데 있어서 각 `argument`가 왜  필요한지 시행착오를 거쳐 파악해 볼 것.
+
+```{r, fig.width = 12, fig.height = 6}
+par(mfrow = c(1, 2), family = "KoPubWorldDotum Medium")
+#> Titanic %>% 
+#>   apply(MARGIN = c(4, 1), FUN = sum)
+pos <- function(x){
+  cumsum(x) - x / 2
+}
+pos <- . %>% {`-`(cumsum(.), . / 2)}
+b1 <- Surv_Class %>% 
+  barplot(yaxt = "n", col = rainbow(2))
+axis(side = 2, 
+     at = Surv_Class %>%
+       apply(MARGIN = 2, FUN = cumsum) %>% c(0, .),
+     labels = Surv_Class %>% 
+       apply(MARGIN = 2, FUN = cumsum) %>% c(0, .),
+     las = 2)
+y1_text <- apply(Surv_Class,
+                 MARGIN = 2,
+                 FUN = pos)
+# y1_text <- c(Surv_Class[1, ] / 2, Surv_Class[1, ] + Surv_Class[2, ] / 2) 
+# text(x = rep(b1, times = 2), 
+#      y = y1_text, 
+#      labels = c(Surv_Class[1, ], Surv_Class[2, ]))
+text(x = rep(b1, each = 2), 
+     y = y1_text, 
+     labels = Surv_Class)
+legend("topleft", inset = 0.05, fill = rainbow(2), legend = c("사망", "생존"))
+#> Titanic %>%
+#>   apply(c(4,1), sum) 
+p1 <- Surv_Class %>%
+  prop.table(margin = 2) 
+b1_p <- p1 %>%  
+  barplot(yaxt = "n", col = rainbow(2))
+axis(side = 2, 
+     at = seq(0, 1, by = 0.25), 
+     labels = seq(0, 100, by = 25),
+     las = 2)
+mtext("(%)", side = 2, at = 1.05, line = 0, las = 2)
+p1_text <- apply(p1,
+                 MARGIN = 2,
+                 FUN = pos)
+# p1_text <- c(p1[1, ] / 2, p1[1, ] + p1[2, ] / 2) 
+text(x = b1_p %>% 
+       rep(each = 2), 
+     y = p1_text, 
+     labels = p1 %>%
+       `*`(100) %>%
+       format(digits = 2, nsmall = 1) %>%
+       paste0("%"))
+legend("topleft", inset = 0.05, fill = rainbow(2), legend = c("사망", "생존"))
+title(main = "객실 등급별 생존/사망", line = -1, outer = TRUE, cex.main = 1.5,
+      family = "KoPubWorldDotum Bold")
+dev.copy(png, "../pics/Titanic_barplot01.png", width = 840, height = 420)
+dev.off()
+```
+
+### Mosaic Plot
+
+```{r, fig.width = 6, fig.height = 6, fig.align = "center"}
+par(mfrow = c(1, 1), family = "KoPubWorldDotum Medium")
+mosaicplot(t(Surv_Class), main = "객실 등급별 생존/사망",
+           xlab = "객실 등급", ylab = "생존/사망",
+           col = rainbow(2))
+dev.copy(png, "../pics/Titanic_mosaicplot01.png", width = 320, height = 320)
+dev.off()
+```
+
+## 성별 생존/사망
+
+Cross-table 을 계속 작성해 가자면 
+
+```{r}
+Titanic %>% apply(MARGIN = 2:3, FUN = sum)
+Titanic %>% apply(MARGIN = c(2,4), FUN = sum)
+Surv_Sex <- Titanic %>% 
+  apply(MARGIN = c(4,2), FUN = sum)
+```
+
+남녀 생존률을 비교하려면,
+
+```{r}
+Surv_Sex %>%
+  prop.table(margin = 2) %>%
+  `*`(100) %>%
+  rbind(., "Sum" = colSums(.))
+```
+
+### Plots
+
+이를 `barplot`으로 나타내는 데 있어서 각 `argument`가 왜  필요한지 시행착오를 겪어 볼 것.
+
+```{r, fig.width = 12, fig.height = 6}
+par(mfrow = c(1, 2), family = "KoPubWorldDotum Medium")
+b2 <- Surv_Sex %>% 
+  barplot(yaxt = "n", col = rainbow(2))
+axis(side = 2, 
+     at = Surv_Sex %>%
+       apply(MARGIN = 2, FUN = cumsum) %>% c(0, .),
+     labels = Surv_Sex %>% 
+       apply(MARGIN = 2, FUN = cumsum) %>% c(0, .) %>% 
+       format(big.mark = ","),
+     las = 2)
+# y2_text <- c(Surv_Sex[1, ] / 2, Surv_Sex[1, ] + Surv_Sex[2, ] / 2) 
+y2_text <- apply(Surv_Sex,
+                 MARGIN = 2,
+                 FUN = pos)
+text(x = rep(b2, each = 2), 
+     y = y2_text, 
+     labels = Surv_Sex %>%
+       format(big.mark = ","))
+legend("topright", inset = 0.15, fill = rainbow(2), legend = c("사망", "생존"))
+p2 <- Surv_Sex %>%
+  prop.table(margin = 2) 
+b2_p <- p2 %>%  
+  barplot(yaxt = "n", col = rainbow(2))
+axis(side = 2, 
+     at = seq(0, 1, by = 0.25), 
+     labels = seq(0, 100, by = 25),
+     las = 2)
+mtext("(%)", side = 2, at = 1.05, line = 0, las = 2)
+# p2_text <- c(p2[1, ] / 2, p2[1, ] + p2[2, ] / 2) 
+p2_text <- apply(p2,
+                 MARGIN = 2,
+                 FUN = pos)
+text(x = b2_p %>% 
+       rep(each = 2), 
+     y = p2_text, 
+     labels = p2 %>%
+       `*`(100) %>%
+       format(digits = 2, nsmall = 1) %>%
+       paste0("%"))
+legend("topright", inset = 0.15, fill = rainbow(2), legend = c("사망", "생존"))
+title(main = "성별 생존/사망", line = -1, outer = TRUE, cex.main = 1.5,
+      family = "KoPubWorldDotum Bold")
+dev.copy(png, "../pics/Titanic_barplot02.png", width = 840, height = 420)
+dev.off()
+```
+
+### Mosaic Plot
+
+```{r, fig.width = 6, fig.height = 6, fig.align = "center"}
+par(mfrow = c(1, 1), family = "KoPubWorldDotum Medium")
+mosaicplot(t(Surv_Sex), main = "성별 생존/사망", 
+           xlab = "남/여", ylab = "생존/사망",
+           col = rainbow(2))
+dev.copy(png, "../pics/Titanic_mosaicplot02.png", width = 320, height = 320)
+dev.off()
+```
+
+## 연령별 생존/사망
+
+남은 cross-table 은 
+
+```{r}
+Surv_Age <- Titanic %>% 
+  apply(MARGIN = 4:3, FUN = sum)
+```
+
+성인과 어린이의 생존률을 비교하려면 
+
+남녀 생존률을 비교하려면,
+
+```{r}
+Surv_Age %>%
+  prop.table(margin = 2) %>%
+  `*`(100) %>%
+  rbind(., "Sum" = colSums(.))
+```
+
+### Plots
+
+이를 `barplot`으로 나타내는 데 있어서 각 `argument`가 왜  필요한지 시행착오를 겪어 볼 것.
+
+```{r, fig.width = 12, fig.height = 6}
+par(mfrow = c(1, 2), family = "KoPubWorldDotum Medium")
+b3 <- Surv_Age %>% 
+  barplot(yaxt = "n", col = rainbow(2))
+axis(side = 2, 
+     at = Surv_Age %>%
+       apply(MARGIN = 2, FUN = cumsum) %>% c,
+     labels = Surv_Age %>% 
+       apply(MARGIN = 2, FUN = cumsum) %>% c %>% 
+       format(big.mark = ","),
+     las = 2)
+# y3_text <- c(Surv_Age[1, ] / 2, Surv_Age[1, ] + Surv_Age[2, ] / 2) 
+y3_text <- apply(Surv_Age,
+                 MARGIN = 2,
+                 FUN = pos)
+text(x = rep(b3, each = 2), 
+     y = y3_text, 
+     labels = Surv_Age %>%
+       format(big.mark = ","))
+legend("topleft", inset = 0.15, fill = rainbow(2), legend = c("사망", "생존"))
+p3 <- Surv_Age %>%
+  prop.table(margin = 2) 
+b3_p <- p3 %>%  
+  barplot(yaxt = "n", col = rainbow(2))
+axis(side = 2, 
+     at = seq(0, 1, by = 0.25), 
+     labels = seq(0, 100, by = 25),
+     las = 2)
+mtext("(%)", side = 2, at = 1.05, line = 0, las = 2)
+# p3_text <- c(p3[1, ] / 2, p3[1, ] + p3[2, ] / 2) 
+p3_text <- apply(p3,
+                 MARGIN = 2,
+                 FUN = pos)
+text(x = b3_p %>% 
+       rep(each = 2), 
+     y = p3_text, 
+     labels = p3 %>%
+       `*`(100) %>%
+       format(digits = 2, nsmall = 1) %>%
+       paste0("%"))
+legend(x = 0.5, y = 0.95, fill = rainbow(2), legend = c("사망", "생존"))
+title(main = "연령별 생존/사망", line = -1, outer = TRUE, cex.main = 1.5,
+      family = "KoPubWorldDotum Bold")
+dev.copy(png, "../pics/Titanic_barplot03.png", width = 840, height = 420)
+dev.off()
+```
+
+### Mosaic Plot
+
+```{r, fig.width = 6, fig.height = 6, fig.align = "center"}
+par(mfrow = c(1, 1), family = "KoPubWorldDotum Medium")
+mosaicplot(t(Surv_Age), main = "연령별 생존/사망",
+           xlab = "어린이/어른", ylab = "생존/사망", 
+           col = rainbow(2))
+dev.copy(png, "../pics/Titanic_mosaicplot03.png", width = 320, height = 320)
+dev.off()
+```
+
+## 어린이들의 객실 등급별 생존/사망 
+
+객실 등급별로 어린이들과 어른들의 생존/사망을 비교하려면
+
+```{r}
+Child_df <- Titanic %>%
+  as.data.frame %>%
+  subset(Age == "Child")
+Adult_df <- Titanic %>%
+  as.data.frame %>%
+  subset(Age == "Adult")
+Child_Class <- Child_df %>% 
+  xtabs(Freq ~ Survived + Class, data = ., drop.unused.levels = TRUE)
+Child_Class %>%
+  prop.table(margin = 2) %>%
+  `*`(100) %>%
+  rbind(., "Sum" = colSums(.))
+```
+
+### Plots
+
+```{r, fig.width = 12, fig.height = 6}
+par(mfrow = c(1, 2), family = "KoPubWorldDotum Medium")
+b4 <- Child_Class %>% 
+  barplot(yaxt = "n", col = rainbow(2))
+axis(side = 2, 
+     at = Child_Class %>%
+       apply(MARGIN = 2, FUN = cumsum) %>% c(0, .),
+     labels = Child_Class %>% 
+       apply(MARGIN = 2, FUN = cumsum) %>% c(0, .) %>% 
+       format(big.mark = ","),
+     las = 2)
+# y4_text <- c(Child_Class[1, ] / 2, Child_Class[1, ] + Child_Class[2, ] / 2) 
+y4_text <- apply(Child_Class,
+                 MARGIN = 2,
+                 FUN = pos)
+y4_text[c(1, 3, 7, 8)] <- NA
+text(x = rep(b4, each = 2), 
+     y = y4_text, 
+     labels = Child_Class %>%
+       format(big.mark = ","))
+legend("topright", inset = 0.05, fill = rainbow(2), legend = c("사망", "생존"))
+p4 <- Child_Class %>%
+  prop.table(margin = 2) 
+b4_p <- p4 %>%  
+  barplot(yaxt = "n", col = rainbow(2))
+axis(side = 2, 
+     at = seq(0, 1, by = 0.25), 
+     labels = seq(0, 100, by = 25),
+     las = 2)
+mtext("(%)", side = 2, at = 1.05, line = 0, las = 2)
+# p4_text <- c(p4[1, ] / 2, p4[1, ] + p4[2, ] / 2) 
+p4_text <- apply(p4,
+                 MARGIN = 2,
+                 FUN = pos)
+p4_text[c(1, 3)] <- NA
+text(x = b4_p %>% 
+       rep(each = 2), 
+     y = p4_text, 
+     labels = p4 %>%
+       `*`(100) %>%
+       format(digits = 2, nsmall = 1) %>%
+       paste0("%"))
+legend("topright", inset = 0.05, fill = rainbow(2), legend = c("사망", "생존"))
+title(main = "어린이들의 객실 등급별 생존/사망", line = -1, outer = TRUE, cex.main = 1.5,
+      family = "KoPubWorldDotum Bold")
+dev.copy(png, "../pics/Titanic_barplot04.png", width = 840, height = 420)
+dev.off()
+```
+
+### Mosaic Plot
+
+```{r, fig.width = 6, fig.height = 6, fig.align = "center"}
+par(mfrow = c(1, 1), family = "KoPubWorldDotum Medium")
+mosaicplot(t(Child_Class), main = "어린이들의 객실 등급별 생존/사망",
+           xlab = "객실 등급", ylab = "생존/사망", 
+           col = rainbow(2))
+dev.copy(png, "../pics/Titanic_mosaicplot04.png", width = 320, height = 320)
+dev.off()
+```
+
+## 여성들의 등급별 생존/사망
+
+객실 등급별로 여성들과 남성들의 생존률을 비교하려면
+
+```{r}
+Female_df <- Titanic %>%
+  as.data.frame %>%
+  subset(Sex == "Female")
+Male_df <- Titanic %>%
+  as.data.frame %>%
+  subset(Sex == "Male")
+Female_Class <- Female_df %>% 
+  xtabs(Freq ~ Survived + Class, data = ., drop.unused.levels = TRUE)
+Female_Class %>%
+  prop.table(margin = 2) %>%
+  `*`(100) %>%
+  rbind(., "Sum" = colSums(.))
+```
+
+### Plots
+
+```{r, fig.width = 12, fig.height = 6}
+par(mfrow = c(1, 2), family = "KoPubWorldDotum Medium")
+b5 <- Female_Class %>% 
+  barplot(yaxt = "n", col = rainbow(2))
+axis(side = 2, 
+     at = Female_Class %>%
+       apply(MARGIN = 2, FUN = cumsum) %>% c,
+     labels = Female_Class %>% 
+       apply(MARGIN = 2, FUN = cumsum) %>% c %>% 
+       format(big.mark = ","),
+     las = 2)
+# y5_text <- c(Female_Class[1, ] / 2, Female_Class[1, ] + Female_Class[2, ] / 2) 
+y5_text <- apply(Female_Class,
+                 MARGIN = 2,
+                 FUN = pos)
+#> y5_text[c(1:2, 4, 8)] <- NA
+text(x = rep(b5, each = 2), 
+     y = y5_text, 
+     labels = Female_Class %>%
+       format(big.mark = ","))
+legend("topright", inset = 0.05, fill = rainbow(2), legend = c("사망", "생존"))
+p5 <- Female_Class %>%
+  prop.table(margin = 2) 
+b5_p <- p5 %>%  
+  barplot(yaxt = "n", col = rainbow(2))
+axis(side = 2, 
+     at = seq(0, 1, by = 0.25), 
+     labels = seq(0, 100, by = 25),
+     las = 2)
+mtext("(%)", side = 2, at = 1.05, line = 0, las = 2)
+# p5_text <- c(p5[1, ] / 2, p5[1, ] + p5[2, ] / 2) 
+p5_text <- apply(p5,
+                 MARGIN = 2,
+                 FUN = pos)
+#> p5_text[1:2] <- NA
+text(x = b5_p %>% 
+       rep(each = 2), 
+     y = p5_text, 
+     labels = p5 %>%
+       `*`(100) %>%
+       format(digits = 2, nsmall = 1) %>%
+       paste0("%"))
+legend("topright", inset = 0.05, fill = rainbow(2), legend = c("사망", "생존"))
+title(main = "여성들의 객실 등급별 생존/사망", line = -1, outer = TRUE, cex.main = 1.5,
+      family = "KoPubWorldDotum Bold")
+dev.copy(png, "../pics/Titanic_barplot05.png", width = 840, height = 420)
+dev.off()
+```
+
+### Mosaic Plot
+
+```{r, fig.width = 6, fig.height = 6, fig.align = "center"}
+par(mfrow = c(1, 1), family = "KoPubWorldDotum Medium")
+mosaicplot(t(Female_Class), 
+           main = "여성들의 객실 등급별 생존/사망", xlab = "객실 등급", ylab = "생존/사망", 
+           col = rainbow(2))
+dev.copy(png, "../pics/Titanic_mosaicplot05.png", width = 320, height = 320)
+dev.off()
+```
+
+## Save
+
+```{r, echo = FALSE}
+save.image("./Titanic_Base.RData")
+```
+

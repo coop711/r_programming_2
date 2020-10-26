@@ -17,7 +17,8 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(xlsx)
+# library(xlsx)
+library(openxlsx)
 library(pander)
 library(knitr)
 library(magrittr)
@@ -31,15 +32,21 @@ options(width=180)
 
 
 ```{r, read data, echo = FALSE, results = 'hide'}
-literacy_roll <- read.xlsx("../data/literacy_1702.xlsx", 
-                           sheetIndex = 1, 
-                           startRow = 3, 
-                           endRow  = 182, 
-                           colIndex = c(1:26), 
-                           colClasses = c(rep("character", 26)), 
-                           header = FALSE, 
-                           stringsAsFactors = FALSE,
-                           encoding = "UTF-8")
+# literacy_roll <- read.xlsx("../data/literacy_1702.xlsx", 
+#                            sheetIndex = 1, 
+#                            startRow = 3, 
+#                            endRow  = 182, 
+#                            colIndex = c(1:26), 
+#                            colClasses = c(rep("character", 26)), 
+#                            header = FALSE, 
+#                            stringsAsFactors = FALSE,
+#                            encoding = "UTF-8")
+literacy_roll <-
+  openxlsx::read.xlsx("../data/literacy_1702.xlsx",
+                      sheet = 1,    
+                      colNames = FALSE,
+                      cols = 1:26,
+                      rows = 3:182)
 names(literacy_roll) <- c("id", paste("Q", 1:25, sep = ""))
 head(literacy_roll$id)
 str(literacy_roll)
