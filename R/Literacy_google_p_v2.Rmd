@@ -31,20 +31,26 @@ options(width=180)
 
 ```{r, read data, echo = FALSE, results = 'hide'}
 # load("./red_and_black_190830_data.RData")
-literacy_roll <- read.xlsx("../data/literacy_1902.xlsx", 
-                           sheetIndex = 1, 
-                           startRow = 1, 
-                           endRow  = 69, 
-                           colIndex = c(3, 6:30), 
-                           colClasses = c(rep("character", 26)), 
-                           header = TRUE, 
-                           stringsAsFactors = FALSE,
-                           encoding = "UTF-8")
+# literacy_roll <- read.xlsx("../data/literacy_1902.xlsx", 
+#                            sheetIndex = 1, 
+#                            startRow = 1, 
+#                            endRow  = 69, 
+#                            colIndex = c(3, 6:30), 
+#                            colClasses = c(rep("character", 26)), 
+#                            header = TRUE, 
+#                            stringsAsFactors = FALSE,
+#                            encoding = "UTF-8")
+literacy_roll <-
+  openxlsx::read.xlsx("../data/literacy_1902.xlsx",
+                      sheet = 1,    
+                      colNames = FALSE,
+                      cols = c(3, 6:30),
+                      rows = 1:69)
 names(literacy_roll) <- c("id", paste0("Q", 1:25))
 head(literacy_roll$id)
 str(literacy_roll)
 ## literacy_roll 에 그룹을 짝지어 추가 (예시이나 재현하려면 set.seed 사용하여야 함)
-set.seed(2)
+set.seed(1)
 literacy_roll$group <- literacy_roll %>%
   nrow %>%
   `:`(1, .) %>%

@@ -1,0 +1,99 @@
+---
+title: "Twin Studies on Smoking"
+author: "coop711"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, message = FALSE}
+library(magrittr)
+library(tidyverse)
+# par(mfrow = c(1, 2))
+#> 제시된 표와 닮은 행열 생성
+Nature1 <- matrix(c(1, 1, 1, 3), 
+                  nrow = 2)
+rownames(Nature1) <- c("1990", "2020")
+colnames(Nature1) <- c("시골", "서울")
+Nature1
+```
+
+<P style = "page-break-before:always">
+
+#### 행렬 구조와 barplot
+
+```{r, fig.height = 4, out.width = "50%"}
+Nature1 %>%
+  barplot
+Nature1 %>% 
+  t %>%
+  barplot
+# par(mfrow = c(1, 1))
+```
+
+`Nature1`의 구조를 전치(transpose)해 주어야 원하는 모양의 막대그래프가 나올 것임을 알 수 있다. 나머지 이러한 점을 염두에 두고 작성한다.
+
+### Stack
+
+```{r}
+options(digits = 3)
+#> RColorBrewer 패키지를 이용하여 컬러 생성
+library(RColorBrewer)
+#> "Accent" palette 채택
+cols <- brewer.pal(8, "Accent")
+#> 막대의 가운데에 추가 정보를 넣기 위한 좌표 설정 함수. 
+# pos <- function(x){
+#   cumsum(x) - x / 2
+# }
+pos <- . %>% {`-`(cumsum(.), . / 2)}
+# pos <- . %>% {cumsum(.) - . / 2}
+#> 아래와 같이 작성하면 오류 발생
+# pos <- . %>% cumsum(.) - . / 2
+#> 텍스트 정보 넣을 좌표를 계산한다. 
+y1_text <- apply(Nature1, 
+                 MARGIN = 1, 
+                 FUN = pos)
+```
+
+```{r, out.width = "50%", fig.align = "center"}
+par(family = "KoPubWorldDotum Medium")
+b1 <- Nature1 %>% 
+  t %>%
+  barplot(width = 0.8, 
+          xlim = c(0, 5), 
+          space = 1, 
+          col = cols[1:2], 
+          yaxt = "n")
+#> 쌍둥이유형 별로 한 막대에 흡연습관의 닮음 정도를 나타낼 것이므로 `cumsum`함수를 이용하여 막대들이 위치할 좌표를 계산한다. 일란성과 이란성 각각의 수효부터 비교할 수 있도록  막대 높이로 나타내고, 막대 중심에는 해당 속성의 돗수를 표시한다. 원점을 나타내기 위하여 0을 `c`함수 안에 추가하였다. 이를 추가하지 않으면 축이 어떻게 표시되는지 비교한다.
+#> `format`함수의 용법에 익숙해지고, `las = 2`가 왜 필요한지 여러 경우를 비교하라.
+axis(side = 2,
+     at = c(0, apply(t(Nature1),
+                     MARGIN = 2, 
+                     FUN = cumsum)),
+     labels = format(c(0, apply(t(Nature1), 
+                                MARGIN = 2, 
+                                FUN = cumsum)), 
+                     digits = 3, 
+                     nsmall = 0), 
+     las = 2)
+mtext(text = "단위(억원)", side = 2, at = 4.2, las = 2)
+#> 막대그래프 작성 과정에서 나온 막대의 좌표와 `pos`함수로 계산한 y좌표를 이용하여 실제 관찰된 쌍둥이 페어의 수효를 표시한다.`y_text`의 구조에 맞추어 `rep()`에서 `each = 3`으로 설정하였다. `bty = ` `"o" 또는 "n"으로 정할 수 있다. 
+text(x = rep(b1, each = 2), 
+     y = y1_text, 
+     labels = paste0(t(Nature1), "억"))
+#> 범례 표시
+legend("topleft", 
+       inset = 0.01, 
+       fill = cols[2:1], 
+       legend = rev(colnames(Nature1)), 
+       bty = "n")
+#> 메인 타이틀 
+title(main = "불균형 성장과 양극화", 
+      cex.main = 1.5)
+```
+
