@@ -18,6 +18,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 # library(xlsx)
+library(openxlsx)
 library(pander)
 library(knitr)
 library(magrittr)
@@ -44,7 +45,7 @@ literacy_roll <-
   openxlsx::read.xlsx("../data/literacy_1902.xlsx",
                       sheet = 1,    
                       colNames = FALSE,
-                      cols = c(3, 6:30),
+                      cols = 2:27,
                       rows = 1:69)
 names(literacy_roll) <- c("id", paste0("Q", 1:25))
 head(literacy_roll$id)
