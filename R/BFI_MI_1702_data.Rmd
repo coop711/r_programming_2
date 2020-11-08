@@ -16,18 +16,22 @@ knitr::opts_chunk$set(echo = TRUE)
 ### Data
 
 ```{r, xlsx}
-library(xlsx)
+# library(xlsx)
+library(readxl)
 options(width = 180)
-class_roll <- readRDS("class_id_group.RDS")
+class_roll <- 
+  readRDS("class_id_group.RDS")
 class_roll %<>%
   `names<-`(c("ID", "Group"))
+# BFI <- "../data/BFI.xlsx" %>% 
+#   read.xlsx(sheetIndex = 1, 
+#             startRow = 2, endRow = 182, 
+#             colIndex = 1:13, 
+#             header = TRUE, 
+#             encoding = "UTF-8",
+#             stringsAsFactors = FALSE)
 BFI <- "../data/BFI.xlsx" %>% 
-  read.xlsx(sheetIndex = 1, 
-            startRow = 2, endRow = 182, 
-            colIndex = 1:13, 
-            header = TRUE, 
-            encoding = "UTF-8",
-            stringsAsFactors = FALSE)
+  read_excel(range = "A2:M182")
 names(BFI) %<>%
   `[<-`(1, "ID")
 # names(BFI)[1] <- "ID"
@@ -39,14 +43,22 @@ BFI$ID %<>%
 BFI %>% 
   head %>%
   kable
+BFI %<>%
+  data.frame
 # pander(head(BFI))
+# MI <- "../data/MI.xlsx" %>%
+#   read.xlsx(sheetIndex = 1, 
+#             startRow = 2, endRow = 182, 
+#             colIndex = 1:57, 
+#             header = TRUE, 
+#             encoding = "UTF-8",
+#             stringsAsFactors = FALSE)
 MI <- "../data/MI.xlsx" %>%
-  read.xlsx(sheetIndex = 1, 
-            startRow = 2, endRow = 182, 
-            colIndex = 1:57, 
-            header = TRUE, 
-            encoding = "UTF-8",
-            stringsAsFactors = FALSE)
+  read_excel(range = "A2:BE182")
+MI %<>%
+  data.frame
+MI %>%
+  str
 MI %<>%
   `names<-`(c("ID", paste0("Q", 1:56)))
 # names(MI) <- c("ID", paste0("Q", 1:56))

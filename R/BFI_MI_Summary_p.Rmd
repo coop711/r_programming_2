@@ -19,7 +19,7 @@ panderOptions("table.split.table", Inf)
 필수 자료 읽어들이기
 
 ```{r}
-load("./BFI_MI_report_1701.RData")
+load("./BFI_MI_report_1702.RData")
 ```
 -->
 
