@@ -106,7 +106,6 @@ world$Q5
 pander(summary(world))
 ```
 
-
 ## 내가 살고 싶은 세상
 
 ### 내가 남보다, 혹은 남이 나보다 

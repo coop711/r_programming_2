@@ -1,0 +1,134 @@
+---
+title: "Monty Hall Simulation"
+author: "coop711"
+date: '2020-11-23 '
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo = FALSE}
+library(knitr)
+library(magrittr)
+options(width = 180)
+```
+
+```{r, echo = FALSE, out.width = "65%", fig.align = "left"}
+include_graphics("../pics/Monty_Hall.png")
+```
+
+<P style = "page-break-before:always">
+
+## Single Trial
+
+```{r}
+set.seed(41)
+monty_hall <- function() {
+  key <- 1:3 %>% sample(size = 1)
+  goat <- 1:3 %>% setdiff(key)
+  contestant <- 1:3 %>% sample(size = 1)
+  monty <- contestant %>%
+    `==` (key) %>%
+    ifelse(goat %>% sample(size = 1), 
+           goat %>% setdiff(contestant))
+  switch <- 1:3 %>% setdiff(c(contestant, monty))
+  result <- switch %>% 
+    `==`(key) %>%
+    ifelse("Switching wins", "Staying wins") 
+  c("Key" = key, 
+    "Contestant" = contestant, 
+    "Monty" = monty, 
+    "Switch" = switch, 
+    "Result" = result)
+}
+monty_hall()
+```
+
+<P style = "page-break-before:always">
+
+## `N` trials
+
+```{r}
+N <- 30
+monty_result <- 
+  replicate(N, monty_hall()) %>% 
+  t
+monty_result
+table(monty_result[, 5])
+sum(monty_result[, 5] == "Switching wins")/N
+cumsum(monty_result[, 5] == "Switching wins")
+cumsum(monty_result[, 5] == "Staying wins")
+y_switch <- cumsum(monty_result[, 5] == "Switching wins")
+y_stay <- 1:N - y_switch
+# y_stay <- cumsum(monty_result[, 5] == "Staying wins")
+```
+
+## ggplot
+
+```{r}
+library(ggplot2)
+monty_plot <- function(N) {
+  monty_result <- 
+    replicate(N, monty_hall()) %>%
+    t %>%
+    data.frame
+  y_switch <- cumsum(monty_result[, 5] == "Switching wins")
+#  y_stay <- cumsum(monty_result[, 5] == "Staying wins")
+  y_stay <- 1:N - y_switch
+  y_df <- data.frame(x = rep(1:N, times = 2), 
+                     Result = c(y_switch, y_stay), 
+                     Decision = rep(c("Switching wins","Staying wins"), each = N)) 
+  p_wins <- sum(monty_result[, 5] == "Switching wins") / N
+monty <-  
+  ggplot(data = y_df, 
+         mapping = aes(x = x, 
+                       y = Result / N, 
+                       colour = Decision,
+                       shape = Decision,
+                       fill = Decision)) +
+    geom_point() +
+    scale_shape_manual(values = c(23, 22)) +
+    scale_fill_manual(values = c("red", "blue")) +
+    scale_y_continuous(name = "Proportion of Wins", 
+                       limits = c(0, 1),
+                       breaks = c(0, 1/3, 2/3, 3/4, 1),
+                       labels = c("0", "1/3", "2/3", "3/4", "1")) +
+    geom_hline(yintercept = c(1/3, 2/3), 
+               linetype = "dotted") +
+    theme_bw() + 
+    labs(title = "Monty Hall Simulation", 
+         x = "Number of Trials") +
+    annotate("text", 
+             x = N / 5, 
+             y = 1 / 2,
+             label = paste0("P(Switching wins) = ", format(p_wins, digits = 2, nsmall = 2))) +
+    theme(legend.position = c(0.15, 0.8),
+          legend.title = element_blank(),
+          legend.box.background = element_rect(fill = "transparent"),
+          panel.grid = element_blank(),
+          plot.title = element_text(hjust = 0.5, size = 20))
+list(monty = monty, p_wins = p_wins)
+}
+monty_plot(30)$monty
+monty_plot(30)$p_wins
+```
+
+## Repetitions
+
+```{r}
+x <- 10
+m <- list()
+while (x > 0) {
+m <- list(m, monty_plot(30)$monty)
+  x <- x - 1
+}
+m
+Prop_Switching_wins_100 <- replicate(100, monty_plot(30)$p_wins)
+```
+### Stem and Leaf
+
+```{r, eval = TRUE}
+stem(Prop_Switching_wins_100)
+```

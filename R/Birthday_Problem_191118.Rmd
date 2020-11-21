@@ -31,10 +31,12 @@ quiz1118 %>%
   str
 names(quiz1118) <- c(paste("Q2", 1:4, sep = "_"), "Q1", "Q3", 
                      "group", "Q4_R", "Q4_B", "id", "name")
-quiz1118[paste("Q2", 1:4, sep = "_")] %<>% sapply(FUN = . %>% {substr(., 1, 1)})
+quiz1118[paste("Q2", 1:4, sep = "_")] %<>% 
+  sapply(FUN = . %>% {substr(., 1, 1)})
 quiz1118$Q2 <- apply(quiz1118[paste("Q2", 1:4, sep = "_")], 
                      MARGIN = 1, paste, collapse = "")
-quiz1118$group %<>% factor(levels = c("Red", "Black"))
+quiz1118$group %<>% 
+  factor(levels = c("Red", "Black"))
 quiz1118$Q4 <- ifelse(is.na(quiz1118$Q4_R), quiz1118$Q4_B, quiz1118$Q4_R)
 quiz1118[c("Q3", "Q4")] %<>%
   sapply(FUN = . %>% {strsplit(., split = "[.]") %>% 
