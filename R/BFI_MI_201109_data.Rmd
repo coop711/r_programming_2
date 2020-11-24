@@ -1,0 +1,139 @@
+---
+title: "BFI MI data : 201109"
+author: "coop711"
+date: "2020-11-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(knitr)
+library(pander)
+library(magrittr)
+panderOptions("table.split.table", Inf)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Data
+
+### 출석부
+
+```{r, xlsx}
+library(xlsx)
+options(width = 180)
+class_roll <- "../data/class_roll200927.xlsx" %>% 
+  read.xlsx(sheetIndex = 1,
+            startRow = 1, endRow = 306,
+            colIndex = 3:4,
+            header = TRUE,
+            encoding = "UTF-8",
+            stringsAsFactors = FALSE)
+class_roll %<>%
+  `names<-`(c("ID", "Name"))
+class_roll$ID %<>%
+  as.character
+str(class_roll)
+#> 몽골 학생의 이름을 한글로 수정. 학번을 2029xxxx라고 입력하곤 함. 
+#> 엑셀 파일 단계에서 수정하여 입력토록 함.
+class_roll %>%
+  head
+class_roll$Name %<>%
+  `[<-`(class_roll$ID %>% `==`("20198043"), "노민에르덴")
+# class_roll$Name[class_roll$ID == "20198043"] <- "노민에르덴"
+class_roll %>%
+  head
+```
+
+### BFI
+
+```{r}
+BFI <- "../data/BFI201109.xlsx" %>% 
+  read.xlsx(sheetIndex = 1, 
+            startRow = 1, endRow = 272, 
+            colIndex = 1:26, 
+            header = TRUE, 
+            encoding = "UTF-8",
+            stringsAsFactors = FALSE)
+BFI %<>%
+  `names<-`(c("Time", "Dept", "ID", "Name", 
+              "E1", "A1", "O1", "C1", "N1", "E2", "A2", "O2", "C2", "N2", "O3", "A3",
+              "E", "N", "C", "A", "O", "E_Score", "N_Score", "C_Score", "A_Score", "O_Score"))
+BFI$ID %<>%
+  as.character
+#> Likert Scale 값만 추출하여 숫자로 변환
+BFI[5:16] %<>%
+  sapply(FUN = {. %>% strsplit(split = "[.]") %>% sapply(`[`, 1)}) %>%
+  as.numeric
+# sapply(BFI[5:16], function(x){sapply(strsplit(x, split = "[.]"), `[`, 1)})
+#> (R) 표시된 문항의 응답값을 역순으로 다시 계산
+BFI[c("A2", "O2", "C2")] %<>% 
+  `-` (6, .)
+BFI %>% 
+  head %>%
+  kable
+#> 구글 설문지를 사용하면서 필요없게된 코드이나 만약을 위하여
+# duplicated(BFI$ID)
+# BFI <- unique(BFI)
+str(BFI)
+#> 이름 뒷 자리에 빈 칸이 남아 있는 데이터 수정
+BFI$Name %>%
+  `[`(BFI$ID == "20193223")
+# BFI$Name[BFI$Name == "서재현 "] <- "서재현"
+BFI$Name %<>%
+  `[<-`(BFI$Name == "서재현 ", "서재현")
+```
+
+### MI
+
+```{r}
+MI <- "../data/MI201109.xlsx" %>%
+  read.xlsx(sheetIndex = 1, 
+            startRow = 1, endRow = 261, 
+            colIndex = 1:68, 
+            header = TRUE, 
+            encoding = "UTF-8",
+            stringsAsFactors = FALSE)
+MI %<>%
+  `names<-`(c("Time", "Dept", "ID", "Name", 
+              paste0(LETTERS[1:8], 1:56), 
+              paste(LETTERS[1:8], "Score", sep = "_")))
+# MI %<>%
+#   `names<-`(c("Time", "Dept", "ID", "Name", 
+#               paste0("Q", 1:56), 
+#               paste(LETTERS[1:8], "Score", sep = "_")))
+MI$ID %<>% 
+  as.character
+# duplicated(MI$ID)
+# MI <- unique(MI)
+MI[5:60] %<>%
+  sapply(FUN = {. %>% strsplit(split = "[.]") %>% sapply(`[`, 1)}) %>%
+  as.numeric
+kable(head(MI[c(3, 5:18)]))
+kable(head(MI[c(3, 19:32)]))
+kable(head(MI[c(3, 33:46)]))
+kable(head(MI[c(3, 47:60)]))
+#> 각 조사 불참자 
+setdiff(class_roll$Name, BFI$Name)
+setdiff(class_roll$Name, MI$Name)
+# MI$Name
+# class_roll$Name
+str(MI)
+BFI <- BFI[, -c(2, 4)]
+MI <- MI[, -c(2, 4)]
+## piping을 이용한 다음 대안들을 개선해 보세요.
+# lapply(list(1:15, c(1, 16:29), c(1, 30:43), c(1, 44:57)), 
+#        function(x) MI %>% `[`(x) %>% head %>% kable)
+# list(1:15, c(1, 16:29), c(1, 30:43), c(1, 44:57)) %>%
+#   lapply(function(x) MI %>% `[`(x) %>% head %>% kable)
+# list(1:15, c(1, 16:29), c(1, 30:43), c(1, 44:57)) %>%
+#   lapply(. %>% {kable(head(MI[.]))})
+```
+
+### Save Data
+
+```{r, save.image}
+saveRDS(BFI, file = "./BFI201109.RDS")
+saveRDS(MI, file = "./MI201109.RDS")
+save.image("./BFI_MI_201109.RData")
+```
+
