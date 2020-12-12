@@ -209,6 +209,16 @@ geom_bar(stat = "identity",
 ```{r}
 ggplot(data = VADeaths_df,
               mapping = aes(x = interaction(Place, Gender), 
+                            y = Rates, 
+                            fill = Age)) +
+geom_bar(stat = "identity", 
+         position = "identity",
+         alpha = 0.3)
+```
+
+```{r}
+ggplot(data = VADeaths_df,
+              mapping = aes(x = interaction(Place, Gender), 
                             y = rev(Rates), 
                             fill = Age)) +
 geom_bar(stat = "identity", 
