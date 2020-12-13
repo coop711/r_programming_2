@@ -79,7 +79,7 @@ monty_plot <- function(N) {
   y_stay <- 1:N - y_switch
   y_df <- data.frame(x = rep(1:N, times = 2), 
                      Result = c(y_switch, y_stay), 
-                     Decision = rep(c("Switching wins","Staying wins"), each = N)) 
+                     Decision = rep(c("Switching wins", "Staying wins"), each = N)) 
   p_wins <- sum(monty_result[, 5] == "Switching wins") / N
 monty <-  
   ggplot(data = y_df, 
@@ -120,13 +120,14 @@ monty_plot(30)$p_wins
 ```{r}
 x <- 10
 m <- list()
-while (x > 0) {
-m <- list(m, monty_plot(30)$monty)
-  x <- x - 1
+for (i in 1:x) {
+m[[i]] <- monty_plot(30)$monty
+print(m[[i]])
 }
-m
+# m
 Prop_Switching_wins_100 <- replicate(100, monty_plot(30)$p_wins)
 ```
+
 ### Stem and Leaf
 
 ```{r, eval = TRUE}
