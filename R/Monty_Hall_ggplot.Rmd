@@ -118,10 +118,15 @@ monty_plot(30)$p_wins
 ## Repetitions
 
 ```{r}
-x <- 10
+N2 <- 10
 m <- list()
-for (i in 1:x) {
+for (i in 1:N2) {
 m[[i]] <- monty_plot(30)$monty
+#> Title 에 몇 번째 시도인지 횟수 표시
+m[[i]] <- m[[i]]+ 
+  ggtitle(paste0("Replication No.", i))
+# m[[i]]
+#> 그림을 매번 출력하려면 print()를 반드시 실행시켜야 함.
 print(m[[i]])
 }
 # m
