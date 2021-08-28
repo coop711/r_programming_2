@@ -1,8 +1,10 @@
 ---
 title: "Birthday Problem"
 author: "coop711"
-date: "`r Sys.Date()`"
-output: html_document
+date: '2019-04-29'
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -26,8 +28,7 @@ include_graphics("../pics/birthday_sample_excel.png")
 ```
 
 ```{r, data, echo = FALSE, results = 'hide'}
-birthday <- 
-  "../data/birthday_problem.xlsx" %>% 
+birthday <- "../data/birthday_problem.xlsx" %>% 
   read_excel(range = "A2:D78")
 # birthday <- "../data/birthday_problem.xlsx" %>% 
 #   read.xlsx(sheetIndex = 1, 
@@ -35,14 +36,9 @@ birthday <-
 #             colIndex = c(3:7, 9:12), colClasses = rep("character", 9),
 #             encoding = "UTF-8",
 #             stringsAsFactors = FALSE)
-birthday %>% 
-  str
+birthday %>% str
 names(birthday) <- c("id", "Q1", "Q2", "group")
-birthday$group %<>% 
-  factor(levels = c("Red", "Black"))
-birthday$id %<>%
-  `class<-`("character")
-# class(birthday$id) <- "character"
+birthday$group %<>% factor(levels = c("Red", "Black"))
 
 ##> 생일이 같은 사람을 찾아 날짜 순으로 늘어세우기.
 ##1> 입력된 데이터 살피기
@@ -90,7 +86,7 @@ birthday$date %<>%
 # birthday$date <- sapply(strsplit(birth_month_date, split = ","), function(x) x[2])
 # birthday$date <- ifelse(nchar(birthday$date) == 1, paste0(0, birthday$date), birthday$date)
 
-##> "01월01일" 등의 포맷으로 합치기. str_c 용법 알아볼 것.
+##> "1월1일" 등의 포맷으로 합치기. str_c 용법 알아볼 것.
 birthday$Q2_2 <- birthday %$%
   paste0(.$month, "월", .$date, "일")
 # birthday$Q2_2 <- birthday$month %>%
@@ -121,8 +117,7 @@ birthdate <- birthday_2$Q2_2 %>%
   `[`(is.na(.) %>% `!`)
 # birthdate <- birthday_2$Q2_2[!is.na(birthday_2$Q2_2)]
 #> 태어난 월일을 제출한 인원
-N1 <- birthdate %>% 
-  length
+N1 <- birthdate %>% length
 # N1 <- length(birthdate)
 
 ##4> 어느 위치에서 앞에 나온 날짜와 같은 날짜가 등장하는 지 파악하고 중복된 생일 나열.
@@ -130,19 +125,15 @@ N1 <- birthdate %>%
 dup_b <- birthdate %>%
   duplicated
 # dup_b <- duplicated(birthdate)
-
 #> 최소한 두번 이상 중복되는 생일들(3번 이상 중복되는 값이 나올 수 있음), 둘째 줄까지만 수행해보면 5월10일이 두번 나오는 데 이는 5월10일이 생일인 사람이 세명 있다는 뜻임.
 b_dup_b <- birthdate %>%
   `[`(duplicated(.)) %>%
   unique
 # b_dup_b <- unique(birthdate[duplicated(birthdate)])
 # b_dup_b <- unique(birthdate[dup_b])
-
 #> 중복되는 생일들을 순서대로 나열하려면 어느 날짜들이 중복된 생일인지 파악하고, 전체 생일 목록과 대조하여 그 리스트에 등장하는 생일들을 뽑아냄. 
 birthdate %>%
-  `[`(. %in% (birthdate %>% 
-                `[`(duplicated(.)) %>% 
-                unique))
+  `[`(. %in% (birthdate %>% `[`(duplicated(.)) %>% unique))
 # birthdate[birthdate %in% unique(birthdate[duplicated(birthdate)])]
 # birthdate[birthdate %in% b_dup_b]
 #> Q2_2의 어느 위치에 중복된 생일이 등장하는가?
@@ -167,13 +158,11 @@ birthday_2$Q2_2 %>%
 # tbl_b <- t(as.matrix(table(birthday_2$Q2_2[index.dup.b])))
 # cbind(tbl_b, "계" = rowSums(tbl_b))
 # kable(t(as.matrix(table(birthday_2$Q2_2[index.dup.b]))))
-
 ##> Q1
-birthday$Q1 %<>% 
-  factor(levels = c("가", "나"),
-         labels = c("있을 것이다", "없을 것이다"))
+birthday$Q1 %<>% factor(levels = c("가", "나"),
+                        labels = c("있을 것이다", "없을 것이다"))
 # str(birthday)
-kable(birthday[c("Q2", "Q1", "group")])
+pander(birthday[c("Q2", "Q1", "group")])
 ```
 
 ```{r, randomization, echo = FALSE, results = 'hide'}
@@ -183,7 +172,7 @@ summary(birthday)
 ## 생일 문제의 질문
 
 ```{r, echo = FALSE, out.width = "75%"}
-include_graphics("../pics/birthday_Qs.png", dpi = NA)
+knitr::include_graphics("../pics/birthday_Qs.png", dpi = NA)
 ```
 
 ### Q2. Birthday Problem
@@ -193,9 +182,7 @@ include_graphics("../pics/birthday_Qs.png", dpi = NA)
 ```{r, echo = FALSE}
 birthday_2 %>%
   `[`(index_dup_b, c("id", "Q2_2", "group")) %>%
-  kable(col.names = c("학번", "생일", "그룹"), 
-        align = "c", 
-        row.names = FALSE)
+  kable(col.names = c("학번", "생일", "그룹"), align = "c", row.names = FALSE)
 ```
 
 #### 어느 날에 몇 명씩 생일이 같은가?
@@ -245,9 +232,8 @@ N1 %>%
 #### 태어난 달의 분포는?
 
 ```{r, month of the birthdates, echo = FALSE}
-birthday$month %<>%
-  factor(levels = unique(birthday$month), 
-         labels = paste0(1:12, "월"))
+birthday$month <- birthday$month %>%
+  factor(levels = unique(birthday$month), labels = paste0(1:12, "월"))
 birthday$month %>%
   table(birthday$group, .) %>%
   cbind("계" = rowSums(.)) %>%
@@ -276,7 +262,8 @@ birthday$month %>%
 ### Q1. 나와 생일 같은 사람이 있을까?
 
 
-나와 생일이 같은 사람이 있겠느냐는 질문에 3/4은 없을 것이라고 답을 했습니다. 생일이 같은 사람이 11명이나 되는 데 대해서 어떻게 생각할까요?
+나와 생일이 같은 사람이 있겠느냐는 질문에 3/4은 없을 것이라고 답을 했습니다. 
+생일이 같은 사람이 11명이나 되는 데 대해서 어떻게 생각할까요?
 
 ```{r, Money illusion, echo = FALSE}
 tbl_Q1_a <- birthday$Q1 %>%
@@ -316,7 +303,6 @@ tbl_Q1_a %>%
   format(digits = 2, nsmall = 1) %>%
   kable
 ```
-## Comments
-
-Birthday problem ...
-
+```{r, save, echo = FALSE}
+#save.image("../R/birthday.rda")
+```

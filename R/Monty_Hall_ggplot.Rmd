@@ -2,7 +2,9 @@
 title: "Monty Hall Simulation"
 author: "coop711"
 date: '2020-11-23 '
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -129,7 +131,7 @@ m[[i]] <- m[[i]]+
 #> 그림을 매번 출력하려면 print()를 반드시 실행시켜야 함.
 print(m[[i]])
 }
-# m
+print(m)
 Prop_Switching_wins_100 <- replicate(100, monty_plot(30)$p_wins)
 ```
 
