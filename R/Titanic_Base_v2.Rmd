@@ -24,6 +24,7 @@ library(showtext)
 ## Nanum Gothic Regular 를 사용하고, Noto Sans KR 을 그림의 타이틀 폰트로 
 font_add_google(name = "Nanum Gothic", family = "Nanum Gothic")
 font_add_google(name = "Noto Sans KR", family = "Noto")
+## 이후 자동으로 선택한 폰트를 보여줌.
 showtext_auto()
 data(Titanic)
 Titanic %>% str
