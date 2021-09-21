@@ -17,11 +17,7 @@ library(magrittr)
 library(knitr)
 library(pander)
 library(ggplot2)
-# library(extrafont)
-library(showtext)
-showtext_auto()
-font_add(family = "KoPubWorld Dotum Medium", regular = "KoPubWorld/KoPubWorld Dotum Medium.ttf")
-font_add(family = "KoPubWorld Dotum Bold", regular = "KoPubWorld/KoPubWorld Dotum Bold.ttf")
+library(extrafont)
 data(Titanic)
 Titanic %>% str
 ```
