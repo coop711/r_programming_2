@@ -2,9 +2,7 @@
 title: "Student 3000 Criminal Data"
 author: "coop711"
 date: "`r Sys.Date()`"
-output:
-  pdf_document: default
-  html_document: default
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
