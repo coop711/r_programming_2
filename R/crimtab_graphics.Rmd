@@ -2,9 +2,7 @@
 title: "Student Crimtab Data Graphic Analysis"
 author: "coop711"
 date: "`r Sys.Date()`"
-output:
-  pdf_document: default
-  html_document: default
+output: html_document
 ---
 
 ## Data Manipulation
@@ -113,4 +111,5 @@ par(mfrow = c(1, 1))
 ```
 
 ## Comments 
+
 Student(W.S. Gosset)이 수행한 바 있는 ...
