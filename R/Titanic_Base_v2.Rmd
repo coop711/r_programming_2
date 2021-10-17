@@ -20,10 +20,13 @@ library(ggplot2)
 # library(extrafont)
 ## showtext 패키지 사용. 설치 먼저 하여야 함.
 library(showtext)
-## fonts.google.com에서 폰트 다운로드 받아 추가 
-## Nanum Gothic Regular 를 사용하고, Noto Sans KR 을 그림의 타이틀 폰트로 
-font_add_google(name = "Nanum Gothic", family = "Nanum Gothic")
-font_add_google(name = "Noto Sans KR", family = "Noto")
+## system에 받아 놓은 KoPubWorld Dotum 폰트 패밀리를 사용.
+## family 에는 애칭으로 사용할 편한 이름을 적고, regular font 와 bold font의 파일명을 적어 줌. 
+## 파일명에 따라 font_add 가 파일을 찾아내고, regular 를 부르려면 
+## font = 1 (default 라 명시하지 않아도 됨), bold 를 부르려면 font = 2 를 명시하여 줌.
+font_add(family = "KWD", 
+         regular = "KoPubWorld Dotum Medium.ttf", 
+         bold = "KoPubWorld Dotum Bold.ttf")
 ## 이후 자동으로 선택한 폰트를 보여줌.
 showtext_auto()
 data(Titanic)
@@ -79,7 +82,7 @@ Surv_Class %>%
 이를 `barplot`으로 나타내는 데 있어서 각 `argument`가 왜  필요한지 시행착오를 거쳐 파악해 볼 것.
 
 ```{r, fig.width = 12, fig.height = 6}
-par(mfrow = c(1, 2), family = "Nanum Gothic")
+par(mfrow = c(1, 2), family = "KWD")
 #> Titanic %>% 
 #>   apply(MARGIN = c(4, 1), FUN = sum)
 pos <- function(x){
@@ -129,7 +132,7 @@ text(x = b1_p %>%
        paste0("%"))
 legend("topleft", inset = 0.05, fill = rainbow(2), legend = c("사망", "생존"))
 title(main = "객실 등급별 생존/사망", line = -1, outer = TRUE, cex.main = 1.5,
-      family = "Noto")
+      family = "KWD", font = 2)
 dev.copy(png, "../pics/Titanic_barplot01.png", width = 840, height = 420)
 dev.off()
 ```
@@ -137,7 +140,7 @@ dev.off()
 ### Mosaic Plot
 
 ```{r, fig.width = 6, fig.height = 6, fig.align = "center"}
-par(mfrow = c(1, 1), family = "Nanum Gothic")
+par(mfrow = c(1, 1), family = "KWD")
 mosaicplot(t(Surv_Class), main = "객실 등급별 생존/사망",
            xlab = "객실 등급", ylab = "생존/사망",
            col = rainbow(2))
@@ -170,7 +173,7 @@ Surv_Sex %>%
 이를 `barplot`으로 나타내는 데 있어서 각 `argument`가 왜  필요한지 시행착오를 겪어 볼 것.
 
 ```{r, fig.width = 12, fig.height = 6}
-par(mfrow = c(1, 2), family = "Nanum Gothic")
+par(mfrow = c(1, 2), family = "KWD")
 b2 <- Surv_Sex %>% 
   barplot(yaxt = "n", col = rainbow(2))
 axis(side = 2, 
@@ -211,7 +214,7 @@ text(x = b2_p %>%
        paste0("%"))
 legend("topright", inset = 0.15, fill = rainbow(2), legend = c("사망", "생존"))
 title(main = "성별 생존/사망", line = -1, outer = TRUE, cex.main = 1.5,
-      family = "Noto")
+      family = "KWD", font = 2)
 dev.copy(png, "../pics/Titanic_barplot02.png", width = 840, height = 420)
 dev.off()
 ```
@@ -219,7 +222,7 @@ dev.off()
 ### Mosaic Plot
 
 ```{r, fig.width = 6, fig.height = 6, fig.align = "center"}
-par(mfrow = c(1, 1), family = "Nanum Gothic")
+par(mfrow = c(1, 1), family = "KWD")
 mosaicplot(t(Surv_Sex), main = "성별 생존/사망", 
            xlab = "남/여", ylab = "생존/사망",
            col = rainbow(2))
@@ -252,7 +255,7 @@ Surv_Age %>%
 이를 `barplot`으로 나타내는 데 있어서 각 `argument`가 왜  필요한지 시행착오를 겪어 볼 것.
 
 ```{r, fig.width = 12, fig.height = 6}
-par(mfrow = c(1, 2), family = "Nanum Gothic")
+par(mfrow = c(1, 2), family = "KWD")
 b3 <- Surv_Age %>% 
   barplot(yaxt = "n", col = rainbow(2))
 axis(side = 2, 
@@ -293,7 +296,7 @@ text(x = b3_p %>%
        paste0("%"))
 legend(x = 0.5, y = 0.95, fill = rainbow(2), legend = c("사망", "생존"))
 title(main = "연령별 생존/사망", line = -1, outer = TRUE, cex.main = 1.5,
-      family = "Noto")
+      family = "KWD", font = 2)
 dev.copy(png, "../pics/Titanic_barplot03.png", width = 840, height = 420)
 dev.off()
 ```
@@ -301,7 +304,7 @@ dev.off()
 ### Mosaic Plot
 
 ```{r, fig.width = 6, fig.height = 6, fig.align = "center"}
-par(mfrow = c(1, 1), family = "Nanum Gothic")
+par(mfrow = c(1, 1), family = "KWD")
 mosaicplot(t(Surv_Age), main = "연령별 생존/사망",
            xlab = "어린이/어른", ylab = "생존/사망", 
            col = rainbow(2))
@@ -331,7 +334,7 @@ Child_Class %>%
 ### Plots
 
 ```{r, fig.width = 12, fig.height = 6}
-par(mfrow = c(1, 2), family = "Nanum Gothic")
+par(mfrow = c(1, 2), family = "KWD")
 b4 <- Child_Class %>% 
   barplot(yaxt = "n", col = rainbow(2))
 axis(side = 2, 
@@ -374,7 +377,7 @@ text(x = b4_p %>%
        paste0("%"))
 legend("topright", inset = 0.05, fill = rainbow(2), legend = c("사망", "생존"))
 title(main = "어린이들의 객실 등급별 생존/사망", line = -1, outer = TRUE, cex.main = 1.5,
-      family = "Noto")
+      family = "KWD", font = 2)
 dev.copy(png, "../pics/Titanic_barplot04.png", width = 840, height = 420)
 dev.off()
 ```
@@ -382,7 +385,7 @@ dev.off()
 ### Mosaic Plot
 
 ```{r, fig.width = 6, fig.height = 6, fig.align = "center"}
-par(mfrow = c(1, 1), family = "Nanum Gothic")
+par(mfrow = c(1, 1), family = "KWD")
 mosaicplot(t(Child_Class), main = "어린이들의 객실 등급별 생존/사망",
            xlab = "객실 등급", ylab = "생존/사망", 
            col = rainbow(2))
@@ -412,7 +415,7 @@ Female_Class %>%
 ### Plots
 
 ```{r, fig.width = 12, fig.height = 6}
-par(mfrow = c(1, 2), family = "Nanum Gothic")
+par(mfrow = c(1, 2), family = "KWD")
 b5 <- Female_Class %>% 
   barplot(yaxt = "n", col = rainbow(2))
 axis(side = 2, 
@@ -455,7 +458,7 @@ text(x = b5_p %>%
        paste0("%"))
 legend("topright", inset = 0.05, fill = rainbow(2), legend = c("사망", "생존"))
 title(main = "여성들의 객실 등급별 생존/사망", line = -1, outer = TRUE, cex.main = 1.5,
-      family = "Noto")
+      family = "KWD", font = 2)
 dev.copy(png, "../pics/Titanic_barplot05.png", width = 840, height = 420)
 dev.off()
 ```
@@ -463,7 +466,7 @@ dev.off()
 ### Mosaic Plot
 
 ```{r, fig.width = 6, fig.height = 6, fig.align = "center"}
-par(mfrow = c(1, 1), family = "Nanum Gothic")
+par(mfrow = c(1, 1), family = "KWD")
 mosaicplot(t(Female_Class), 
            main = "여성들의 객실 등급별 생존/사망", xlab = "객실 등급", ylab = "생존/사망", 
            col = rainbow(2))
