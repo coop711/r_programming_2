@@ -4,8 +4,8 @@
 %
 \documentclass[
 ]{article}
+\usepackage{amsmath,amssymb}
 \usepackage{lmodern}
-\usepackage{amssymb,amsmath}
 \usepackage{ifxetex,ifluatex}
 \ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
   \usepackage[T1]{fontenc}
@@ -82,7 +82,7 @@
 \newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
 \newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
 \newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\usepackage{graphicx,grffile}
+\usepackage{graphicx}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
 \def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
@@ -99,10 +99,13 @@
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifluatex
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
 
 \title{Student Crimtab Data Graphic Analysis}
 \author{coop711}
-\date{2021-02-10}
+\date{2021-10-17}
 
 \begin{document}
 \maketitle
@@ -112,7 +115,7 @@
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{load}\NormalTok{(}\StringTok{"./crimtab.RData"}\NormalTok{)}
+\FunctionTok{load}\NormalTok{(}\StringTok{"./crimtab.RData"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -120,8 +123,8 @@
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# install.packages("hexbin", repos = "https://cran.rstudio.com")}
-\KeywordTok{library}\NormalTok{(hexbin)}
+\CommentTok{\# install.packages("hexbin", repos = "https://cran.rstudio.com")}
+\FunctionTok{library}\NormalTok{(hexbin)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -129,9 +132,9 @@
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{crimtab_bin <-}\StringTok{ }\KeywordTok{hexbin}\NormalTok{(crimtab_long_df}\OperatorTok{$}\NormalTok{height, }
-\NormalTok{                      crimtab_long_df}\OperatorTok{$}\NormalTok{finger, }
-                      \DataTypeTok{xbins =} \DecValTok{50}\NormalTok{)}
+\NormalTok{crimtab\_bin }\OtherTok{\textless{}{-}} \FunctionTok{hexbin}\NormalTok{(crimtab\_long\_df}\SpecialCharTok{$}\NormalTok{height, }
+\NormalTok{                      crimtab\_long\_df}\SpecialCharTok{$}\NormalTok{finger, }
+                      \AttributeTok{xbins =} \DecValTok{50}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -140,20 +143,20 @@
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{))}
-\CommentTok{# plot(x = crimtab_long_df[, 2], y = crimtab_long_df[, "finger"])}
-\KeywordTok{plot}\NormalTok{(crimtab_long_df[, }\DecValTok{2}\OperatorTok{:}\DecValTok{1}\NormalTok{])}
-\KeywordTok{plot}\NormalTok{(crimtab_long_df[, }\DecValTok{2}\OperatorTok{:}\DecValTok{1}\NormalTok{], }
-     \DataTypeTok{pch =} \DecValTok{20}\NormalTok{)}
-\CommentTok{# smoothScatter(crimtab_long_df[,"height"], crimtab_long_df[,"finger"], xlab = "height", ylab = "finger")}
-\CommentTok{# smoothScatter(crimtab_long_df[,"height"], crimtab_long_df[,"finger"], nbin = 32, xlab = "height", ylab = "finger")}
-\KeywordTok{smoothScatter}\NormalTok{(crimtab_long_df, }
-              \DataTypeTok{xlab =} \StringTok{"height"}\NormalTok{, }
-              \DataTypeTok{ylab =} \StringTok{"finger"}\NormalTok{)}
-\KeywordTok{smoothScatter}\NormalTok{(crimtab_long_df, }
-              \DataTypeTok{nbin =} \DecValTok{32}\NormalTok{, }
-              \DataTypeTok{xlab =} \StringTok{"height"}\NormalTok{, }
-              \DataTypeTok{ylab =} \StringTok{"finger"}\NormalTok{)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\CommentTok{\# plot(x = crimtab\_long\_df[, 2], y = crimtab\_long\_df[, "finger"])}
+\FunctionTok{plot}\NormalTok{(crimtab\_long\_df[, }\DecValTok{2}\SpecialCharTok{:}\DecValTok{1}\NormalTok{])}
+\FunctionTok{plot}\NormalTok{(crimtab\_long\_df[, }\DecValTok{2}\SpecialCharTok{:}\DecValTok{1}\NormalTok{], }
+     \AttributeTok{pch =} \DecValTok{20}\NormalTok{)}
+\CommentTok{\# smoothScatter(crimtab\_long\_df[,"height"], crimtab\_long\_df[,"finger"], xlab = "height", ylab = "finger")}
+\CommentTok{\# smoothScatter(crimtab\_long\_df[,"height"], crimtab\_long\_df[,"finger"], nbin = 32, xlab = "height", ylab = "finger")}
+\FunctionTok{smoothScatter}\NormalTok{(crimtab\_long\_df, }
+              \AttributeTok{xlab =} \StringTok{"height"}\NormalTok{, }
+              \AttributeTok{ylab =} \StringTok{"finger"}\NormalTok{)}
+\FunctionTok{smoothScatter}\NormalTok{(crimtab\_long\_df, }
+              \AttributeTok{nbin =} \DecValTok{32}\NormalTok{, }
+              \AttributeTok{xlab =} \StringTok{"height"}\NormalTok{, }
+              \AttributeTok{ylab =} \StringTok{"finger"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -164,10 +167,10 @@
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{))}
-\KeywordTok{plot}\NormalTok{(crimtab_bin, }
-     \DataTypeTok{xlab =} \StringTok{"height(inches)"}\NormalTok{, }
-     \DataTypeTok{ylab =} \StringTok{"finger length(cm)"}\NormalTok{)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(crimtab\_bin, }
+     \AttributeTok{xlab =} \StringTok{"height(inches)"}\NormalTok{, }
+     \AttributeTok{ylab =} \StringTok{"finger length(cm)"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -179,16 +182,16 @@
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{par}\NormalTok{(}\DataTypeTok{mar =} \KeywordTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{))}
-\KeywordTok{par}\NormalTok{(}\DataTypeTok{fig =} \KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.8}\NormalTok{, }\DecValTok{0}\NormalTok{, }\FloatTok{0.8}\NormalTok{))}
-\KeywordTok{plot}\NormalTok{(crimtab_long_df, }\DataTypeTok{pch =} \DecValTok{20}\NormalTok{)}
-\KeywordTok{par}\NormalTok{(}\DataTypeTok{fig =} \KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.8}\NormalTok{, }\FloatTok{0.68}\NormalTok{, }\DecValTok{1}\NormalTok{), }\DataTypeTok{new =} \OtherTok{TRUE}\NormalTok{)}
-\CommentTok{# hist(crimtab_long_df[, "height"], axes = FALSE, ann = FALSE)}
-\KeywordTok{hist}\NormalTok{(crimtab_long_df}\OperatorTok{$}\NormalTok{height, }\DataTypeTok{axes =} \OtherTok{FALSE}\NormalTok{, }\DataTypeTok{ann =} \OtherTok{FALSE}\NormalTok{)}
-\KeywordTok{par}\NormalTok{(}\DataTypeTok{fig =} \KeywordTok{c}\NormalTok{(}\FloatTok{0.68}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{, }\FloatTok{0.8}\NormalTok{), }\DataTypeTok{new =} \OtherTok{TRUE}\NormalTok{)}
-\CommentTok{# barplot(table(cut(crimtab_long_df[, "finger"], breaks = 10)), space = 0, col = "white", horiz = TRUE, axes = FALSE, axisnames = FALSE)}
-\KeywordTok{barplot}\NormalTok{(}\KeywordTok{table}\NormalTok{(}\KeywordTok{cut}\NormalTok{(crimtab_long_df}\OperatorTok{$}\NormalTok{finger, }\DataTypeTok{breaks =} \DecValTok{10}\NormalTok{)), }
-        \DataTypeTok{space =} \DecValTok{0}\NormalTok{, }\DataTypeTok{col =} \StringTok{"white"}\NormalTok{, }\DataTypeTok{horiz =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{axes =} \OtherTok{FALSE}\NormalTok{, }\DataTypeTok{axisnames =} \OtherTok{FALSE}\NormalTok{)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{fig =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.8}\NormalTok{, }\DecValTok{0}\NormalTok{, }\FloatTok{0.8}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(crimtab\_long\_df, }\AttributeTok{pch =} \DecValTok{20}\NormalTok{)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{fig =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.8}\NormalTok{, }\FloatTok{0.68}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{new =} \ConstantTok{TRUE}\NormalTok{)}
+\CommentTok{\# hist(crimtab\_long\_df[, "height"], axes = FALSE, ann = FALSE)}
+\FunctionTok{hist}\NormalTok{(crimtab\_long\_df}\SpecialCharTok{$}\NormalTok{height, }\AttributeTok{axes =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{ann =} \ConstantTok{FALSE}\NormalTok{)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{fig =} \FunctionTok{c}\NormalTok{(}\FloatTok{0.68}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{, }\FloatTok{0.8}\NormalTok{), }\AttributeTok{new =} \ConstantTok{TRUE}\NormalTok{)}
+\CommentTok{\# barplot(table(cut(crimtab\_long\_df[, "finger"], breaks = 10)), space = 0, col = "white", horiz = TRUE, axes = FALSE, axisnames = FALSE)}
+\FunctionTok{barplot}\NormalTok{(}\FunctionTok{table}\NormalTok{(}\FunctionTok{cut}\NormalTok{(crimtab\_long\_df}\SpecialCharTok{$}\NormalTok{finger, }\AttributeTok{breaks =} \DecValTok{10}\NormalTok{)), }
+        \AttributeTok{space =} \DecValTok{0}\NormalTok{, }\AttributeTok{col =} \StringTok{"white"}\NormalTok{, }\AttributeTok{horiz =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{axes =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{axisnames =} \ConstantTok{FALSE}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -196,8 +199,8 @@
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{par}\NormalTok{(}\DataTypeTok{fig =} \KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{))}
-\KeywordTok{par}\NormalTok{(}\DataTypeTok{mar =} \KeywordTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{) }\OperatorTok{+}\StringTok{ }\FloatTok{0.1}\NormalTok{)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{fig =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{) }\SpecialCharTok{+} \FloatTok{0.1}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -213,31 +216,31 @@
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{))}
-\KeywordTok{persp}\NormalTok{(crimtab_}\DecValTok{2}\NormalTok{, }
-      \DataTypeTok{xlab =} \StringTok{"Finger Length"}\NormalTok{, }
-      \DataTypeTok{ylab =} \StringTok{"Height"}\NormalTok{)}
-\KeywordTok{persp}\NormalTok{(crimtab_}\DecValTok{2}\NormalTok{, }
-      \DataTypeTok{xlab =} \StringTok{"Finger Length"}\NormalTok{, }
-      \DataTypeTok{ylab =} \StringTok{"Height"}\NormalTok{, }
-      \DataTypeTok{theta =} \DecValTok{90}\NormalTok{, }
-      \DataTypeTok{phi =} \DecValTok{30}\NormalTok{, }
-      \DataTypeTok{expand =} \FloatTok{0.5}\NormalTok{, }
-      \DataTypeTok{scale =} \OtherTok{TRUE}\NormalTok{)}
-\KeywordTok{persp}\NormalTok{(crimtab_}\DecValTok{2}\NormalTok{, }
-      \DataTypeTok{xlab =} \StringTok{"Finger Length"}\NormalTok{, }
-      \DataTypeTok{ylab =} \StringTok{"Height"}\NormalTok{, }
-      \DataTypeTok{theta =} \DecValTok{135}\NormalTok{, }
-      \DataTypeTok{phi =} \DecValTok{30}\NormalTok{, }
-      \DataTypeTok{expand =} \FloatTok{0.5}\NormalTok{, }
-      \DataTypeTok{scale =} \OtherTok{TRUE}\NormalTok{)}
-\KeywordTok{persp}\NormalTok{(crimtab_}\DecValTok{2}\NormalTok{, }
-      \DataTypeTok{xlab =} \StringTok{"Finger Length"}\NormalTok{, }
-      \DataTypeTok{ylab =} \StringTok{"Height"}\NormalTok{, }
-      \DataTypeTok{theta =} \DecValTok{45}\NormalTok{, }
-      \DataTypeTok{phi =} \DecValTok{45}\NormalTok{, }
-      \DataTypeTok{expand =} \FloatTok{0.5}\NormalTok{, }
-      \DataTypeTok{scale =} \OtherTok{TRUE}\NormalTok{)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{persp}\NormalTok{(crimtab\_2, }
+      \AttributeTok{xlab =} \StringTok{"Finger Length"}\NormalTok{, }
+      \AttributeTok{ylab =} \StringTok{"Height"}\NormalTok{)}
+\FunctionTok{persp}\NormalTok{(crimtab\_2, }
+      \AttributeTok{xlab =} \StringTok{"Finger Length"}\NormalTok{, }
+      \AttributeTok{ylab =} \StringTok{"Height"}\NormalTok{, }
+      \AttributeTok{theta =} \DecValTok{90}\NormalTok{, }
+      \AttributeTok{phi =} \DecValTok{30}\NormalTok{, }
+      \AttributeTok{expand =} \FloatTok{0.5}\NormalTok{, }
+      \AttributeTok{scale =} \ConstantTok{TRUE}\NormalTok{)}
+\FunctionTok{persp}\NormalTok{(crimtab\_2, }
+      \AttributeTok{xlab =} \StringTok{"Finger Length"}\NormalTok{, }
+      \AttributeTok{ylab =} \StringTok{"Height"}\NormalTok{, }
+      \AttributeTok{theta =} \DecValTok{135}\NormalTok{, }
+      \AttributeTok{phi =} \DecValTok{30}\NormalTok{, }
+      \AttributeTok{expand =} \FloatTok{0.5}\NormalTok{, }
+      \AttributeTok{scale =} \ConstantTok{TRUE}\NormalTok{)}
+\FunctionTok{persp}\NormalTok{(crimtab\_2, }
+      \AttributeTok{xlab =} \StringTok{"Finger Length"}\NormalTok{, }
+      \AttributeTok{ylab =} \StringTok{"Height"}\NormalTok{, }
+      \AttributeTok{theta =} \DecValTok{45}\NormalTok{, }
+      \AttributeTok{phi =} \DecValTok{45}\NormalTok{, }
+      \AttributeTok{expand =} \FloatTok{0.5}\NormalTok{, }
+      \AttributeTok{scale =} \ConstantTok{TRUE}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -245,7 +248,7 @@
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 

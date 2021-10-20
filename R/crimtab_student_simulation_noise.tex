@@ -1,0 +1,367 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Crimtab Data (with noise) for Simulation of T-Distribution},
+  pdfauthor={coop711},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifluatex
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\title{Crimtab Data (with noise) for Simulation of T-Distribution}
+\author{coop711}
+\date{2021-03-28}
+
+\begin{document}
+\maketitle
+
+\hypertarget{data-loading}{%
+\subsubsection{Data Loading}\label{data-loading}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{load}\NormalTok{(}\StringTok{"./crimtab\_noise.RData"}\NormalTok{)}
+\FunctionTok{ls}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "crimtab_2"             "crimtab_df"            "crimtab_long"         
+## [4] "crimtab_long_df"       "crimtab_long_df_noise" "r_noise"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ls.str}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## crimtab_2 :  'table' int [1:42, 1:22] 0 0 0 0 0 0 1 0 0 0 ...
+## crimtab_df : 'data.frame':   924 obs. of  3 variables:
+##  $ finger: num  9.4 9.5 9.6 9.7 9.8 9.9 10 10.1 10.2 10.3 ...
+##  $ height: num  56 56 56 56 56 56 56 56 56 56 ...
+##  $ Freq  : int  0 0 0 0 0 0 1 0 0 0 ...
+## crimtab_long :  num [1:3000, 1:2] 10 10.3 9.9 10.2 10.2 10.3 10.4 10.7 10 10.1 ...
+## crimtab_long_df : 'data.frame':  3000 obs. of  2 variables:
+##  $ finger: num  10 10.3 9.9 10.2 10.2 10.3 10.4 10.7 10 10.1 ...
+##  $ height: num  56 57 58 58 58 58 58 58 59 59 ...
+## crimtab_long_df_noise : 'data.frame':    3000 obs. of  2 variables:
+##  $ finger: num  9.98 10.29 9.91 10.24 10.17 ...
+##  $ height: num  55.8 56.9 58.1 58.4 57.7 ...
+## r_noise :  num [1:3000] -0.2345 -0.1279 0.0729 0.4082 -0.2983 ...
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{head}\NormalTok{(crimtab\_long\_df\_noise, }\AttributeTok{n =} \DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       finger   height
+## 1   9.976551 55.76551
+## 2  10.287212 56.87212
+## 3   9.907285 58.07285
+## 4  10.240821 58.40821
+## 5  10.170168 57.70168
+## 6  10.339839 58.39839
+## 7  10.444468 58.44468
+## 8  10.716080 58.16080
+## 9  10.012911 59.12911
+## 10 10.056179 58.56179
+\end{verbatim}
+
+\hypertarget{student-uxc758-simulation-uxc7acuxd604}{%
+\subsubsection{Student 의 Simulation
+재현}\label{student-uxc758-simulation-uxc7acuxd604}}
+
+3,000장의 카드를 잘 섞는 것은 \texttt{sample()} 이용.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# set.seed(113)}
+\NormalTok{crimtab\_shuffle\_noise }\OtherTok{\textless{}{-}} 
+\NormalTok{  crimtab\_long\_df\_noise[}\FunctionTok{sample}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{3000}\NormalTok{), ]}
+\FunctionTok{head}\NormalTok{(crimtab\_shuffle\_noise, }\AttributeTok{n =} \DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        finger   height
+## 2753 12.13674 69.36744
+## 1451 11.90282 65.02817
+## 114  10.79315 60.93147
+## 253  11.09707 61.97068
+## 2782 12.28416 68.84159
+## 1150 11.16040 64.60402
+## 1425 11.79061 64.90610
+## 716  10.89315 63.93146
+## 82   10.22125 61.21251
+## 2170 11.66442 66.64423
+\end{verbatim}
+
+표본의 크기가 4인 750개의 표본을 만드는 작업은 \texttt{rep()} 이용.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sample\_id }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(}\FunctionTok{rep}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{750}\NormalTok{, }\AttributeTok{each =} \DecValTok{4}\NormalTok{))}
+\FunctionTok{head}\NormalTok{(sample\_id, }\AttributeTok{n =} \DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] 1 1 1 1 2 2 2 2 3 3
+## 750 Levels: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 ... 750
+\end{verbatim}
+
+각 표본의 평균과 표준편차 계산에는 \texttt{tapply()} 이용.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{finger.sample.mean }\OtherTok{\textless{}{-}} 
+  \FunctionTok{tapply}\NormalTok{(crimtab\_shuffle\_noise[, }\StringTok{"finger"}\NormalTok{], sample\_id, mean)}
+\NormalTok{finger.sample.sd }\OtherTok{\textless{}{-}} 
+  \FunctionTok{tapply}\NormalTok{(crimtab\_shuffle\_noise[, }\StringTok{"finger"}\NormalTok{], sample\_id, sd)}
+\FunctionTok{str}\NormalTok{(finger.sample.mean)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  num [1:750(1d)] 11.5 11.5 10.9 12.1 11.9 ...
+##  - attr(*, "dimnames")=List of 1
+##   ..$ : chr [1:750] "1" "2" "3" "4" ...
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{str}\NormalTok{(finger.sample.sd)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  num [1:750(1d)] 0.64 0.627 0.853 0.63 0.481 ...
+##  - attr(*, "dimnames")=List of 1
+##   ..$ : chr [1:750] "1" "2" "3" "4" ...
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{head}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(finger.sample.mean, finger.sample.sd), }\AttributeTok{n =} \DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    finger.sample.mean finger.sample.sd
+## 1            11.48244        0.6399130
+## 2            11.53208        0.6268552
+## 3            10.93248        0.8532840
+## 4            12.09689        0.6302403
+## 5            11.85990        0.4806624
+## 6            11.32976        0.3051783
+## 7            10.92255        0.3746216
+## 8            11.86878        0.3806060
+## 9            11.51023        0.9246134
+## 10           11.52343        0.1418952
+\end{verbatim}
+
+t-통계량 계산. Student는 표준편차 계산에서 분모에 \(n\)을 사용하고
+히스토그램을 그려 비교하였으나 자유도 3인 t-분포와 비교하기 위하여
+\(t=\frac{\bar{X_n}-\mu}{\hat{SD}/\sqrt{n}}\)을 계산함. (여기서
+\(\hat{SD}\)는 표본 표준편차)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sample.t }\OtherTok{\textless{}{-}}\NormalTok{ (finger.sample.mean }\SpecialCharTok{{-}} \FunctionTok{mean}\NormalTok{(crimtab\_long\_df\_noise[, }\StringTok{"finger"}\NormalTok{]))}\SpecialCharTok{/}\NormalTok{(finger.sample.sd}\SpecialCharTok{/}\FunctionTok{sqrt}\NormalTok{(}\DecValTok{4}\NormalTok{))}
+\FunctionTok{str}\NormalTok{(sample.t)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  num [1:750(1d)] -0.2008 -0.0466 -1.4396 1.746 1.3033 ...
+##  - attr(*, "dimnames")=List of 1
+##   ..$ : chr [1:750] "1" "2" "3" "4" ...
+\end{verbatim}
+
+계산한 t-통계량 값들의 평균과 표준편차, 히스토그램을 그리고 자유도 3인
+t-분포의 밀도함수 및 표준정규곡선과 비교. 우선 모두 같은 값들이 나와서
+분모가 0인 경우가 있는지 파악. 있으면 모평균과 비교하여 양수인 경우 +6,
+음수인 경우 -6 값 부여(Student가 한 일)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{t.inf }\OtherTok{\textless{}{-}} \FunctionTok{is.infinite}\NormalTok{(sample.t)}
+\NormalTok{sample.t[t.inf]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## named numeric(0)
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sample.t[t.inf] }\OtherTok{\textless{}{-}} \DecValTok{6}\SpecialCharTok{*}\FunctionTok{sign}\NormalTok{(sample.t[t.inf])}
+\end{Highlighting}
+\end{Shaded}
+
+문제되는 값이 없는 것을 확인하고, 평균과 표준편차 계산. 자유도 \(n\)인
+\(t-\)분포의 평균과 표준편차는 각각 0과 \(\sqrt{\frac{n}{n-2}}\)임을
+상기할 것. \(-6\)이나 \(+6\)보다 큰 값이 상당히 자주 나온다는 점에 유의.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mean}\NormalTok{(sample.t)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] -0.00135926
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sd}\NormalTok{(sample.t)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1.566195
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(sample.t)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       Min.    1st Qu.     Median       Mean    3rd Qu.       Max. 
+## -15.474107  -0.727005  -0.060401  -0.001359   0.766502   9.357463
+\end{verbatim}
+
+t-통계량들의 히스토그램을 그리고, 자유도 3인 t의 밀도함수, 표준정규분포
+밀도함수와 비교.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# hist(sample.t, prob = TRUE, ylim = c(0, 0.5))}
+\CommentTok{\# hist(sample.t, prob = TRUE, nclass = 20, xlim = c({-}6, 6), ylim = c(0, 0.5), main = "Histogram of Sample t{-}statistics", xlab = "Sampled t{-}values")}
+\CommentTok{\# hist(sample.t, prob = TRUE, nclass = 50, xlim = c({-}6, 6), ylim = c(0, 0.5), main = "Histogram of Sample t{-}statistics", xlab = "Sampled t{-}values")}
+\FunctionTok{hist}\NormalTok{(sample.t, }\AttributeTok{prob =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{breaks =} \FunctionTok{seq}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{20}\NormalTok{, }\DecValTok{20}\NormalTok{, }\AttributeTok{by =} \FloatTok{0.5}\NormalTok{), }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{6}\NormalTok{, }\DecValTok{6}\NormalTok{), }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.5}\NormalTok{), }\AttributeTok{main =} \StringTok{"Histogram of Sample t{-}statistics"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Sample t{-}values"}\NormalTok{)}
+\FunctionTok{lines}\NormalTok{(}\FunctionTok{seq}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{6}\NormalTok{, }\DecValTok{6}\NormalTok{, }\AttributeTok{by =} \FloatTok{0.01}\NormalTok{), }\FunctionTok{dt}\NormalTok{(}\FunctionTok{seq}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{6}\NormalTok{, }\DecValTok{6}\NormalTok{, }\AttributeTok{by =} \FloatTok{0.01}\NormalTok{), }\AttributeTok{df =} \DecValTok{3}\NormalTok{), }\AttributeTok{col =} \StringTok{"blue"}\NormalTok{)}
+\FunctionTok{lines}\NormalTok{(}\FunctionTok{seq}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{6}\NormalTok{, }\DecValTok{6}\NormalTok{, }\AttributeTok{by =} \FloatTok{0.01}\NormalTok{), }\FunctionTok{dnorm}\NormalTok{(}\FunctionTok{seq}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{6}\NormalTok{, }\DecValTok{6}\NormalTok{, }\AttributeTok{by =} \FloatTok{0.01}\NormalTok{)), }\AttributeTok{col =} \StringTok{"red"}\NormalTok{)}
+\FunctionTok{legend}\NormalTok{(}\StringTok{"topright"}\NormalTok{, }\AttributeTok{inset =} \FloatTok{0.05}\NormalTok{, }\AttributeTok{lty =} \DecValTok{1}\NormalTok{, }\AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\StringTok{"blue"}\NormalTok{, }\StringTok{"red"}\NormalTok{), }\AttributeTok{legend =} \FunctionTok{c}\NormalTok{(}\StringTok{"t with df = 3"}\NormalTok{, }\StringTok{"standard normal"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{crimtab_student_simulation_noise_files/figure-latex/comparison-1.pdf}
+
+\texttt{qqnorm()} 을 그려보면 정규분포와 꼬리에서 큰 차이가 난다는 것을
+알 수 있음.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{qqnorm}\NormalTok{(sample.t, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{15}\NormalTok{, }\DecValTok{15}\NormalTok{))}
+\FunctionTok{abline}\NormalTok{(}\AttributeTok{a =} \DecValTok{0}\NormalTok{, }\AttributeTok{b =} \DecValTok{1}\NormalTok{, }\AttributeTok{col =} \StringTok{"blue"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{crimtab_student_simulation_noise_files/figure-latex/qqnorm-1.pdf}
+
+\end{document}

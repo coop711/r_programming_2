@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2021.9.30)  17 OCT 2021 14:36
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2021.3.25)  28 MAR 2021 14:54
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**crimtab_graphics.tex
-(./crimtab_graphics.tex
+**DollnHill.tex
+(./DollnHill.tex
 LaTeX2e <2020-02-02> patch level 2
 L3 programming layer <2020-02-14> (/usr/share/texlive/texmf-dist/tex/latex/base
 /article.cls
@@ -344,8 +344,8 @@ File: l3backend-pdfmode.def 2020-02-03 L3 backend support: PDF mode
 \l__kernel_color_stack_int=\count274
 \l__pdf_internal_box=\box48
 )
-No file crimtab_graphics.aux.
-\openout1 = `crimtab_graphics.aux'.
+No file DollnHill.aux.
+\openout1 = `DollnHill.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 110.
 LaTeX Font Info:    ... okay on input line 110.
@@ -488,28 +488,23 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) (/usr/share/texlive/texmf-dist/tex/latex/microtype/mt-msb.cfg
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 1
-17.
-(/usr/share/texmf/tex/latex/lm/t1lmtt.fd
-File: t1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
-)
 
-! Package inputenc Error: Unicode character 산 (U+C0B0)
+! Package inputenc Error: Unicode character 흡 (U+D761)
 (inputenc)                not set up for use with LaTeX.
 
 See the inputenc package documentation for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.122 산
-         점도를 여러 유형으로 표현하기 위하여 필요한 패�...
+l.116 흡
+         연과 건강의 관계에 대한 대표적인 회고 연구(Retros...
  
 Here is how much of TeX's memory you used:
- 13274 strings out of 481239
- 193967 string characters out of 5920377
- 480218 words of memory out of 5000000
- 28323 multiletter control sequences out of 15000+600000
- 557603 words of font info for 53 fonts, out of 8000000 for 9000
+ 13230 strings out of 481239
+ 193266 string characters out of 5920377
+ 480197 words of memory out of 5000000
+ 28284 multiletter control sequences out of 15000+600000
+ 557284 words of font info for 52 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 41i,6n,42p,815b,329s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 41i,6n,42p,808b,329s stack positions out of 5000i,500n,10000p,200000b,80000s
 !  ==> Fatal error occurred, no output PDF file produced!
