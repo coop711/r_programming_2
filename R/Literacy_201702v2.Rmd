@@ -18,6 +18,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 # library(xlsx)
+library(readxl)
 library(openxlsx)
 library(pander)
 library(knitr)
@@ -31,7 +32,7 @@ options(width=180)
 ```
 
 
-```{r, read data, echo = FALSE, results = 'hide'}
+```{r, read data, echo = FALSE, results = 'hide', message = FALSE}
 # literacy_roll <- read.xlsx("../data/literacy_1702.xlsx", 
 #                            sheetIndex = 1, 
 #                            startRow = 3, 
@@ -42,11 +43,15 @@ options(width=180)
 #                            stringsAsFactors = FALSE,
 #                            encoding = "UTF-8")
 literacy_roll <-
-  openxlsx::read.xlsx("../data/literacy_1702.xlsx",
-                      sheet = 1,    
-                      colNames = FALSE,
-                      cols = 1:26,
-                      rows = 3:182)
+  readxl::read_excel("../data/literacy_1702.xlsx",
+                      range = "A3:Z182",    
+                      col_names = FALSE)
+# literacy_roll <-
+#   openxlsx::read.xlsx("../data/literacy_1702.xlsx",
+#                       sheet = 1,    
+#                       colNames = FALSE,
+#                       cols = 1:26,
+#                       rows = 3:182)
 names(literacy_roll) <- c("id", paste("Q", 1:25, sep = ""))
 head(literacy_roll$id)
 str(literacy_roll)
