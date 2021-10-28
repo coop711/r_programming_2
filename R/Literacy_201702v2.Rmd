@@ -55,7 +55,7 @@ literacy_roll <-
 names(literacy_roll) <- c("id", paste("Q", 1:25, sep = ""))
 head(literacy_roll$id)
 str(literacy_roll)
-class_roll <- readRDS("class_id_group.RDs")
+class_roll <- readRDS("class_id_group.RDS")
 ## match 함수를 공부하기 위해 학번 오름차 순으로 정리
 class_roll_o <- class_roll[order(class_roll$id), ]
 head(class_roll_o$id)
