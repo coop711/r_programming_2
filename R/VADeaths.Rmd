@@ -1,9 +1,7 @@
 ---
 title: "VADeaths"
 author: "coop711"
-output:
-  html_document: default
-  pdf_document: default
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
