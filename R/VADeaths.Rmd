@@ -233,3 +233,7 @@ ggplot(data = VADeaths_df,
 geom_bar(stat = "identity", 
          position = position_stack())
 ```
+
+## Comments
+
+학습한 내용에 대하여 가급적 상세하게 기술합니다.
