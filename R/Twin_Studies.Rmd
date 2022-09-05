@@ -73,6 +73,31 @@ y1_text <- apply(Nature1,
                  FUN = pos)
 ```
 
+### #`pos()` 의 이해
+
+벡터 $\overrightarrow{x} = (x_1, x_2, x_3)$ 에 대하여 $pos(\overrightarrow{x}) = cumsum(\overrightarrow{x}) - \overrightarrow{x} / 2$. $pos$ 함수는 다음 각 막대 중점(x로 표시)의 $y$ 좌표를 찾아주는 역할을 한다는 것을 쉽게 파악할 수 있다.
+
+```{r, pos, echo = FALSE}
+b1 <- barplot(as.matrix(1:3, ncol = 1), 
+              axes = FALSE,
+              width = 1, 
+              xlim = c(-0.5, 3.5), 
+              ylim = c(0, 6.5), 
+              beside = FALSE, 
+              col = "white")
+text(x = b1 + 0.55, 
+     y = cumsum(1:3), 
+     labels = c("x1", "x1 + x2", "x1 + x2 + x3"), 
+     adj = 0)
+text(x = b1, 
+     y = cumsum(1:3) - (1:3)/2, 
+     labels = "x")
+text(x = b1 + 0.7, 
+     y = cumsum(1:3) - (1:3)/2, 
+     labels = c("x1 - x1/2", "x1 + x2 - x2/2", "x1 + x2 + x3 - x3/2"), 
+     adj = 0)
+```
+
 ```{r, out.width = "75%", fig.align = "center"}
 b1 <- Nature1 %>% 
   t %>%
