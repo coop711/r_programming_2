@@ -1,19 +1,9 @@
 ---
-title: "Literacy 220919"
+title: "Literacy AR Class"
 author: "coop711"
-date: "2022-09-19"
+date: "`r Sys.Date()`"
 output: html_document
 ---
-
-<!--
-#### Data 
--->
-
-<!--#### Excel 자료 읽어들이기 
-
-* excel 파일을 잘 읽어들이는 `xlsx` 패키지를 올려놓고, 자료구조에 맞춰 argument 설정.
-    * Sheet 번호, startRow, colIndex, header 의 용도 파악. 
--->
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -29,23 +19,23 @@ options(width=180)
 # panderOptions('digits', 3)
 ```
 
-
 ```{r, read data, echo = FALSE, results = 'hide', message = FALSE}
-# load("./red_and_black_220909_data.RData")
+#> 랜덤화 출석부에서 학번과 Red, Black 랜덤화 결과만 추출하여 class_roll 에 저장
+#> saveRDS <=> readRDS 용법 익혀둘 것.
 class_roll <- readRDS("./class_roll_id_group.RDS")
-literacy_roll <- 
+literacy_data <- 
   read_excel("../data/literacy_class_version.xlsx",
              range = "A1:AA1004",
              col_names = TRUE)
-literacy_roll <- literacy_roll[, -1]
-N <- nrow(literacy_roll)
-names(literacy_roll) <- c("id", paste0("Q", 1:25))
-class(literacy_roll$id) <- "character"
-class(literacy_roll$Q1) <- "character"
-str(literacy_roll)
-literacy_roll %<>%
-  data.frame
-## literacy_roll 에 그룹을 짝지어 추가 (예시이나 재현하려면 set.seed 사용하여야 함)
+names(literacy_data) <- c("time", "id", paste0("Q", 1:25))
+class(literacy_data$id) <- "character"
+#> Q1의 선지는 숫자로만 되어 있어서 "character"로 class 를 정해 주어야 함.
+class(literacy_data$Q1) <- "character"
+
+#> class_roll 에 있는 group 을 id 에 맞추어(match) literacy_roll,  에 복제
+literacy_data$group <- class_roll$group[match(literacy_data$id, class_roll$id)]
+
+#> literacy_roll 에 그룹을 랜덤하게 추가 (예시이나 재현하려면 set.seed 사용하여야 함)
 # set.seed(2)
 # literacy_roll$group <- literacy_roll %>%
 #   nrow %>%
@@ -54,18 +44,34 @@ literacy_roll %<>%
 #   `%%`(2) %>%
 #  sample(1:nrow(literacy_roll)) %% 2 %>%
 #   factor(levels = 0:1, labels = c("Red", "Black"))
-literacy_roll$group <- class_roll$group[match(literacy_roll$id, class_roll$id)]
-literacy_roll$id %in% class_roll$id %>%
+str(literacy_data)
+literacy_data %<>%
+  data.frame
+
+#> POSIX 분리하여 문해력 분석용 데이터 생성, literacy_data 는 제출시간 분포 파악에 별도 활용
+literacy_roll <- literacy_data[, -1]
+N <- nrow(literacy_roll)
+
+#> 출석부에 있는 사람 중 문해력조사에 빠진 사람 확인
+class_roll$id %in% literacy_roll$id %>%
   `!` %>% 
   which %>%
-  `[`(literacy_roll, ., "id")
+  `[`(class_roll, ., "id")
+#> Set Difference 를 활용하여 코드를 보다 간략히 할 수 있음.
+# setdiff(class_roll$id, literacy_roll$id)
+#> strsplit 을 이용하여 응답에서 가, 나, 다, 라 만 추출. '[.]'를 씌워야 하는 이유 기억해 두어야 함.
 literacy_roll[2:26] %<>% 
   sapply(FUN = {. %>% strsplit(split = "[.]") %>% sapply(`[`, 1)})
 kable(literacy_roll)
-literacy <- literacy_roll[, c(2:27)] #> 문해력 집계에 필요한 변수만 추출. 
+#> 문해력 집계에 필요한 변수만 추출. 
+literacy <- literacy_roll[, c(2:27)] 
 kable(literacy)
-#> 학번 잘못 써서 고생시키는 녀석들 찾아내는 코드
-# literacy_roll[literacy_roll$id %in% setdiff(literacy_roll$id, class_roll$id), c("id", "name", "dept")]
+#> 학번 잘못 써서 고생시키는 녀석들 찾아내는 코드, 수정한 결과 지금 상태에서는 없음.
+# literacy_roll[literacy_roll$id %in% setdiff(literacy_roll$id, class_roll$id), "id"]
+#> Time Stamp 를 활용하여 제출시간의 분포를 파악하기 위한 데이터 생성
+literacy_data$days <- as.numeric(difftime("2022-10-3 09:00:00", literacy_data$time, units = 'days'))
+literacy_data$hours <- as.numeric(difftime("2022-10-3 09:00:00", literacy_data$time, units = 'hours'))
+#> literacy_roll 을 RDS 파일로 저장
 saveRDS(literacy_roll, file = "./literacy_roll220919.RDS")
 ```
 
@@ -80,11 +86,7 @@ literacy_df <- literacy[1:25] %>%
 str(literacy_df)
 ```
 
-## 막대그래프
-
-막대그래프로 답안 분포를 시각적으로 살핀다. 차후 나오는 정답률과 함께 어느 문항에서 어느 답안을 많이 고르는지 파악하는 데 활용한다.
-
-### Data
+## 응답 집계
 
 ```{r, echo = FALSE}
 literacy_tbl <- literacy_df %>%
@@ -102,7 +104,11 @@ label_ptbl <- literacy_ptbl %>%
   matrix(nrow = 4)
 ```
 
-### `barplot`
+## 막대그래프
+
+막대그래프로 답안 분포를 시각적으로 살핀다. 차후 나오는 정답률과 함께 어느 문항에서 어느 답안을 많이 고르는지 파악하는 데 활용한다.
+
+### barplot
 
 ```{r, echo = FALSE, fig.width = 9, fig.height = 12}
 library(RColorBrewer)
@@ -137,7 +143,7 @@ title(main = "문해력조사 문항별 응답", cex.main = 1.8, line = -0.5)
 dev.copy(png, file = "../pics/Literacy_220919.png", width = 640, height = 840)
 ```
 
-### `ggplot`
+### ggplot
 
 ```{r, echo = FALSE, message = FALSE, fig.width = 12, fig.height = 6}
 library(tidyverse)
@@ -537,4 +543,29 @@ include_graphics("../pics/Q17.png")
 
 ```{r, echo = FALSE, out.width = "75%", fig.align = "left"}
 include_graphics("../pics/Q22.png")
+```
+
+### 일 단위 마감 시간으로부터 제출 시간의 분포
+
+```{r, echo = FALSE}
+par(family = "KoPubWorldDotum Medium")
+literacy_data$days %>%
+  cut(breaks = c(0:14), include.lowest = TRUE) %>%
+  table(literacy_data$group, .) %>%
+#  cbind("계" = rowSums(.)) %>%
+#  rbind("계" = colSums(.)) %>%
+  pander(caption = "일 단위")
+literacy_data$days %>%
+  cut(breaks = c(0:14), include.lowest = TRUE) %>%
+  table(literacy_data$group, .) %>%
+  chisq.test %>%
+  pander
+literacy_data$days %>%
+  cut(breaks = c(0:14), include.lowest = TRUE) %>%
+  table %>%
+  rev %>%
+  barplot(space = 0, 
+          names.arg = rep(c("월", "화", "수", "목", "금", "토", "일"), 2), 
+          col = c(rep("white", 13), "pink"))
+title(main = "일 단위 퀴즈 제출 횟수")
 ```
