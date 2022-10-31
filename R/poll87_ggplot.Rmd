@@ -48,7 +48,7 @@ counts_by_cand_df
 
 ```{r fig.width=7, fig.height=7}
 library(ggplot2)
-source("./barplot_gg_old.R")
+source("./barplot_gg.R")
 ```
 
 ```{r}

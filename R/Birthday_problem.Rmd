@@ -2,7 +2,9 @@
 title: "Birthday Problem"
 author: "coop711"
 date: '2019-04-29'
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
