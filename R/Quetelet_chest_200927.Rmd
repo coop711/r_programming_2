@@ -409,7 +409,7 @@ g0 <- ggplot(data = data.frame(chest_vec),
 
 #### x-axis label and main title
 
-``````{r, xlab and ggtitle, fig.width = 8, fig.height = 4.5}
+```{r, xlab and ggtitle, fig.width = 8, fig.height = 4.5}
 (g3 <- g2 + 
    theme_bw() + 
 #   xlab(x_lab) + 
