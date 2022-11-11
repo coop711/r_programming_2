@@ -1,0 +1,99 @@
+---
+title: "Simulation"
+output: html_document
+date: "2022-11-09"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Birthday Problem
+
+23명이 모였을 때 최소한 한 쌍의 생일이 같을 확률을 계산합니다.
+
+```{r}
+library(magrittr)
+set.seed(1)
+sample(1:365, size = 23, replace = TRUE) %>%
+  duplicated %>%
+  any 
+```
+`replicated` 를 이용하여 반복 시행하고 중복 생일 여부를 카운트. 반복횟수를 `N`으로 변수화.
+
+```{r}
+set.seed(1)
+N <- 100
+replicate(N, sample(1:365, size = 23, replace = TRUE) %>% 
+            duplicated %>% 
+            any) %>%
+  sum
+```
+참여 인원이 2명~100명일 때 최소한 한쌍이 생일이 같을 확률을 `N`회 반복모의실험으로 계산.
+
+```{r}
+prob <- vector(mode = "numeric", length = 100)
+prob[1] <- 0
+for (i in 2:100){
+  prob[i] <- 
+    replicate(N, 
+              sample(1:365, size = i, replace = TRUE) %>% 
+                duplicated %>% 
+                any) %>%
+    sum %>%
+    "/"(N)
+}
+prob
+
+```
+
+반복수를 default로 설정하고, 참여 인원을 변수로 갖는 사용자 함수 작성
+
+```{r}
+birthday <- 
+  function(N = 1000, x){
+    replicate(N, 
+              sample(1:365, size = x, replace = TRUE) %>% 
+                duplicated %>% 
+                any) %>%
+      sum %>%
+      "/"(N)
+  }
+birthday(x = 23)
+```
+
+### Plots
+
+`N` = 100000 으로 설정하여 x = 2 ~ 100 명까지 한 쌍 이상 생일같은 사람이 있을 확률을 모의 실험으로 계산하고 `plot()` 으로 시각화
+
+```{r echo=FALSE}
+probs <- 
+  sapply(2:100, FUN = function(x) birthday(N = 100000, x))
+opar <- par(no.readonly = TRUE)
+par(mai = c(1.02, 1.02, 0.82, 0.42))
+plot(2:100, probs, type = "p", pch = ".", cex = 3, axes = FALSE, xlab = "Number of People", ylab = "")
+axis(side = 1, at = c(0, 23, 40, 60, 80, 100), labels = c(0, 23, 40, 60, 80, 100))
+axis(side = 2, at = c(0, 0.25, probs[22], 0.75, 1), labels = format(c(0, 0.25, probs[22], 0.75, 1), digits = 4), las = 1)
+text(x = 23, y = probs[22], labels = "x")
+arrows(x0 = 23, y0 = 0, x1 = 23, y1 = probs[22], code = 1, length = 0.15)
+arrows(x0 = 0, y0 = probs[22], x1 = 23, y1 = probs[22], code = 1, length = 0.15)
+title(ylab = "Probability", line = 4)
+title(main = "Birthday Problem")
+```
+
+## Matching Problem
+
+```{r}
+set.seed(1)
+K <- 4
+sum(sample(K) == 1:K)
+N <- 24000
+replicate(N, sum(sample(K) == 1:K)) %>%
+  mean
+  table %>%
+  mean
+  `/`(240) %>%
+  mean
+```
+
+
