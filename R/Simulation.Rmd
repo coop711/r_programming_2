@@ -68,7 +68,7 @@ birthday(x = 23)
 
 ```{r echo=FALSE}
 probs <- 
-  sapply(2:100, FUN = function(x) birthday(N = 100000, x))
+  sapply(2:100, FUN = function(x) birthday(N = 1000, x))
 opar <- par(no.readonly = TRUE)
 par(mai = c(1.02, 1.02, 0.82, 0.42))
 plot(2:100, probs, type = "p", pch = ".", cex = 3, axes = FALSE, xlab = "Number of People", ylab = "")
@@ -90,10 +90,59 @@ sum(sample(K) == 1:K)
 N <- 24000
 replicate(N, sum(sample(K) == 1:K)) %>%
   mean
+replicate(N, sum(sample(K) == 1:K)) %>%
+  sd
+replicate(N, sum(sample(K) == 1:K)) %>%
   table %>%
-  mean
-  `/`(240) %>%
-  mean
+  `/`(1000)%>%
+  round
+replicate(N, sum(sample(K) == 1:K)) %>%
+  hist(breaks = c(-0.5, 0.5, 1.5, 2.5, 3.5, 4.5), 
+       axes = FALSE,
+       prob = TRUE,
+       col = "skyblue",
+       main = "Matching Problem Simulation")
+axis(side = 1, at = 0:4, labels = 0:4)
+axis(side = 2, at = c(0, 1/24, 6/24, 8/24, 9/24),
+     labels = c("0", "1/24", "6/24", "8/24", "9/24"),
+     las = 1)
+library(ggplot2)
+matching_df <- 
+  replicate(N, sum(sample(K) == 1:K)) %>%
+  data.frame(N_matches = .)
+ggplot(mapping = aes(x = N_matches, y = after_stat(density)), 
+       data = matching_df) +
+  geom_histogram(binwidth = 1, 
+                 fill = "blue", 
+                 colour = "black", 
+                 alpha = 0.3) +
+  theme_classic() +
+  labs(x = "Number of Matching", y = "Density") +
+  scale_y_continuous(breaks = c(0, 1/24, 6/24, 8/24, 9/24),
+     labels = c("0", "1/24", "6/24", "8/24", "9/24"))+
+  ggtitle("Matching Problem Simulation") +
+  theme(plot.title = element_text(hjust = 0.5))
+df <- 
+  replicate(N, sum(sample(K) == 1:K)) %>%
+  table %>%
+  as.data.frame %>%
+  `names<-`(c("N_matches", "Counts"))
+df$N_matches %<>%
+  factor(levels = 0:4, labels = 0:4)
+ggplot(mapping = aes(x = N_matches), data = df) +
+  geom_bar(aes(y = proportions(Counts)), 
+           stat = "identity",
+           fill = "blue",
+           colour = "black",
+           alpha = 0.3)+
+  theme_classic() +
+  scale_x_discrete(name = "Number of Matching", drop = FALSE)+
+  scale_y_continuous(name = "Density", 
+                     breaks = c(0, 1/24, 6/24, 8/24, 9/24),
+                     labels = c("0", "1/24", "6/24", "8/24", "9/24"))+
+  ggtitle("Matching Problem Simulation") +
+  theme(plot.title = element_text(hjust = 0.5))
+  
 ```
 
 
