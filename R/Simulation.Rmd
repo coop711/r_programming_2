@@ -235,29 +235,51 @@ ggplot(mapping = aes(x = N_matches), data = matching_tbl) +
 ## Chisquare Test : simulated p-value
 
 ```{r}
-M <- 1000
-sample(x = c(0, 1, 2, 4), 
-       size = M, 
-       prob = c(9, 8, 6, 1) / 24, 
-       replace = TRUE) %>%
-  table %>%
-  chisq.test %>%
-  .$statistic 
-chi_square_stat <-
-  function(M) {
+set.seed(1)
+M <- 100
+Expected <- 
+  M * c(9, 8, 6, 1) / 24
+Observed <- 
   sample(x = c(0, 1, 2, 4), 
          size = M, 
          prob = c(9, 8, 6, 1) / 24, 
          replace = TRUE) %>%
-  table %>%
-  chisq.test(p = c(9, 8, 6, 1) / 24) %>%
-  .$statistic 
+  factor(levels = c(0, 1, 2, 4)) %>%
+  table 
+    chi_square <- 
+      sum((Observed - Expected) ^ 2 / Expected)
+    chi_square
+chi_square_stat <-
+  function(M) {
+    Expected <- 
+      M * c(9, 8, 6, 1) / 24
+    Observed <- 
+      sample(x = c(0, 1, 2, 4), 
+             size = M, 
+             prob = c(9, 8, 6, 1) / 24, 
+             replace = TRUE) %>%
+      factor(levels = c(0, 1, 2, 4)) %>%
+      table 
+    chi_square <- 
+      sum((Observed - Expected) ^ 2 / Expected)
+    chi_square
   }
-chi_square_stat(M = 1000)  
-replicate(100000, chi_square_stat(M = 1000)) %>% 
-#  hist
-  `>=`(10) %>%
-  sum %>%
-  `/`(100000) 
+chi_square_stat(M = 100)  
+B <- 2000
+chi_squares <-
+  replicate(B, chi_square_stat(M = 100))
+h <- chi_squares %>% 
+  hist(breaks = 0:ceiling(max(.)), 
+       prob = TRUE, 
+       col = "white",
+       ylim = c(0, 0.25), 
+       main = "Chi-Square Values")
+lines(x = seq(0, max(h$breaks), by = 0.1), 
+      y = dchisq(x = seq(0, max(h$breaks), by = 0.1), df = 3),
+      type = "l", col = "red")
+legend("topright", inset = 0.05, lty = 1, col = c("black", "red"), legend = c("Observed", "Chisquare, df = 3"))
+#> 만약 관찰된 카이제곱 통계량이 22였다면, simulated p_value 는
+p_value <- sum(chi_squares >= 22) / (B + 1)
+p_value
 ```
 
