@@ -64,7 +64,9 @@ m <-
   geom_bar(aes(fill = tbl_df[, 1]), 
            stat = "identity", 
            col = "white", 
-           size = 1, 
+           linewidth = 1,
+           na.rm = TRUE,
+#           size = 1, 
            position = position_stack(reverse = TRUE)) +
 #  geom_text(aes(x = center, 
 #                y = 1.05), 
@@ -74,6 +76,7 @@ m <-
                 y = label_height), 
             label = format(ifelse(tbl_df[, 3] == 0, "", tbl_df[, 3]), 
                            big.mark = ","), 
+            na.rm = TRUE,
             position = position_identity()) +
   scale_x_continuous(breaks = x_breaks, 
                      label = x_label) + 
