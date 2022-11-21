@@ -68,11 +68,7 @@ birthday(x = 23)
 ```{r echo=FALSE}
 #> sapply 와 birthday 함수를 이용하여 인원이 2명~100명까지 모였을 때 한 쌍 이상 생일같은 사람이 있을 확률 계산. 반복수로 N = 100000 설정. N = 100, 1000, 10000 실행하여 비교하세요.
 probs <- 
-<<<<<<< HEAD
-  sapply(2:100, FUN = function(x) birthday(N = 10000, x))
-=======
-  sapply(2:100, FUN = function(x) birthday(N = 100000, x))
->>>>>>> 4170b3a6a6bb6e898dbb0c2eb31ed20270ba1496
+  sapply(2:100, FUN = function(x) birthday(N = 1000, x))
 #> plot 그리고 되돌려 놓기 위하여 그래픽 파라미터 저장
 opar <- par(no.readonly = TRUE)
 #> plot 의 왼쪽 여백 확보 (default 는 0.82)
@@ -126,11 +122,7 @@ ggplot(data = data.frame(x = 2:100, Probs = probs),
   annotate("segment", x = 23, y = probs[22], xend = 0, yend = probs[22],  #> y축 화살표
            colour = "red", arrow = arrow()) +
   ggtitle("Birthday Problem Simulation") +  #> 메인 타이틀
-<<<<<<< HEAD
   theme(plot.title = element_text(hjust = 0.5)) #> 메인 타이틀 폰트 패밀리 설정과 hjust 를 이용한 가운데 정렬
-=======
-  theme(plot.title = element_text(family = "KoPubWorldDotum Bold", hjust = 0.5)) #> 메인 타이틀 폰트 패밀리 설정과 hjust 를 이용한 가운데 정렬
->>>>>>> 4170b3a6a6bb6e898dbb0c2eb31ed20270ba1496
 ```
 
 ## Matching Problem
@@ -197,16 +189,10 @@ matching_df <-
   replicate(N, sum(sample(K) == 1:K)) %>%
   data.frame(N_matches = .)
 #> y = ..probability.. 대신 after_stat(density) 가 사용됨에 유의. ggplot 3.4.0부터 사용.
-<<<<<<< HEAD
 ggplot(mapping = aes(x = N_matches), 
        data = matching_df) +
   geom_histogram(aes(y = after_stat(density)),
                  binwidth = 1,      #> binwidth 의 기능 확인
-=======
-ggplot(mapping = aes(x = N_matches, y = after_stat(density)), 
-       data = matching_df) +
-  geom_histogram(binwidth = 1,      #> binwidth 의 기능 확인
->>>>>>> 4170b3a6a6bb6e898dbb0c2eb31ed20270ba1496
                  fill = "blue",     #> 막대 색깔 설정
                  colour = "black",  #> 막대 테두리의 색깔 설정
                  alpha = 0.3) +     #> 막대 색깔의 투명도 설정
@@ -294,11 +280,7 @@ lines(x = seq(0, max(h$breaks), by = 0.1),
       type = "l", col = "red")
 legend("topright", inset = 0.05, lty = 1, col = c("black", "red"), legend = c("Observed", "Chisquare, df = 3"))
 #> 만약 관찰된 카이제곱 통계량이 22였다면, simulated p_value 는
-<<<<<<< HEAD
 p_value <- sum(chi_squares >= 18) / (B + 1)
-=======
-p_value <- sum(chi_squares >= 22) / (B + 1)
->>>>>>> 4170b3a6a6bb6e898dbb0c2eb31ed20270ba1496
 p_value
 ```
 
