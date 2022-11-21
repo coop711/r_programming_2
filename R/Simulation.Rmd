@@ -279,7 +279,7 @@ lines(x = seq(0, max(h$breaks), by = 0.1),
       y = dchisq(x = seq(0, max(h$breaks), by = 0.1), df = 3),
       type = "l", col = "red")
 legend("topright", inset = 0.05, lty = 1, col = c("black", "red"), legend = c("Observed", "Chisquare, df = 3"))
-#> 만약 관찰된 카이제곱 통계량이 22였다면, simulated p_valugit statue 는
+#> 만약 관찰된 카이제곱 통계량이 22였다면, simulated p_value 는
 p_value <- sum(chi_squares >= 18) / (B + 1)
 p_value
 ```
