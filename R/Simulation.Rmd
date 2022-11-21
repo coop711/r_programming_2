@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Birthday Problem
 
-23명이 모였을 때 최소한 한 쌍의 생일이 같을 확률을 계산합니다.
+23명이 모였을 때 최소한 한 쌍의 생일이 같을 확률을 simulation으로 계산합니다.
 
 ```{r}
 library(magrittr)
@@ -19,7 +19,7 @@ sample(1:365, size = 23, replace = TRUE) %>%
   duplicated %>%
   any 
 ```
-`replicated` 를 이용하여 반복 시행하고 중복 생일 여부를 카운트. 반복횟수를 `N`으로 변수화.
+`replicate` 를 이용하여 반복 시행하고 중복 생일 여부를 카운트. 반복횟수를 `N`으로 변수화.
 
 ```{r}
 set.seed(1)
@@ -29,7 +29,7 @@ replicate(N, sample(1:365, size = 23, replace = TRUE) %>%
             any) %>%
   sum
 ```
-참여 인원이 2명~100명일 때 최소한 한쌍이 생일이 같을 확률을 `N`회 반복모의실험으로 계산.
+참여 인원이 2명~100명일 때 최소한 한쌍이 생일이 같을 확률을 `N`회 반복 모의실험으로 계산.
 
 ```{r}
 prob <- vector(mode = "numeric", length = 100)
@@ -44,7 +44,6 @@ for (i in 2:100){
     "/"(N)
 }
 prob
-
 ```
 
 반복수를 default로 설정하고, 참여 인원을 변수로 갖는 사용자 함수 작성
@@ -62,38 +61,226 @@ birthday <-
 birthday(x = 23)
 ```
 
-### Plots
+### R Base Plot
 
 `N` = 100000 으로 설정하여 x = 2 ~ 100 명까지 한 쌍 이상 생일같은 사람이 있을 확률을 모의 실험으로 계산하고 `plot()` 으로 시각화
 
 ```{r echo=FALSE}
+#> sapply 와 birthday 함수를 이용하여 인원이 2명~100명까지 모였을 때 한 쌍 이상 생일같은 사람이 있을 확률 계산. 반복수로 N = 100000 설정. N = 100, 1000, 10000 실행하여 비교하세요.
 probs <- 
-  sapply(2:100, FUN = function(x) birthday(N = 100000, x))
+  sapply(2:100, FUN = function(x) birthday(N = 10000, x))
+#> plot 그리고 되돌려 놓기 위하여 그래픽 파라미터 저장
 opar <- par(no.readonly = TRUE)
+#> plot 의 왼쪽 여백 확보 (default 는 0.82)
 par(mai = c(1.02, 1.02, 0.82, 0.42))
-plot(2:100, probs, type = "p", pch = ".", cex = 3, axes = FALSE, xlab = "Number of People", ylab = "")
-axis(side = 1, at = c(0, 23, 40, 60, 80, 100), labels = c(0, 23, 40, 60, 80, 100))
-axis(side = 2, at = c(0, 0.25, probs[22], 0.75, 1), labels = format(c(0, 0.25, probs[22], 0.75, 1), digits = 4), las = 1)
+#> 그래픽 파라미터 설정에 유의.
+plot(x = 2:100, y = probs, 
+     type = "p", pch = ".", cex = 3, 
+     axes = FALSE, xlab = "Number of People", ylab = "")
+#> x축의 조정, 23을 집어넣은 데 유의
+axis(side = 1, 
+     at = c(0, 23, 40, 60, 80, 100), labels = c(0, 23, 40, 60, 80, 100))
+#> y축의 조정, 23명 모였을 떄의 확률 probs[22]를 포함시킨 데 유의.
+axis(side = 2, 
+     at = c(0, 0.25, probs[22], 0.75, 1), 
+     labels = format(c(0, 0.25, probs[22], 0.75, 1), digits = 4), las = 1)
+#> 23명 모였을 때 한 쌍 이상 생일이 같은 경우의 비율을 'x'로 표시
 text(x = 23, y = probs[22], labels = "x")
-arrows(x0 = 23, y0 = 0, x1 = 23, y1 = probs[22], code = 1, length = 0.15)
-arrows(x0 = 0, y0 = probs[22], x1 = 23, y1 = probs[22], code = 1, length = 0.15)
+#> 화살표로 x축 상의 위치 표시. code 의 기능 확인할 것.
+arrows(x0 = 23, y0 = 0, x1 = 23, y1 = probs[22], 
+       code = 1, length = 0.15, col = "red")
+#> 화살표로 y축 상의 위치 표시
+arrows(x0 = 0, y0 = probs[22], x1 = 23, y1 = probs[22], 
+       code = 1, length = 0.15, col = "red")
+#> title 함수를 이용하여 y축의 이름 표시. line 의 기능 확인.
 title(ylab = "Probability", line = 4)
-title(main = "Birthday Problem")
+#> title 함수를 이용하여 메인 타이틀 표시
+title(main = "Birthday Problem Simulation")
+#> 그래픽 파라미터를 디폴트 상태로 복원
+par(opar)
+```
+
+### ggplot 
+
+```{r}
+library(ggplot2)
+#> arrow 함수를 사용하기 위하여 `grid` 패키지 등록
+library(grid)
+#> plot 틀 잡기. data 를 data.frame 으로 구성하는 것에 유의.
+ggplot(data = data.frame(x = 2:100, Probs = probs), 
+       aes(x = x, y = Probs)) +   #>  x축, y축 설정
+  geom_point(shape = 20, size = 1) +   #> geom_point 에 shape 와 size 만 설정
+  theme_bw() +    #> 배경 조정
+  scale_x_continuous(name = "Number of People",   #> x축 설정
+                     breaks = c(0, 23, 40, 60, 80, 100), 
+                     labels = c(0, 23, 40, 60, 80, 100)) +
+  scale_y_continuous(name = "Probability",       #> y축 설정
+                     breaks = c(0, 0.25, probs[22], 0.75, 1), 
+                     labels = format(c(0, 0.25, probs[22], 0.75, 1), digits = 4)) +
+  annotate("segment", x = 23, y = probs[22], xend = 23, yend = 0,     #> x축 화살표  
+           colour = "red", arrow = arrow()) +
+  annotate("segment", x = 23, y = probs[22], xend = 0, yend = probs[22],  #> y축 화살표
+           colour = "red", arrow = arrow()) +
+  ggtitle("Birthday Problem Simulation") +  #> 메인 타이틀
+  theme(plot.title = element_text(hjust = 0.5)) #> 메인 타이틀 폰트 패밀리 설정과 hjust 를 이용한 가운데 정렬
 ```
 
 ## Matching Problem
+
+매칭 문제의 기본적 틀에 대하여 코딩. 문항이 네 개일 때 중점 집중 파악.
 
 ```{r}
 set.seed(1)
 K <- 4
 sum(sample(K) == 1:K)
-N <- 24000
-replicate(N, sum(sample(K) == 1:K)) %>%
-  mean
-  table %>%
-  mean
-  `/`(240) %>%
-  mean
+```
+$K = 4$일 때, 매칭의 개수가 0일 확률은 9/24, 1일 확률은 8/24, 2일 확률은 6/24, 4일 확률은 1/24 임. 24의 배수로 반복하면 대수의 법칙을 확인할 수 있음.
+
+```{r}
+N <- 240000
 ```
 
+N회 반복하여 평균과 표준편차 계산. 이론적으로 알고 있는 기대값 1, SD 1과 비교.
+표준오차를 계산해 보면 $1/sqrt(N)$ 범위 안에 들어감을 확인할 필요. $N = $`N`일 때, 표준오차는 `r 1/sqrt(N)` 임
+
+```{r}
+replicate(N, sum(sample(K) == 1:K)) %>%
+  mean
+replicate(N, sum(sample(K) == 1:K)) %>%
+  sd
+```
+
+매칭의 개수와 빈도를 테이블로 정리하고, `r N / 24` 로 나누어 이론적 확률 확인.
+
+```{r}
+replicate(N, sum(sample(K) == 1:K)) %>%
+  table %>%
+  `/`(10000)%>%
+  round
+```
+
+### R Base plot
+
+모의 실험 결과물을 확률 히스토그램으로 표현하고 이론적 확률 분포가 구현되고 있음을 확인. 
+
+```{r}
+## plot() 함수 이용
+replicate(N, sum(sample(K) == 1:K)) %>%
+  hist(breaks = c(-0.5, 0.5, 1.5, 2.5, 3.5, 4.5), 
+       axes = FALSE,
+       prob = TRUE,
+       col = "skyblue",
+       main = "Matching Problem Simulation")
+axis(side = 1, at = 0:4, labels = 0:4)
+axis(side = 2, at = c(0, 1/24, 6/24, 8/24, 9/24),
+     labels = c("0", "1/24", "6/24", "8/24", "9/24"),
+     las = 1)
+```
+
+### ggplot
+
+raw 데이터를 geom_histogram에 그대로 사용하는 방법과 table로 정리하고 data frame으로 만든 후 geom_bar로 작성하는 방법을 소개.
+
+#### raw data와 geom_histogram 
+
+```{r}
+#> raw data 활용
+matching_df <- 
+  replicate(N, sum(sample(K) == 1:K)) %>%
+  data.frame(N_matches = .)
+#> y = ..probability.. 대신 after_stat(density) 가 사용됨에 유의. ggplot 3.4.0부터 사용.
+ggplot(mapping = aes(x = N_matches), 
+       data = matching_df) +
+  geom_histogram(aes(y = after_stat(density)),
+                 binwidth = 1,      #> binwidth 의 기능 확인
+                 fill = "blue",     #> 막대 색깔 설정
+                 colour = "black",  #> 막대 테두리의 색깔 설정
+                 alpha = 0.3) +     #> 막대 색깔의 투명도 설정
+  theme_classic() +                 #> theme 설정
+  labs(x = "Number of Matching", y = "Density") +       #> x축 이름, y축 이름 설정
+  scale_y_continuous(breaks = c(0, 1/24, 6/24, 8/24, 9/24),  #> y축 설정
+     labels = c("0", "1/24", "6/24", "8/24", "9/24"))+
+  ggtitle("Matching Problem Simulation") +                   #> 메인 타이틀
+  theme(plot.title = element_text(hjust = 0.5))              #> 메인 타이틀 가운데 정렬
+```
+
+#### table, data.frame, geom_bar
+
+raw data를 table로 집계하고 tidy한 data frame 으로 변환. 
+
+```{r}
+matching_tbl <- 
+  replicate(N, sum(sample(K) == 1:K)) %>%
+  table %>%
+  as.data.frame %>%
+  `names<-`(c("N_matches", "Counts"))
+#>빈도가 없는 3을 x 축에 넣기 위하여 factor로 정리
+matching_tbl$N_matches %<>%
+  factor(levels = 0:4, labels = 0:4)
+#> geom_bar 를 활용하기 위하여 x 변수 설정
+ggplot(mapping = aes(x = N_matches), data = matching_tbl) +
+  geom_bar(aes(y = proportions(Counts)),  #> proportions 를 활용하여 확률 히스토그램 작성
+           stat = "identity",
+           fill = "blue",
+           colour = "black",
+           alpha = 0.3)+
+  theme_classic() +
+  scale_x_discrete(name = "Number of Matching", drop = FALSE) +  #> drop = FALSE 로 카운트가 없는 3을 x축에 표시. 
+  scale_y_continuous(name = "Density",         #> y축 설정 
+                     breaks = c(0, 1/24, 6/24, 8/24, 9/24),
+                     labels = c("0", "1/24", "6/24", "8/24", "9/24"))+
+  ggtitle("Matching Problem Simulation") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+## Chisquare Test : simulated p-value
+
+```{r}
+set.seed(1)
+M <- 100
+Expected <- 
+  M * c(9, 8, 6, 1) / 24
+Observed <- 
+  sample(x = c(0, 1, 2, 4), 
+         size = M, 
+         prob = c(9, 8, 6, 1) / 24, 
+         replace = TRUE) %>%
+  factor(levels = c(0, 1, 2, 4)) %>%
+  table 
+    chi_square <- 
+      sum((Observed - Expected) ^ 2 / Expected)
+    chi_square
+chi_square_stat <-
+  function(M) {
+    Expected <- 
+      M * c(9, 8, 6, 1) / 24
+    Observed <- 
+      sample(x = c(0, 1, 2, 4), 
+             size = M, 
+             prob = c(9, 8, 6, 1) / 24, 
+             replace = TRUE) %>%
+      factor(levels = c(0, 1, 2, 4)) %>%
+      table 
+    chi_square <- 
+      sum((Observed - Expected) ^ 2 / Expected)
+    chi_square
+  }
+chi_square_stat(M = 100)  
+B <- 2000
+chi_squares <-
+  replicate(B, chi_square_stat(M = 100))
+h <- chi_squares %>% 
+  hist(breaks = 0:ceiling(max(.)), 
+       prob = TRUE, 
+       col = "white",
+       ylim = c(0, 0.25), 
+       main = "Chi-Square Values")
+lines(x = seq(0, max(h$breaks), by = 0.1), 
+      y = dchisq(x = seq(0, max(h$breaks), by = 0.1), df = 3),
+      type = "l", col = "red")
+legend("topright", inset = 0.05, lty = 1, col = c("black", "red"), legend = c("Observed", "Chisquare, df = 3"))
+#> 만약 관찰된 카이제곱 통계량이 22였다면, simulated p_value 는
+p_value <- sum(chi_squares >= 18) / (B + 1)
+p_value
+```
 
