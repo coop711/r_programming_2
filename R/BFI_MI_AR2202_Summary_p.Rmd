@@ -15,6 +15,7 @@ library(knitr)
 library(pander)
 library(dplyr)
 library(magrittr)
+library(extrafont)
 panderOptions("table.split.table", Inf)
 ```
 필수 자료 읽어들이기
