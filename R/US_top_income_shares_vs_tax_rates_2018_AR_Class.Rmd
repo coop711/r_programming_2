@@ -1,0 +1,179 @@
+---
+title: "Marginal Tax Rates vs US Income (1913 ~ 2018)"
+author: "coop711"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Data Preparation
+
+준비한 자료는  [E. Saez 교수의 홈페이지](http://elsa.berkeley.edu/~saez/)에 있는 `TabFig2018prel.xls` 와 [Tax Foundation](http://taxfoundation.org/)에서 제공하는 자료를 손봐서 불러들인 것이다. 
+연도를 공통으로 수평축에 놓고, 상위 1%의 소득점유율과 한계소득세율, 또는 상위1%와 하위 99%의 소득 기준년도 대비 소득(%) 등, 서로 다른 범위를 가진 변수들을 한 화면에 함께 표현해야 하기 때문에 선형변환을 이용하여 범위를 0에서 1사이로 맞추고, 각 변수의 변환하기 전 원시 값은 좌측 수직축과 우측 수직축에 표현하는 트릭을 써 보자. 이 작업에서 반복되는 선형 변환은 사용자 정의 함수를 작성하여 활용한다.
+
+```{r, data preparation, message = FALSE, echo = FALSE, results = 'hide'}
+options(digits = 2)
+library(knitr)
+library(magrittr)
+library(ggplot2)
+library(extrafont)
+#> 데이터 불러 들이기
+load("US_top_income_shares_vs_tax_rates_2018.RData")
+```
+
+이 중에서 소득 상위 1%(`P99_100`)몫과 최고세율(Marginal Tax Rates) 간의 관계를 살펴보자.
+
+## R Base Plot
+
+```{r, top 1 percent shares vs MTR, echo = FALSE, fig.width = 12, fig.height = 6.75, message = FALSE}
+# png(file = "../pics/US_Top_Income_Share_vs_MTR_72dpi_en.png", width = 864, height = 486)
+# png(file = "../pics/US_Top_Income_Share_vs_MTR_300dpi_en.png", width = 1280, height = 720)
+#> 왼쪽, 오른쪽 수직 축의 축 눈금을 수평하게 놓을 수 있도록 공간 조정
+par(mar = c(5, 6, 4, 6) + 0.1,
+    family = "KoPubWorldDotum Medium")
+#> 점과 선을 함께 사용하여 소득 상위 1%의 점유율 표시.
+top_income_tax %>%
+  plot(P99_100_z ~ Year, 
+       data = ., 
+       type = "b", 
+       pch = 17, 
+       cex = 1.2, 
+       lwd = 3,
+       axes = FALSE, 
+       ann = FALSE, 
+       xlim = c(1910, 2020), 
+       ylim = c(0, 1))
+#> 점유율 도표를 박스 안에
+box()
+#> 수평축 눈금 표시
+seq(1910, 2020, by = 10) %>% 
+  axis(side = 1, at = ., labels = .)
+# axis(side = 1, at = seq(1910, 2020, by = 10), labels = seq(1910, 2020, by = 10))
+#> 상위 1% 소득점유율을 왼편 수직축에 표시. 수직축 눈금을 표시하기 위하여 선형변환 함수를 이용하되, 실제 표시되는 눈금은 상위 1% 소득점유율의 실제 값이 표시될 수 있도록 최소값과 최대값을 범위로 하고 중간에는 10%, 17%, 20%만 나오도록 함. 
+y1_at <- 
+  top_income_tax$P99_100 %>%
+  z(c(10, 15, 20)) %>%
+  c(0, ., 1)
+# y1_at <- c(0, z(top_income_tax$P99_100, c(10, 17, 20)), 1)
+labels1_at <- 
+  top_income_tax$P99_100 %>%
+  min %>%
+  c(seq(10, 20, by = 5), max(top_income_tax$P99_100)) %>%
+  format(digits = 2, nsmall = 1)
+# labels1_at <- format(c(min(top_income_tax$P99_100), seq(10, 20, by = 5), max(top_income_tax$P99_100)),
+#                     digits = 2, nsmall = 1)
+axis(side = 2, 
+     at = y1_at, 
+     labels = labels1_at, 
+     las = 1)
+#> 왼편 수직축 가장자리에 석 줄을 띠워 놓고 축 이름 표시.
+mtext("상위 1% 소득점유율(%)", 
+      side = 2, 
+      line = 3)
+#> 범위를 0에서 1사이로 변환한 한계소득세율을 도표에 추가.
+top_income_tax %>%
+  lines(Marginal_z ~ Year, data = ., 
+        type = "l", 
+        lty = 1, 
+        lwd = 5, 
+        col = "red", 
+        xlim = c(1910, 2020), ylim = c(0, 1))
+#> 오른편 수직축에 한계소득세율의 눈금을 표시하기 위하여 역시 선형변환 함수를 이용하고 실제 표시하는 눈금은 한계소득세율의 실제값 사용.
+y4_at <- top_income_tax$Marginal %>%
+  z(seq(20, 80, by = 20)) %>%
+  c(0, ., 1)
+# y4_at <- c(0, z(top_income_tax$Marginal, seq(20, 80, by = 20)), 1)
+labels4_at <- top_income_tax$Marginal %>%
+  min %>%
+  c(seq(20, 80, by = 20), max(top_income_tax$Marginal)) %>%
+  format(digits = 2, nsmall = 1)
+# labels4_at <- format(c(min(top_income_tax$Marginal), seq(20, 80, by = 20), max(top_income_tax$Marginal)),
+#                     digits = 2, nsmall = 1)
+axis(side = 4, 
+     at = y4_at, 
+     labels = labels4_at, 
+     las = 1)
+#> 오른편 수직축의 이름을 석 줄 띄워 표시.
+mtext("최고 한계세율(%)", 
+      side = 4, 
+      line = 3)
+#> 메인 타이틀 작성
+title(main = "상위 1% 소득점유율과 최고 한계세율", 
+      xlab = "연도", 
+      cex.main = 1.8)
+#> 어느 선이 어느 변수인지 텍스트로 표시
+text(x = 1975, y = 0.8, 
+     labels = "최고 한계세율", 
+     cex = 1.2)
+text(x = 1964, y = 0.2, 
+     labels = "상위 1% 소득점유율", 
+     cex = 1.2)
+text(x = c(1935, 1965, 2015), y = c(0.9, 0.35, 0.6),
+     labels = c("대공황", "대번영", "대침체"),
+     col = "blue",
+     cex = 1.5)
+#> 외부 그림 파일로 저장.
+# dev.copy(png, file ="../pics/US_Top_Income_Share_vs_MTR_kr.png", width = 960, height = 540)
+# dev.off()
+``` 
+
+## ggplot
+
+```{r, top 1 percent shares vs MTR2, echo = FALSE, fig.width = 12, fig.height = 6.75, message = FALSE, warning = FALSE}
+M1 <- 
+  ggplot(data = M_tbl, 
+         mapping = aes(x = Year, 
+                       y = Values, 
+                       size = Variables,
+                       colour = Variables)) +
+  geom_line(show.legend = FALSE) +
+  geom_point(data = subset(M_tbl, M_tbl$Variables == "P99_100_z"),
+             mapping = aes(x = Year, 
+                           y = Values), 
+             shape = 24, 
+             fill = "black",
+             size = 3.5, 
+             stroke = 2,
+             color = "white",
+             show.legend = FALSE)
+#             shape = 17, size = 3, show.legend = FALSE)
+M2 <- M1 +
+  scale_colour_manual(values = c("red", "black")) +
+  scale_size_manual(values = c(2, 1))
+M3 <- M2 + 
+  theme_bw(base_family = "KoPubWorldDotum Medium") + 
+  scale_x_continuous(name = "연도", 
+                     breaks = seq(1910, 2020, by = 10), 
+                     labels = seq(1910, 2020, by = 10)) +
+  scale_y_continuous(name = "상위 1% 소득 점유율(%)", 
+                     breaks = y1_at, 
+                     labels = labels1_at, 
+                     limits = c(0, 1),
+                     sec.axis = sec_axis(name = "최고 한계세율(%)", 
+                                         trans = ~ z(., q = .), 
+                                         breaks = (y4_at + 0.05 )/1.1, 
+                                         labels = labels4_at)) +
+  labs(title = "상위 1% 소득점유율과 최고 한계세율") +
+  annotate("text", 
+           x = c(1975, 1965), 
+           y = c(0.8, 0.2), 
+           label = c("최고 한계세율", "상위 1% 소득점유율"), 
+           family = "KoPubWorldDotum Medium", 
+           size = 6) +
+  annotate("text",
+           x = c(1935, 1965, 2015), 
+           y = c(0.9, 0.35, 0.6),
+           label = c("대공황", "대번영", "대침체"),
+           family = "KoPubWorldDotum Medium",
+           colour = "blue",
+           size = 8) +
+  theme(plot.title = element_text(hjust = 0.5, 
+                                  size = 20, 
+                                  margin = margin(t = 0, r = 0, b = 12, l = 0)),
+        axis.title.y.right = element_text(angle = 90))
+M3
+ggsave("../pics/US_Top_Income_share_vs_MTR_ggplot_kr.png")
+``` 
+
+## Comments
+
+I've learned ...

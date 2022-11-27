@@ -1,0 +1,536 @@
+---
+title: "US Top Income Share 1913 ~ 2018 (도표)"
+author: "coop711"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r, setup , include = FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Data
+
+준비한 자료는  [E. Saez 교수의 홈페이지](http://elsa.berkeley.edu/~saez/)에 있는 [`TabFig2018prel.xls`](http://eml.berkeley.edu//~saez/TabFig2018prel.xls) 를 손봐서 불러들인 것이다. 
+
+```{r, data preparation, echo = FALSE, message = FALSE, results = 'hide'}
+options(digits = 3)
+load("US_top_income_shares_2018.RData")
+ls()
+```
+
+<!--작업을 마친 자료파일은 `US_top_income_shares_18`이며, 이 자료의 구조와 앞의 몇 열의 값은 다음과 같다.-->
+
+```{r, data structure, echo = FALSE, results = 'hide'}
+library(knitr)
+# library(extrafont)
+str(US_top_income_shares_18)
+```
+
+```{r, data for Table 3, echo = FALSE}
+kable(US_top_income_shares_18)
+# kable(US_top_income_shares_18[c(11:20, 41:51, 92:106), ])
+```
+
+## Plots
+
+### Top 10%의 소득점유율
+
+소득 상위 10%(`P90_100`)의 소득점유율 변화
+
+```{r, top 10, echo = FALSE, message = FALSE, warning = FALSE, fig.width = 12, fig.height = 6.75}
+# png(file = "../pics/US_top_income_share_10_2018_72dpi_kr.png", width = 864, height = 486)
+# png(file = "../pics/US_top_income_share_10_2018_300dpi_kr.png", width = 1280, height = 720)
+par(family = "KoPubWorldDotum Medium")
+x_lab <- "연도"
+y_lab <- "소득 점유(%)"
+plot(P90_100 ~ Year, 
+     data = US_top_income_shares_18, 
+     xlab = x_lab, 
+     ylab = y_lab, 
+     xlim = c(1910, 2020), 
+     ylim = c(30, 52), 
+     xaxt = "n", 
+     type = "b", 
+     pch = 17)
+axis(side = 1, 
+     at = seq(1910, 2020, by = 10), 
+     labels = seq(1910, 2020, by = 10))
+# lines(P95_99 ~ Year, data = US_top_income_shares_18, type = "b", pch = 17, col = "red")
+# lines(P90_95 ~ Year, data = US_top_income_shares_18, type = "b", pch = 17, col = "blue")
+abline(h = seq(30, 50, by = 5), 
+       lty = 3)
+abline(v = seq(1910, 2020, by = 10), 
+       lty = 3)
+# legend.text <- "Top 10% (incomes above $121,360 in 2018)")
+# legend(x = 1940, y = 25, legend = legend.text, pch = 17, col = "black")
+main_title <- "미국 상위 10% 소득 점유(1917 ~ 2018)"
+title(main = main_title, cex.main = 1.8)
+text(x = c(1927.5, 2007, 2012.5, 2018), 
+     y = c(50, 50, 51, 50.5), 
+     labels = c("1928", "2007", "2012", "2018"), 
+     pos = 3)
+times_label <- c("대공황", "대번영", "대침체")
+text(x = c(1935, 1965, 2018), 
+     y = c(48.5, 32, 46.5), 
+     label = times_label, 
+     cex = 1.5, 
+     col = "red")
+dev.copy(png, 
+         file = "../pics/US_top_income_share_10_2018_kr.png", 
+         width = 960, 
+         height = 540)
+dev.off()
+```
+
+### Top 10% 분할
+
+소득 상위 10%(`P90_100`)를 상위 1%(`P99_100`), 차상위 4%(`P95_99`), 차차상위 5%(`P90_95`)로 분할
+
+```{r, partition top 10, echo = FALSE, message = FALSE, warning = FALSE, fig.width = 12, fig.height = 6.75}
+# png(file = "../pics/US_top_income_share_1-4-5_2018_72dpi_kr.png", width = 864, height = 486)
+# png(file = "../pics/US_top_income_share_1-4-5_2018_300dpi_kr.png", width = 1280, height = 720)
+par(family = "KoPubWorldDotum Medium")
+plot(P99_100 ~ Year, 
+     data = US_top_income_shares_18, 
+     xlab = x_lab, 
+     ylab = y_lab, 
+     xlim = c(1910, 2020), 
+     ylim = c(5, 25), 
+     xaxt = "n", 
+     type = "b", 
+     pch = 17)
+axis(side = 1, 
+     at = seq(1910, 2020, by = 10), 
+     labels = seq(1910, 2020, by = 10))
+lines(P95_99 ~ Year, 
+      data = US_top_income_shares_18, 
+      type = "b", 
+      pch = 17, 
+      col = "red")
+lines(P90_95 ~ Year, 
+      data = US_top_income_shares_18, 
+      type = "b", 
+      pch = 17, 
+      col = "blue")
+abline(h = seq(5, 25, by = 5), 
+       lty = 3)
+abline(v = seq(1910, 2020, by = 10), 
+       lty = 3)
+legend_text_1 <- c("99-100%:$480,170 이상(2018년 기준)", 
+                   "95-99%:$197,940-$480,170", 
+                   "90-95%:$134,680-$197,940")
+legend(x = 1947, 
+       y = 25, 
+       legend = legend_text_1, 
+       pch = 17, 
+       col = c("black", "red", "blue"))
+main_title_1 <- "미국 상위 10% 소득 점유 분할 (1913 ~ 2018)"
+title(main = main_title_1, cex.main = 1.8)
+text(x = c(1924, 2007), 
+     y = c(23.5, 23.5), 
+     labels = c("1928", "2007"), 
+     pos = 3)
+text(x = c(1935, 1965, 2018), 
+     y = c(22, 8, 18), 
+     labels = times_label, 
+     cex = 1.5, 
+     col = "red")
+dev.copy(png, 
+         file = "../pics/US_top_income_share_1-4-5_2018_kr.png", 
+         width = 960, 
+         height = 540)
+dev.off()
+```
+
+<P style="page-break-before:always">
+
+### Top 1% 분할
+
+소득 상위 1%(`P99_100`)를 상위 0.1%(`P99.9_100`), 차상위 0.4%(`P99.5_99.9`), 차차상위 0.5%(`P99_99.5`)로 분할
+
+```{r, partiotion top 1, echo = FALSE, message = FALSE, warning = FALSE, fig.width = 12, fig.height = 6.75}
+# png(file = "../pics/US_top_income_share_0.1-0.4-0.5_2018_72dpi_kr.png", width = 864, height = 486)
+# png(file = "../pics/US_top_income_share_0.1-0.4-0.5_2018_300dpi_kr.png", width = 1280, height = 720)
+par(family = "KoPubWorldDotum Medium")
+plot(P99.9_100 ~ Year, 
+     data = US_top_income_shares_18, 
+     xlab = x_lab, 
+     ylab = y_lab, 
+     xlim = c(1910, 2020), 
+     ylim = c(0, 13), 
+     xaxt = "n", 
+     yaxt = "n", 
+     type = "b", 
+     pch = 17)
+axis(side = 1, 
+     at = seq(1910, 2020, by = 10), 
+     labels = seq(1910, 2020, by = 10))
+axis(side = 2, 
+     at = seq(0, 12, by = 3), 
+     labels = seq(0, 12, by = 3))
+lines(P99.5_99.9 ~ Year, 
+      data = US_top_income_shares_18, 
+      type = "b", 
+      pch = 17, 
+      col = "red")
+lines(P99_99.5 ~ Year, 
+      data = US_top_income_shares_18, 
+      type = "b", 
+      pch = 17, 
+      col = "blue")
+abline(h = seq(0, 12, by = 3), 
+       lty = 3)
+abline(v = seq(1910, 2020, by = 10), 
+       lty = 3)
+legend_text_2 <- c("99.9-100%:$2,128,800 이상(2018년 기준)", 
+                   "99.5-99.9%:$731,640-$2,128,800", 
+                   "99-99.5%:$480,170-$731,640")
+legend(x = 1946, 
+       y = 13, 
+       legend = legend_text_2, 
+       pch = 17, 
+       col = c("black", "red", "blue"))
+main_title_2 <- "미국 상위 1% 소득 점유 분할 (1913 ~ 2018)"
+title(main = main_title_2, cex.main = 1.8)
+text(x = c(1924, 2007), 
+     y = c(11, 12.5), 
+     labels = c("1928", "2007"), 
+     pos = 3)
+text(x = c(1935, 1965, 2018), 
+     y = c(10, 2, 8), 
+     label = times_label, 
+     cex = 1.5, 
+     col = "red")
+dev.copy(png, 
+         file = "../pics/US_top_income_share_0.1-0.4-0.5_2018_kr.png", 
+         width = 960, 
+         height = 540)
+dev.off()
+```
+
+### Top 0.1% 분할
+
+소득 상위 0.1%(`P99.9_100`)를 상위 0.01%(`P99.99_100`)와 다음 0.09%(`P99_9.99.99`)로 분할
+
+```{r, partition top 1 0.01 vs 0.09, echo = FALSE, message = FALSE, warning = FALSE, fig.width = 12, fig.height = 6.75}
+# png(file = "../pics/US_top_income_share_0.01-0.09_2018_72dpi_kr.png", width = 864, height = 486)
+# png(file = "../pics/US_top_income_share_0.01-0.09_2018_300dpi_kr.png", width = 1280, height = 720)
+par(family = "KoPubWorldDotum Medium")
+plot(P99.99_100 ~ Year, 
+     data = US_top_income_shares_18, 
+     xlab = x_lab, 
+     ylab = y_lab, 
+     xlim = c(1910, 2020), 
+     ylim = c(0, 7), 
+     xaxt = "n", 
+     type = "b", 
+     pch = 17)
+axis(side = 1, 
+     at = seq(1910, 2020, by = 10), 
+     labels = seq(1910, 2020, by = 10))
+lines(P99.9_99.99 ~ Year, 
+      data = US_top_income_shares_18, 
+      type = "b", 
+      pch = 17, 
+      col = "blue")
+abline(h = seq(0, 6, by = 2), 
+       lty = 3)
+abline(v = seq(1910, 2020, by = 10), 
+       lty = 3)
+legend_text_3 <- c("99.99-100%:$11,312,000 이상(2018년 기준)", 
+                   "99.9-99.99%:$2,128,800-$11,312,000")
+legend(x = 1945, 
+       y = 6.95, 
+       legend = legend_text_3, 
+       pch = 17, 
+       col = c("black", "blue"))
+main_title_3 <- "미국 상위 0.1% 소득 점유 분할 (1913 ~ 2018)"
+title(main = main_title_3, cex.main = 1.8)
+text(x = c(1924, 2007), 
+     y = c(6.3, 6.3), 
+     labels = c("1928", "2007"), 
+     pos = 3)
+text(x = c(1935, 1965, 2018), 
+     y = c(5.6, 0.5, 3.4), 
+     label = times_label, 
+     cex = 1.5, 
+     col = "red")
+dev.copy(png, 
+         file = "../pics/US_top_income_share_0.01-0.09_2018_kr.png", 
+         width = 960, 
+         height = 540)
+dev.off()
+```
+
+<P style = "page-break-before:always">
+
+## ggplot
+
+### Tidy Data
+
+`tidyverse` 패키지를 이용하여 tidy data
+
+```{r, tidy, echo = FALSE, message = FALSE}
+library(tidyverse)
+data_10_df <- 
+  US_top_income_shares_18[c("Year", "P90_100")]
+data_10 <- 
+  US_top_income_shares_18[c("Year", "P99_100", "P95_99", "P90_95")]
+data_10_tbl <- 
+  data_10 %>%
+  as_tibble %>%
+  gather(key = "Percentiles", value = "Share", -Year) %>%
+  mutate(Percentiles = factor(Percentiles, 
+                              levels = c("P99_100", "P95_99", "P90_95")))
+data_1 <- 
+  US_top_income_shares_18[c("Year", "P99.9_100", "P99.5_99.9", "P99_99.5")]
+data_1_tbl <- 
+  data_1 %>%
+  as_tibble %>%
+  gather(key = "Percentiles", value = "Share", -Year) %>%
+  mutate(Percentiles = factor(Percentiles, 
+                              levels = c("P99.9_100", "P99.5_99.9", "P99_99.5")))
+data_01 <- 
+  US_top_income_shares_18[c("Year", "P99.99_100", "P99.9_99.99")]
+data_01_tbl <- 
+  data_01 %>%
+  as_tibble %>%
+  gather(key = "Percentiles", value = "Share", -Year) %>%
+  mutate(Percentiles = factor(Percentiles, 
+                              levels = c("P99.99_100", "P99.9_99.99")))
+```
+
+### Top 10%의 소득점유(%)
+
+```{r, Top 10 shares change, warning = FALSE, echo = FALSE, fig.width = 12, fig.height = 6}
+ggplot(data = data_10_df, 
+       mapping = aes(x = Year, y = P90_100)) + 
+  geom_line(na.rm = TRUE) + 
+  geom_point(shape = 24, 
+             fill = "black",
+             size = 2.7, 
+             stroke = 1.2,
+             color = "white",
+             na.rm = TRUE) +
+  theme_bw(base_family = "KoPubWorldDotum Medium") + 
+  theme(panel.grid.major = element_line(linetype = "dotted", 
+                                        colour = "black")) +
+  scale_x_continuous(breaks = seq(1910, 2020, by = 10), 
+                     limits = c(1910, 2020)) +
+  scale_y_continuous(breaks = seq(30, 50, by = 5), 
+                     limits = c(30, 52)) +
+  labs(x = x_lab, y = y_lab, title = main_title) +
+  theme(axis.title.x = element_text()) +
+  theme(axis.title.y = element_text()) +
+  theme(plot.title = element_text(size = 20, 
+                                  hjust = 0.5)) +
+  annotate("text", 
+           x = c(1927.5, 2007, 2012, 2018), 
+           y = c(50.5, 50.5, 51.5, 51.5), 
+           label = c(1928, 2007, 2012, 2018)) +
+  annotate("text", 
+           x = c(1935, 1965, 2018), 
+           y = c(48.5, 32, 46.5), 
+           label = times_label, 
+           colour = "red", 
+           family = "KoPubWorldDotum Medium", 
+           size = 8)
+```
+
+```{r, Top 10 percent share ggsave, warning = FALSE, echo = FALSE, fig.width = 12, fig.height = 6}
+ggsave("../pics/US_top_income_share_10_2018_ggplot_kr.png", 
+       width = 12, 
+       height = 6.75)
+```
+
+
+### Top 10%의 분할 
+
+```{r, Top 10 percent, warning = FALSE, echo = FALSE, fig.width = 12, fig.height = 6}
+ggplot(data = data_10_tbl, 
+       mapping = aes(x = Year, y = Share, colour = Percentiles)) + 
+  geom_line(na.rm = TRUE) + 
+  geom_point(shape = 24, 
+             aes(fill = Percentiles), 
+             size = 2.7, 
+             stroke = 1.2,
+             colour = "white",
+             na.rm = TRUE) +
+  theme_bw(base_family = "KoPubWorldDotum Medium") +
+  theme(panel.grid.major = element_line(linetype = "dotted", 
+                                        colour = "black")) +
+  scale_x_continuous(breaks = seq(1910, 2020, by = 10), 
+                     limits = c(1910, 2020)) +
+  scale_y_continuous(breaks = seq(5, 25, by = 5), 
+                     limits = c(5, 25)) +
+  labs(x = x_lab, 
+       y = y_lab, 
+       title = main_title_1, 
+       colour = "Income Fractile", 
+       fill = "Income Fractile") +
+  theme(axis.title.x = element_text()) +
+  theme(axis.title.y = element_text()) +
+  theme(plot.title = element_text(size = 20, 
+                                  hjust = 0.5)) +
+  theme(legend.position =  c(0.5, 0.85)) +
+  scale_colour_manual(name = "", 
+                      values = c("black", "red", "blue"), 
+                      labels = legend_text_1) +
+  scale_fill_manual(name = "", 
+                    values = c("black", "red", "blue"), 
+                    labels = legend_text_1) +
+  theme(legend.text = element_text(size = 12)) +
+  guides(colour ="none") +
+  theme(legend.title = element_blank()) +
+  theme(legend.background = element_rect(fill = "white", 
+                                         colour = "black")) +
+#  theme(legend.key = element_blank()) +
+  annotate("text", 
+           x = c(1928, 2007), 
+           y = c(24.5, 24), 
+           label = c(1928, 2007)) +
+  annotate("text", 
+           x = c(1935, 1960, 2018), 
+           y = c(22, 8, 18), 
+           label = times_label, 
+           colour = "red", 
+           family = "KoPubWorldDotum Medium", 
+           size = 8)
+```
+
+```{r, Top 10 percent ggsave, warning = FALSE, echo = FALSE, fig.width = 12, fig.height = 6}
+ggsave("../pics/US_top_income_share_1-4-5_2018_ggplot_kr.png", 
+       width = 12, 
+       height = 6.75)
+```
+
+<P style="page-break-before:always">
+
+### Top 1%의 분할 
+
+```{r, Top 1 percent, warning = FALSE, echo = FALSE, fig.width = 12, fig.height = 6}
+ggplot(data = data_1_tbl, 
+       mapping = aes(x = Year, y = Share, colour = Percentiles)) + 
+  geom_line(na.rm = TRUE) + 
+  geom_point(shape = 24, 
+             aes(fill = Percentiles), 
+             size = 2.7, 
+             stroke = 1.2,
+             colour = "white",
+             na.rm = TRUE) +
+  theme_bw(base_family = "KoPubWorldDotum Medium") + 
+  theme(panel.grid.major = element_line(linetype = "dotted", 
+                                        colour = "black")) +
+  scale_x_continuous(breaks = seq(1910, 2020, by = 10), 
+                     limits = c(1910, 2020)) +
+  scale_y_continuous(breaks = seq(0, 12, by = 3), 
+                     limits = c(0, 13)) +
+  labs(x = x_lab,
+       y = y_lab,
+       title = main_title_2,
+       colour = "Income Fractile", 
+       fill = "Income Fractile") +
+  theme(axis.title.x = element_text()) +
+  theme(axis.title.y = element_text()) +
+  theme(plot.title = element_text(size = 20, 
+                                  hjust = 0.5)) +
+  theme(legend.position =  c(0.5, 0.85)) +
+  scale_colour_manual(name = "", 
+                      values = c("black", "red", "blue"), 
+                      labels = legend_text_2) +
+  scale_fill_manual(name = "", 
+                    values = c("black", "red", "blue"), 
+                    labels = legend_text_2) +
+  theme(legend.text = element_text(size = 12)) +
+  guides(colour ="none") +
+  theme(legend.title = element_blank()) +
+  theme(legend.background = element_rect(fill = "white", 
+                                         colour = "black")) +
+#  theme(legend.key = element_blank())
+  annotate("text", 
+           x = c(1925, 2007), 
+           y = c(11.5, 12.8), 
+           label = c(1928, 2007)) +
+  annotate("text", 
+           x = c(1935, 1960, 2018), 
+           y = c(9, 2, 8), 
+           label = times_label, 
+           colour = "red", 
+           family = "KoPubWorldDotum Medium", 
+           size = 8)
+```
+
+```{r, Top 1 percent ggsave, warning = FALSE, echo = FALSE, fig.width = 12, fig.height = 6}
+ggsave("../pics/US_top_income_share_0.1-0.4-0.5_2018_ggplot_kr.png", 
+       width = 12, 
+       height = 6.75)
+```
+
+### Top 0.1%의 분할 
+
+```{r, Top 0.1 percent, warning = FALSE, echo = FALSE, fig.width = 12, fig.height = 6}
+ggplot(data = data_01_tbl, 
+       mapping = aes(x = Year, y = Share, colour = Percentiles)) + 
+  geom_line(na.rm = TRUE) + 
+  geom_point(shape = 24, 
+             aes(fill = Percentiles), 
+             size = 2.7, 
+             stroke = 1.2,
+             colour = "white",
+             na.rm = TRUE) +
+  theme_bw(base_family = "KoPubWorldDotum Medium") +
+  theme(panel.grid.major = element_line(linetype = "dotted", 
+                                        colour = "black")) +
+  scale_x_continuous(breaks = seq(1910, 2020, by = 10), 
+                     limits = c(1910, 2020)) + 
+  scale_y_continuous(breaks = seq(0, 6, by = 2), 
+                     limits = c(0, 7)) +
+  labs(x = x_lab,
+       y = y_lab,
+       title = main_title_3,
+       colour = "Income Fractile", 
+       fill = "Income Fractile") +
+  theme(axis.title.x = element_text()) +
+  theme(axis.title.y = element_text()) +
+  theme(plot.title = element_text(size = 20, 
+                                  hjust = 0.5)) +
+  theme(legend.position =  c(0.5, 0.85)) +
+  scale_colour_manual(name = "", 
+                      values = c("black", "blue"), 
+                      labels = legend_text_3) +
+  scale_fill_manual(name = "", 
+                    values = c("black", "blue"), 
+                    labels = legend_text_3) +
+  theme(legend.text = element_text(size = 12)) +
+  guides(colour ="none") +
+  theme(legend.title = element_blank()) +
+  theme(legend.background = element_rect(fill = "white", 
+                                         colour = "black")) +
+#   theme(legend.key = element_blank())
+  annotate("text", 
+           x = c(1928, 2007), 
+           y = c(6.8, 6.5), 
+           label = c(1928, 2007)) +
+  annotate("text", 
+           x = c(1935, 1960, 2018), 
+           y = c(5.6, 2.8, 3.0), 
+           label = times_label, 
+           colour = "red", 
+           family = "KoPubWorldDotum Medium", 
+           size = 8)
+```
+
+```{r, Top 0.1 percent ggsave, warning = FALSE, echo = FALSE, fig.width = 12, fig.height = 6.75}
+ggsave("../pics/US_top_income_share_0.01-0.09_2018_ggplot_kr.png", 
+       width = 12, 
+       height = 6.75)
+```
+
+
+<!--## 뒷 정리
+
+```{r, save.image}
+# save.image(file = "US_top_income_shares_2018_add.rda")
+```
+-->
