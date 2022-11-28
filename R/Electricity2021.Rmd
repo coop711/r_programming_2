@@ -1,0 +1,48 @@
+---
+title: "Electricity 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(magrittr)
+library(pander)
+```
+
+## 전력자립도
+
+```{r Data, echo = FALSE, out.width = "70%"}
+knitr::include_graphics("../pics/Electricity.png")
+```
+
+```{r, echo = FALSE}
+Province <- c("강원", "경기", "경남", "경북", "광주", "대구", "대전", "부산", "서울", "세종", "울산", "인천", "전남", "전북", "제주", "충남", "충북")
+A <- c(30623, 82233, 43885, 81382, 644, 2812, 182, 40354, 5344, 3777, 31504, 60506, 61841, 14322, 3968, 111229, 2205)
+names(A) <-Province
+pander(round(A / sum(A) * 100, 1))
+B <- c(16808, 133446, 35734, 44258, 8973, 15444, 9749, 21068, 47296, 4295, 33593, 24901, 33487, 21487, 5688, 48802, 28402)
+names(B) <- Province
+pander(round(B / sum(B) *100, 1))
+R <- c("강원", "수도권", "가야", "신라", "영산강", "신라", "백제", "가야", "수도권", "백제", "가야", "수도권", "영산강", "전북", "제주", "백제", "백제")
+R2 <- c("수도권", "수도권", "가야", "신라", "영산강", "신라", "백제", "가야", "수도권", "백제", "가야", "수도권", "영산강", "백제", "영산강", "백제", "백제")
+Electricity <- data.frame(Province, R, R2, A, B)
+Electricity$Rates <- round(Electricity$A / Electricity$B * 100, digits = 1)
+# load("./R/Elec.RData")
+# Electricity$Rates
+Electricity$R2 <- factor(Electricity$R2, 
+                         levels = c("수도권", "가야", "백제", "신라", "영산강"))
+Electricity %>%
+  pander
+# by(Electricity[4:5], factor(Electricity$R2), 
+#    function(x) round(sum(x[1]) / sum(x[2]) * 100, digits = 1)) 
+```
+
+```{r, echo = FALSE}
+library(plyr)
+ddply(Electricity, .(R2), 
+      function(x) round(sum(x[, 4]) / sum(x[, 5]) * 100, digits = 1)) %>%
+  format(digits = 2, nsmall = 1) %>%
+  pander
+```
+
+
