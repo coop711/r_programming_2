@@ -23,6 +23,63 @@ pander(round(A / sum(A) * 100, 1))
 B <- c(16808, 133446, 35734, 44258, 8973, 15444, 9749, 21068, 47296, 4295, 33593, 24901, 33487, 21487, 5688, 48802, 28402)
 names(B) <- Province
 pander(round(B / sum(B) *100, 1))
+Province2 <- c("서울", "부산", "대구", "인천", "광주", "대전", "울산", "세종", "경기", "강원", "충북", "충남", "전북", "전남", "경북", "경남", "제주")
+Usage <- c("가정용", "공공용", "서비스업", "농림어업", "광업", "제조업")
+Sales <- c(14656, 3575, 27499, 19, 2, 1544, 
+           4975, 1280, 7507, 111, 20, 7175, 
+           3461, 866, 5562, 80, 15, 5459, 
+           4587, 944, 7572, 167, 88, 11544, 
+           2216, 569, 3272, 77, 3, 2836, 
+           2103, 1108, 4112, 37, 1, 2388, 
+           1639, 505, 3498, 90, 15, 27846, 
+           612, 343, 1520, 91, 12, 1718, 
+           20775, 5941, 37299, 2712, 272, 66446, 
+           2290, 1479, 6399, 784, 452, 5406, 
+           2386, 1361, 5365, 920, 129, 18241, 
+           3185, 1122, 7231, 2292, 342, 34631, 
+           2589, 1082, 5146, 1705, 70, 10895, 
+           2579, 1373, 5740, 3461, 83, 20251, 
+           3709, 1706, 8789, 2136, 229, 27689, 
+           4826, 1437, 9043, 2370, 69, 17990, 
+           971, 334, 2627, 1445, 8, 303)
+Electricity_Sales <- data.frame(Province2 = factor(rep(Province2, each = 6), levels = Province2), 
+                                Usage = factor(rep(Usage, times = 17), levels = Usage), 
+                                Sales = Sales)
+Electricity_Sales <- Electricity_Sales[, c(2, 1, 3)]
+```
+
+```{r, fig.width = 16, fig.height = 8}
+library(ggplot2)
+source("./mosaic_gg_tidy.R")
+m_list <- mosaic_gg(tbl = Electricity_Sales)
+m <- m_list$m
+df <- m_list$df
+p_df <- m_list$p_df
+str(p_df)
+# y_min <- min(p_df$y_breaks)
+# y_max <- sort(unique(p_df$y_breaks[p_df$y_breaks < 0.99]), decreasing = TRUE)[1]
+m_list$m +
+  geom_text(aes(x = center, y = 1.05),
+            family = "KoPubWorldDotum Medium",
+            label = p_df[, 2]) + 
+  theme_bw() +
+  labs(x = "시도(%)", y = "용도별(%)") + 
+  ggtitle("시도별 용도별 판매전력량") + 
+  scale_fill_brewer(name = "용도별", 
+                    labels = Usage,
+                    type = "qual", 
+                    palette = "Set3", 
+                    direction = 1,
+                    guide = guide_legend(reverse = TRUE)) +
+  theme(legend.title = element_text(family = "KoPubWorldDotum Medium"),
+        axis.title.x = element_text(family = "KoPubWorldDotum Light"),
+        axis.title.y = element_text(family = "KoPubWorldDotum Light"),
+        legend.text = element_text(family = "KoPubWorldDotum Light"),
+        plot.title = element_text(size = 20, hjust = 0.5, family = "KoPubWorldDotum Bold"))
+ggsave("../pics/Electrity_Sales_Province.png", dpi = 300, width = 16, height = 8, units = "in")
+```
+
+```{r}
 R <- c("강원", "수도권", "가야", "신라", "영산강", "신라", "백제", "가야", "수도권", "백제", "가야", "수도권", "영산강", "전북", "제주", "백제", "백제")
 R2 <- c("수도권", "수도권", "가야", "신라", "영산강", "신라", "백제", "가야", "수도권", "백제", "가야", "수도권", "영산강", "백제", "영산강", "백제", "백제")
 Electricity <- data.frame(Province, R, R2, A, B)

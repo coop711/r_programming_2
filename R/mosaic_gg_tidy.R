@@ -43,17 +43,20 @@ N <- length(levels(tbl_df[, 1]))
 #> 
 #> breaks and labels
   tbl_p_m <- tapply(tbl_p_df[, 3], tbl_p_df[, 2], sum)
-  x_breaks <- c(0, ifelse(cumsum(tbl_p_m) < 0.1, 0.0, cumsum(tbl_p_m)))
+  x_breaks <- c(0, ifelse(diff(cumsum(tbl_p_m)) < 0.01, 0.0, cumsum(tbl_p_m)))
   x_label <- format(x_breaks * 100, 
-                    digits = 3, 
+                    digits = 2, 
                     nsmall = 1)
   y_breaks <- tbl_p_df$y_breaks
-  delta <- (max(y_breaks) - min(y_breaks)) / 20
-  y_breaks_sort <- sort(y_breaks)
-  diff(y_breaks_sort) < delta 
-  index <- which(diff(y_breaks_sort)  > delta)
-  y_breaks <- c(0, y_breaks_sort[c(index, length(y_breaks_sort))])
-  y_label <- format(y_breaks * 100,
+  y_breaks_f <- cut(y_breaks, breaks = seq(0, 1, by = 0.1))
+  y_breaks_m <- tapply(y_breaks, y_breaks_f, max) %>%
+    unname
+#  delta <- (max(y_breaks) - min(y_breaks)) / 20
+#   y_breaks_sort <- sort(y_breaks)
+#   diff(y_breaks_sort) < delta 
+#   index <- which(diff(y_breaks_sort)  > delta)
+#   y_breaks <- c(0, y_breaks_sort[c(index, length(y_breaks_sort))])
+  y_label <- format(y_breaks_m * 100,
                     digits = 2,
                     nsmall = 1)
 #> 
@@ -75,13 +78,13 @@ m <-
 #            label = tbl_p_df[, 2]) +
   geom_text(aes(x = center, 
                 y = label_height), 
-            label = format(ifelse(tbl_df[, 3] == 0, "", tbl_df[, 3]), 
+            label = format(ifelse(tbl_df[, 3] < 100, "", tbl_df[, 3]),
                            big.mark = ","), 
             na.rm = TRUE,
             position = position_identity()) +
   scale_x_continuous(breaks = x_breaks, 
                      label = x_label) + 
-  scale_y_continuous(breaks = y_breaks,
+  scale_y_continuous(breaks = y_breaks_m,
                      label = y_label) + 
   theme(plot.margin = unit(c(1, 2, 1, 1), "lines"))
 list(m = m, df = tbl_df, p_df = tbl_p_df)
