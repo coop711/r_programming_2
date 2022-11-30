@@ -1,5 +1,6 @@
 mosaic_gg <-
 function(tbl){
+  library(scales)
 tbl_df <- tbl 
 # %>%
 # as.data.frame
@@ -78,8 +79,7 @@ m <-
 #            label = tbl_p_df[, 2]) +
   geom_text(aes(x = center, 
                 y = label_height), 
-            label = format(ifelse(tbl_df[, 3] < 100, "", tbl_df[, 3]),
-                           big.mark = ","), 
+            label = format(ifelse(tbl_df[, 3] < 100, "", comma(tbl_df[, 3])), trim = TRUE, justify = "right"), 
             na.rm = TRUE,
             position = position_identity()) +
   scale_x_continuous(breaks = x_breaks, 

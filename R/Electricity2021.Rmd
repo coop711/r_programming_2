@@ -6,6 +6,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(magrittr)
+library(readxl)
 library(pander)
 ```
 
@@ -15,15 +16,33 @@ library(pander)
 knitr::include_graphics("../pics/Electricity.png")
 ```
 
-```{r, echo = FALSE}
-Province <- c("강원", "경기", "경남", "경북", "광주", "대구", "대전", "부산", "서울", "세종", "울산", "인천", "전남", "전북", "제주", "충남", "충북")
-A <- c(30623, 82233, 43885, 81382, 644, 2812, 182, 40354, 5344, 3777, 31504, 60506, 61841, 14322, 3968, 111229, 2205)
-names(A) <-Province
-pander(round(A / sum(A) * 100, 1))
-B <- c(16808, 133446, 35734, 44258, 8973, 15444, 9749, 21068, 47296, 4295, 33593, 24901, 33487, 21487, 5688, 48802, 28402)
-names(B) <- Province
-pander(round(B / sum(B) *100, 1))
-Province2 <- c("서울", "부산", "대구", "인천", "광주", "대전", "울산", "세종", "경기", "강원", "충북", "충남", "전북", "전남", "경북", "경남", "제주")
+### 전력 발전량
+
+```{r}
+#> pdf 파일을 copy 하여 excel 시트에 옮기고, xlsx 파일로 정리하여 읽어들임. "-"를 NA 로 설정하여 읽어들인 후 0으로 변환.
+Electricity <- 
+  "../data/Electricity_Produce.xlsx" %>%
+  read_excel(range = "B1:J19", 
+             col_names = TRUE,
+             col_types = "numeric",
+             na = "-") 
+Electricity[is.na(Electricity)] <- 0
+Electricity
+Province <- 
+  c("서울", "부산", "대구", "인천", "광주", "대전", "울산", "세종", "경기", "강원", "충북", "충남", "전북", "전남", "경북", "경남", "제주")
+Electricity %<>%
+  data.frame(row.names = c(Province, "계"))
+Electricity %<>%
+ `/`(1000) %>%
+  round 
+Electricity[, "계", drop = FALSE]
+Electricity
+```
+
+
+### 전력판매량
+
+```{r}
 Usage <- c("가정용", "공공용", "서비스업", "농림어업", "광업", "제조업")
 Sales <- c(14656, 3575, 27499, 19, 2, 1544, 
            4975, 1280, 7507, 111, 20, 7175, 
@@ -42,7 +61,7 @@ Sales <- c(14656, 3575, 27499, 19, 2, 1544,
            3709, 1706, 8789, 2136, 229, 27689, 
            4826, 1437, 9043, 2370, 69, 17990, 
            971, 334, 2627, 1445, 8, 303)
-Electricity_Sales <- data.frame(Province2 = factor(rep(Province2, each = 6), levels = Province2), 
+Electricity_Sales <- data.frame(Province = factor(rep(Province, each = 6), levels = Province), 
                                 Usage = factor(rep(Usage, times = 17), levels = Usage), 
                                 Sales = Sales)
 Electricity_Sales <- Electricity_Sales[, c(2, 1, 3)]
@@ -79,17 +98,39 @@ m_list$m +
 ggsave("../pics/Electrity_Sales_Province.png", dpi = 300, width = 16, height = 8, units = "in")
 ```
 
+### 전력 자급도
+
+```{r, echo = FALSE}
+Province_old <- c("강원", "경기", "경남", "경북", "광주", "대구", "대전", "부산", "서울", "세종", "울산", "인천", "전남", "전북", "제주", "충남", "충북")
+A <- c(30623, 82233, 43885, 81382, 644, 2812, 182, 40354, 5344, 3777, 31504, 60506, 61841, 14322, 3968, 111229, 2205)
+names(A) <- Province_old
+W_A <- round(A / sum(A) * 100, 1)
+# pander(WA, caption = "발전량 비중")
+B <- c(16808, 133446, 35734, 44258, 8973, 15444, 9749, 21068, 47296, 4295, 33593, 24901, 33487, 21487, 5688, 48802, 28402)
+names(B) <- Province_old
+W_B <- round(B / sum(B) *100, 1)
+# pander(W_B, caption = "판매량 비중")
+A <- A[match(Province, Province_old)]
+B <- B[match(Province, Province_old)]
+SS <- round(A / B * 100, digits = 1)
+pander(data.frame(A, W_A, B, W_B, SS),
+       col.names = c("발전량", "발전량비중", "판매량", "판매량비중", "전력자급도(%)"))
+```
+
+### 초광역 접근
+
 ```{r}
 R <- c("강원", "수도권", "가야", "신라", "영산강", "신라", "백제", "가야", "수도권", "백제", "가야", "수도권", "영산강", "전북", "제주", "백제", "백제")
+R <- R[match(Province, Province_old)]
 R2 <- c("수도권", "수도권", "가야", "신라", "영산강", "신라", "백제", "가야", "수도권", "백제", "가야", "수도권", "영산강", "백제", "영산강", "백제", "백제")
-Electricity <- data.frame(Province, R, R2, A, B)
-Electricity$Rates <- round(Electricity$A / Electricity$B * 100, digits = 1)
-# load("./R/Elec.RData")
-# Electricity$Rates
+R2 <- R2[match(Province, Province_old)]
+Electricity <- 
+  data.frame(Province, R, R2, A, B, SS)
+pander(Electricity, col.names = c("시도", "5극3특", "5대권역", "발전량", "판매량", "전력자급도(%)"))
 Electricity$R2 <- factor(Electricity$R2, 
                          levels = c("수도권", "가야", "백제", "신라", "영산강"))
 Electricity %>%
-  pander
+  pander(col.names = c("시도", "5극3특", "5대권역", "발전량", "판매량", "전력자급도(%)"))
 # by(Electricity[4:5], factor(Electricity$R2), 
 #    function(x) round(sum(x[1]) / sum(x[2]) * 100, digits = 1)) 
 ```
@@ -99,7 +140,7 @@ library(plyr)
 ddply(Electricity, .(R2), 
       function(x) round(sum(x[, 4]) / sum(x[, 5]) * 100, digits = 1)) %>%
   format(digits = 2, nsmall = 1) %>%
-  pander
+  pander(col.names = c("5대권역", "전력자급도"))
 ```
 
 
