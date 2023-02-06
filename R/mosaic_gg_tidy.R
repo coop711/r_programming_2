@@ -46,7 +46,7 @@ N <- length(levels(tbl_df[, 1]))
   tbl_p_m <- tapply(tbl_p_df[, 3], tbl_p_df[, 2], sum)
   x_breaks <- c(0, ifelse(diff(cumsum(tbl_p_m)) < 0.01, 0.0, cumsum(tbl_p_m)))
   x_label <- format(x_breaks * 100, 
-                    digits = 2, 
+                    digits = 1, 
                     nsmall = 1)
   y_breaks <- tbl_p_df$y_breaks
   y_breaks_f <- cut(y_breaks, breaks = seq(0, 1, by = 0.1))
@@ -79,7 +79,7 @@ m <-
 #            label = tbl_p_df[, 2]) +
   geom_text(aes(x = center, 
                 y = label_height), 
-            label = format(ifelse(tbl_df[, 3] < 100, "", comma(tbl_df[, 3])), trim = TRUE, justify = "right"), 
+            label = format(ifelse(tbl_df[, 3] < 200, "", comma(tbl_df[, 3])), trim = TRUE, justify = "right"), 
             na.rm = TRUE,
             position = position_identity()) +
   scale_x_continuous(breaks = x_breaks, 
