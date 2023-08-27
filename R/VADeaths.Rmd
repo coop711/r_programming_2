@@ -190,7 +190,7 @@ ggplot(data = VADeaths_tbl,
                             fill = Age)) +
 geom_bar(stat = "identity", 
          position = position_dodge()) + 
-scale_fill_brewer(guide = FALSE,
+scale_fill_brewer(guide = "none",
                   palette = "YlOrRd", 
                   direction = -1) +
 facet_grid(Gender ~ Place)
@@ -217,23 +217,16 @@ geom_bar(stat = "identity",
          alpha = 0.3)
 ```
 
+
 ```{r}
-ggplot(data = VADeaths_df,
+ggplot(data = VADeaths_df[c(5:1, 10:6, 16:11, 20:16), ], 
               mapping = aes(x = interaction(Place, Gender), 
-                            y = rev(Rates), 
+                            y = Rates, 
                             fill = Age)) +
 geom_bar(stat = "identity", 
          position = "identity")
 ```
 
-```{r}
-ggplot(data = VADeaths_df,
-              mapping = aes(x = interaction(Place, Gender), 
-                            y = rev(Rates), 
-                            fill = Age)) +
-geom_bar(stat = "identity", 
-         position = position_stack())
-```
 
 ## Comments
 
