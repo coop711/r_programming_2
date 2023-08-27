@@ -32,8 +32,9 @@ N <- length(Rates) ## `Rates`의 크기를 `N`으로 저장.
 Age <- ordered(rownames(VADeaths)) # 행 이름으로 주어진 글자 벡터, 연령대를 순서형 범주로 변환. 
 Age <- rep(ordered(rownames(VADeaths)), # 전체 관찰 수효 만큼 반복. `length.out = `의 용례에 유의. 
            length.out = N)
-Place <- gl(2, 10, N, # 농촌, 도시의 두 수준을 10번씩 반복하는 `factor` 설정
-           labels = c("Rural", "Urban"))
+Place <- gl(2, 10, N, 
+            labels = c("Rural", "Urban"))
+        # 농촌, 도시의 두 수준을 10번씩 반복하는 `factor` 설정
 Gender <- gl(2, 5, N, # 성별은 5번씩 반복 
              labels = c("Male", "Female"))
 data.frame(Age, Place, Gender, Rates) # 각 벡터를 데이터 프레임의 요소로 편성
@@ -61,6 +62,7 @@ df$Var2
 Var2_str <- strsplit(as.character(df$Var2), split = " ")
 Place <- sapply(Var2_str, function(x) x[1])
 Gender <- sapply(Var2_str, function(x) x[2])
+data.frame(Age = df$Var1, Place, Gender, Rates = df$Freq)
 ```
 
 ## tidyverse를 이용한 방법 
@@ -141,7 +143,6 @@ VADeaths %>%
          Place = factor(Place),
          Gender = factor(Gender,
                          levels = c("Male", "Female"))) 
-         
 ```
 
 
