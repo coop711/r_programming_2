@@ -494,6 +494,16 @@ VADeaths_df # 데이터 프레임 출력 </code></pre>
 ## 18 60-64 Urban Female 19.3
 ## 19 65-69 Urban Female 35.1
 ## 20 70-74 Urban Female 50.0</code></pre>
+<pre class="r"><code>df &lt;- as.data.frame.table(VADeaths)
+df$Var2</code></pre>
+<pre><code>##  [1] Rural Male   Rural Male   Rural Male   Rural Male   Rural Male  
+##  [6] Rural Female Rural Female Rural Female Rural Female Rural Female
+## [11] Urban Male   Urban Male   Urban Male   Urban Male   Urban Male  
+## [16] Urban Female Urban Female Urban Female Urban Female Urban Female
+## Levels: Rural Male Rural Female Urban Male Urban Female</code></pre>
+<pre class="r"><code>Var2_str &lt;- strsplit(as.character(df$Var2), split = &quot; &quot;)
+Place &lt;- sapply(Var2_str, function(x) x[1])
+Gender &lt;- sapply(Var2_str, function(x) x[2])</code></pre>
 </div>
 <div id="tidyverse를-이용한-방법" class="section level2">
 <h2>tidyverse를 이용한 방법</h2>
