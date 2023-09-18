@@ -17,7 +17,7 @@ library(knitr)
 library(magrittr)
 library(readxl)
 doorae0924_rest <- read_excel("../data/Data0924.xlsx", 
-                              sheet = 1, 
+                             sheet = 1, 
                               range = "B1:BB98")
 doorae0924_name <- read_excel("../data/Data0924.xlsx", 
                               sheet = 1, 
@@ -37,18 +37,19 @@ doorae0924 <- data.frame(doorae0924_name, doorae0924_rest)
 #   data.frame(doorae0924_rest)
 # doorae0924 <- doorae0924_rest %>%
 #   data.frame(doorae0924_name, .)
-doorae0924 <- data.frame(doorae0924_name, doorae0924_rest)
+# doorae0924 <- data.frame(doorae0924_name, doorae0924_rest)
 ```
 
+<!--
 ### Data cleaning
 
-```{r, data anomaly}
+```{r, data anomaly, eval = FALSE}
 doorae0924$"시도"
 ```
 
 * 전북이 두 개 나옴에 유의. 어떤 사연인가 하면,
 
-```{r, data cleaning}
+```{r, data cleaning, eval = FALSE}
 # (id_to_fix <- which(doorae0924$"시도" == "전북 "))
 (id_to_fix <- doorae0924 %>%
   `[`(, "시도") %>%
@@ -67,7 +68,7 @@ doorae0924 %>%
 
 * count가 없는 factor level도 손봐야 함. 이는 간단히
 
-```{r, removing null factor level}
+```{r, removing null factor level, eval = FALSE}
 (doorae0924$"시도" %<>% 
   factor)
 doorae0924 %>%
@@ -77,6 +78,7 @@ doorae0924 %>%
   t %>%
   kable
 ```
+-->
 
 ### Data for Years in Business
 
