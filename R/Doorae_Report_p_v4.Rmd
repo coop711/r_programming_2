@@ -212,7 +212,7 @@ ggplot(data = tbl_p_df,
   theme_bw() + 
   geom_text(aes(x = center, y = 1.05), 
             label = tbl_p_df[, 2], 
-            family = "") + 
+            family = "KoPubWorldDotum Medium") + 
   geom_text(aes(x = center, y = label_height), 
             label = format(ifelse(tbl_df[, 3] == 0, "", tbl_df[, 3]), 
                            big.mark = ","), 
