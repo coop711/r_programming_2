@@ -225,7 +225,7 @@ ggplot(data = tbl_p_df,
                      label = y_label) +
   scale_fill_brewer(name = "조직형태") +
   ggtitle("공동체상태와 조직형태") + 
-  theme(plot.title = element_text(family = "KoPubWorldDotum Medium",
+  theme(plot.title = element_text(family = "KoPubWorldDotum Bold",
                                   size = 18, hjust = 0.5),
         axis.title = element_text(family = "KoPubWorldDotum Medium"),
         legend.text = element_text(family = "KoPubWorldDotum Medium"),
