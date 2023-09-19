@@ -17,7 +17,7 @@ library(knitr)
 library(magrittr)
 library(readxl)
 doorae0924_rest <- read_excel("../data/Data0924.xlsx", 
-                             sheet = 1, 
+                              sheet = 1, 
                               range = "B1:BB98")
 doorae0924_name <- read_excel("../data/Data0924.xlsx", 
                               sheet = 1, 
