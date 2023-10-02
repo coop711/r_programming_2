@@ -535,7 +535,7 @@ ggplot(data = doorae_ys,
   ylab("업력(년)") +
   theme(plot.title = element_text(hjust = 0.5, 
                                   family = "KoPubWorldDotum Bold"),
-        axis.text.x = element_text(family = "KoPubWorldDotum Medium"),
+        axis.text.x = element_text(family = "KoPubWorldDotum Light"),
         axis.title.x = element_text(family = "KoPubWorldDotum Medium"),
         axis.title.y = element_text(family = "KoPubWorldDotum Medium")) + 
   scale_x_discrete(labels = c("창업", "경영")) + 
@@ -559,7 +559,7 @@ ggplot(data = doorae_ys,
   stat_ecdf() + 
   theme_bw(base_family = "KoPubWorldDotum Medium") + 
   theme(panel.background = element_rect("white"),
-        panel.border=element_rect(colour = "black", fill = NA)) + 
+        panel.border = element_rect(colour = "black", fill = NA)) + 
   ggtitle("공동체상태와 업력") +
   xlab("업력(년)") +
   ylab("분위") +
@@ -606,12 +606,30 @@ years_df <- data.frame(years = years_x,
                        ecdf_years = years_y)
 ```
 
+```{r, echo = FALSE, eval = FALSE}
+#> piping version example
+ecdf_y_pre <- 
+  doorae_ys %$%
+  tapply(.$years, .$status, sort) %>%
+  sapply(length) %>%
+  sapply(function(x) (1:x) / x) %>%
+  sapply(function(x) c(rep(c(0, head(x, -1)), each = 2), 1)) %>%
+  .[[1]]
+ecdf_y_post <- 
+  doorae_ys %$%
+  tapply(.$years, .$status, sort) %>%
+  sapply(length) %>%
+  sapply(function(x) (1:x) / x) %>%
+  sapply(function(x) c(rep(c(0, head(x, -1)), each = 2), 1)) %>%
+  .[[2]]
+```
+
 
 ```{r echo=FALSE, fig.width=4.5, fig.height=4.5}
 ggplot(data = years_df, 
        mapping = aes(x = years, 
                      y = ecdf_years)) + 
-  geom_path() + 
+#  geom_path() + 
   geom_polygon(alpha = 0.3, 
                fill = "red") + 
   theme_bw(base_family = "KoPubWorldDotum Medium") + 
