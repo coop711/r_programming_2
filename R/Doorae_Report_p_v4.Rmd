@@ -621,7 +621,7 @@ ecdf_y_post <-
   sapply(length) %>%
   sapply(function(x) (1:x) / x) %>%
   sapply(function(x) c(rep(c(0, head(x, -1)), each = 2), 1)) %>%
-  .[[2]]
+  .[[2]] 
 ```
 
 
@@ -629,7 +629,7 @@ ecdf_y_post <-
 ggplot(data = years_df, 
        mapping = aes(x = years, 
                      y = ecdf_years)) + 
-#  geom_path() + 
+  geom_path() + 
   geom_polygon(alpha = 0.3, 
                fill = "red") + 
   theme_bw(base_family = "KoPubWorldDotum Medium") + 
