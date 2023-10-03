@@ -305,7 +305,7 @@ c_names <- c("공동체상태", "조직명", "사업착수여부", "사업자등
 * 경영개선 상태의 법인 조직
     * 모두 사업에 착수하였고, 사업자등록도 마침. 매출도 대부분 발생
 
-```{r, results='asis', echo=FALSE}
+```{r, results = 'asis', echo = FALSE}
 doorae %>%
   `[`(bi_corp, v_names) %>%
   format(big.mark = ",") %>%
@@ -598,7 +598,7 @@ y_pre <- (1:n_pre) / n_pre
 y_post <- (1:n_post) / n_post
 ecdf_x_pre <- c(0, rep(x_pre, each = 2))
 ecdf_y_pre <- c(rep(c(0, head(y_pre, -1)), each = 2), 1)
-ecdf_x_post <- c(0, rep(x_post, each=2))
+ecdf_x_post <- c(0, rep(x_post, each = 2))
 ecdf_y_post <- c(rep(c(0, head(y_post, -1)), each = 2), 1)
 years_x <- c(ecdf_x_pre, rev(ecdf_x_post))
 years_y <- c(ecdf_y_pre, rev(ecdf_y_post))
@@ -621,6 +621,16 @@ ecdf_y_post <-
   sapply(length) %>%
   sapply(function(x) (1:x) / x) %>%
   sapply(function(x) c(rep(c(0, head(x, -1)), each = 2), 1)) %>%
+  .[[2]] 
+ecdf_x_pre <- 
+  doorae_ys %$%
+  tapply(.$years, .$status, sort) %>%
+  sapply(function(x) c(0, rep(x, each = 2))) %>%
+  .[[1]]
+ecdf_x_post <- 
+  doorae_ys %$%
+  tapply(.$years, .$status, sort) %>%
+  sapply(function(x) c(0, rep(x, each = 2))) %>%
   .[[2]] 
 ```
 
