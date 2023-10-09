@@ -51,8 +51,6 @@ str(crimtab_2)
 글자 속성을 갖는 손가락 길이와 키의 조합에 따른 빈도를 또 다른 변수로 갖는 `data frame`으로 변환하고 이를 다시 `long format` 으로 전환하는 과정은 다음과 같음.
 
 * 1차적으로 각 손가락 길이와 키의 조합을 갖는 인원수로 구성된 `data frame`으로 변환하고, case 단위의 `long format data frame`으로 2단계 변환. 
-    + `as.data.frame()` 에서 `stringsAsFactors = FALSE`가 매우 중요한 역할을 하는 것임. 이 옵션을 설정하지 않을 경우 `Factor`로 잡히면 `numeric`으로 전환할 수 없게 됨. `Factor`는 본질적으로 양의 정수로 취급됨.
-    + 보통 이 설정은 `stringsAsFactors = default.stringsAsFactors()`가 default 설정으로 되어 있고, 따라서 `default.stringsAsFactors() = ` `r default.stringsAsFactors()` 에 따라 설정을 바꿔주면 되어야 하나 써 있는 대로 되지 않는 경우가 있어서 가능한 설정해주는 것이 안전함.
     + 단순히 `data.frame()`으로 변환할 경우 `Factor`로 설정되어`numeric`으로 변환하더라도 의미없는 숫자를 얻게 됨. 
     + `as.data.frame()`의 결과물로 두 개의 character vector 와 counts를 나타내는 새로운 변수 `Freq`가 나오게 됨. 손가락 길이와 키를 나타내는 character를 numeric으로 전환하고 다음 작업 진행.`Factor`는 본질적으로 음이 아닌 정수이기 때문임.
 
@@ -96,7 +94,7 @@ long format 으로 변환하는 다른 방법 2
 ```{r, alternative implementation 2}
 # index_crimtab <- rep(1:nrow(crimtab_df), crimtab_df[, "Freq"])
 # index_crimtab[1:10]
-# crimtab_df_long<- crimtab_df[index_crimtab, c("finger", "height")]
+# crimtab_df_long <- crimtab_df[index_crimtab, c("finger", "height")]
 # str(crimtab_df_long)
 ```
 
