@@ -19,7 +19,7 @@ head(crimtab_long_df_noise, n = 10)
 3,000장의 카드를 잘 섞는 것은 `sample()` 이용.
  
 ```{r, suffling}
-# set.seed(113)
+set.seed(113)
 crimtab_shuffle_noise <- 
   crimtab_long_df_noise[sample(1:3000), ]
 head(crimtab_shuffle_noise, n = 10)
