@@ -25,8 +25,8 @@ options(width=180)
 # class_roll <- readRDS("./class_roll_id_group.RDS")
 literacy_data <- 
   read_excel("../data/literacy_ar_2302.xlsx",
-             range = "A1:AA42",
-             col_names = TRUE)
+             range = "A43:AA83",
+             col_names = FALSE)
 names(literacy_data) <- c("time", "id", paste0("Q", 1:25))
 class(literacy_data$id) <- "character"
 #> Q1의 선지는 숫자로만 되어 있어서 "character"로 class 를 정해 주어야 함.
