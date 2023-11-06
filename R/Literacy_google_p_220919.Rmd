@@ -110,7 +110,7 @@ label_ptbl <- literacy_ptbl %>%
 
 ### barplot
 
-```{r, echo = FALSE, fig.width = 9, fig.height = 12}
+```{r, echo = FALSE, fig.width = 9, fig.height = 12, message = FALSE}
 library(RColorBrewer)
 # png(file = "../pics/Literacy_220919.png", width = 640, height = 840)
 par(family = "KoPubWorldDotum Medium", mar = c(5.1, 4.1, 4.1, 8.1))
@@ -139,8 +139,8 @@ pos <- {. %>% {cumsum(.) - `/`(., 2)}}
 x_text <- apply(literacy_tbl, MARGIN = 2, FUN = pos)
 text(x = x_text, y = rep(b, each = 4), labels = label_ptbl)
 title(main = "문해력조사 문항별 응답", cex.main = 1.8, line = -0.5)
-# dev.off()
-dev.copy(png, file = "../pics/Literacy_220919.png", width = 640, height = 840)
+# dev.copy(png, file = "../pics/Literacy_220919.png", width = 640, height = 840)
+invisible(dev.off())
 ```
 
 ### ggplot
@@ -164,7 +164,8 @@ ggplot(data = literacy_tbl2, mapping = aes(x = Questions)) +
 #> Counts 를 Item별로 막대그래프에 쌓아올린다. 순서는 1, 2, 3, 4 순 (reverse = TRUE).
 #> stat = "identity" 는 디폴트이므로 굳이 설정하지 않아도 무방. 
   geom_bar(aes(y = Counts, fill = Item),
-           col = "black", size = 0.3,
+#           col = "black", size = 0.3,
+           col = "black", linewidth = 0.3,
            stat = "identity", position = position_stack(reverse = TRUE)) +
 #> 퍼센티지를 추가 정보로 각 막대의 중점에 표시. mapping = aes() 에서 공통되는 x 좌표 설정은 생략 가능.
   geom_text(aes(y = x_text, label = label_ptbl)) +
@@ -366,7 +367,7 @@ grade_tbl_group %>%
   rbind("계" = colSums(.)) %>%
   kable(caption = "그룹별 문해력 등급 분포")
 grade_tbl_group %>%
-  `[`(, -1) %>%
+  `[`(., -1) %>%
   chisq.test(simulate.p.value = TRUE) %>%
   pander
 ```
@@ -388,12 +389,14 @@ type_kr <- "../data/literacy_type.txt" %>%
 -->
 
 ```{r, computing scores by types, echo = FALSE, results = 'hide', eval = TRUE}
-score_type <- marks %>%
+score_type <- 
+  marks %>%
   t %>%
   aggregate(list("유형" = type_kr), FUN = sum, na.rm = TRUE)
 score_type
-score_type <- aggregate(t(marks), list("유형" = type_kr), 
-                        FUN = sum, na.rm = TRUE)
+# score_type <- 
+#   aggregate(t(marks), list("유형" = type_kr), 
+#             FUN = sum, na.rm = TRUE)
 score_type == 0
 score_type[score_type == 0] <- NA
 score_type_student <- score_type %>%
@@ -401,8 +404,9 @@ score_type_student <- score_type %>%
   t
   t(score_type[, -1])
 N <- nrow(literacy)
-dimnames(score_type_student) <- list(paste0("s", 1:N), 
-                                     paste0(levels(type_kr), c("(52점)", "(36점)", "(12점)")))
+dimnames(score_type_student) <- 
+  list(paste0("s", 1:N), 
+       paste0(levels(type_kr), c("(52점)", "(36점)", "(12점)")))
 ```
 
 ```{r, scores by types, echo = FALSE, results = 'hide', eval = TRUE}
