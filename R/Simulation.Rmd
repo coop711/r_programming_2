@@ -19,6 +19,7 @@ sample(1:365, size = 23, replace = TRUE) %>%
   duplicated %>%
   any 
 ```
+
 `replicate` 를 이용하여 반복 시행하고 중복 생일 여부를 카운트. 반복횟수를 `N`으로 변수화.
 
 ```{r}
