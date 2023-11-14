@@ -1,0 +1,344 @@
+---
+title: "BFI, MI : Comparison with Calculation by Hand"
+author: "coop711"
+date: "2023-05-10"
+output: html_document
+---
+
+<!--
+# Data Reading
+
+`join()`을 사용하기 위하여 `dplyr` 패키지는 사전에 등록
+
+```{r, plyr}
+library(knitr)
+library(pander)
+library(magrittr)
+library(dplyr)
+panderOptions("table.split.table", Inf)
+```
+
+## 필수 자료 읽어들이기
+
+```{r, data}
+load("./BFI_MI_230510.RData")
+str(BFI)
+str(MI)
+str(class_roll)
+options(width = 180)
+```
+
+# Big Five Inventory First
+
+## 각 특성에 맞는 점수끼리 합산.
+
+```{r, scores}
+# E <- BFI$E1 + BFI$E2
+# N <- BFI$N1 + BFI$N2
+# C <- BFI$C1 + BFI$C2
+# A <- BFI$A1 + BFI$A2 + BFI$A3
+# O <- BFI$O1 + BFI$O2 + BFI$O3
+```
+
+data frame으로 정리하고, 한글 명칭 부여
+
+```{r, personality}
+#> 응답 값을 
+# BFI_data <- BFI[4:15]
+#> 각 변수명의 첫 글짜를 떼어내어 R 오브젝트로 저장
+abb_BFI <- c("E", "N", "C", "A", "O")
+#> 성격 특성별 점수 합산
+BFI_score <- abb_BFI %>%
+  sapply(. %>% {BFI[4:15][, `==`(BFI[4:15] %>% names %>% substr(1, 1), .)] %>% 
+      apply(1, sum)}) %>%
+  data.frame
+# BFI_score <- data.frame(sapply(abb_BFI, 
+#                                function(x) apply(BFI_data[, substr(names(BFI_data), 1, 1) == x], 1, sum)))
+# BFI_score <- data.frame(mapply(function(x) apply(BFI_data[, substr(names(BFI_data), 1, 1) == x], 1, sum), abb_BFI))
+#> 성격 특성별 점수에 이름 부여
+names(BFI_score) <- abb_BFI
+#> 성격 특성의 한글 이름 저장
+BFI_type_kr <- c("외향성", "신경성", "성실성", "친화성", "개방성")
+#> 성격 특성 한글 버전 저장
+BFI_score_kr <- BFI_score
+names(BFI_score_kr) <- BFI_type_kr
+#> 학번을 행이름으로 설정
+rownames(BFI_score_kr) <- BFI$ID
+kable(head(BFI_score_kr))
+```
+-->
+
+## 컴퓨터 vs 손계산 점수 비교
+
+```{r, echo = FALSE}
+# kable(head(cbind(BFI_score_kr, BFI[paste(c("E", "N", "C", "A", "O"),"Score", sep = "_")])))
+BFI_score_kr %>%
+  cbind(BFI[c("E", "N", "C", "A", "O")]) %>%
+  kable
+```
+
+<!--
+## 점수에 따른 수준 판정
+
+### `ifelse()`
+
+```{r, criterion, echo = FALSE, eval = FALSE}
+E_level_kr <- BFI_score %$%
+  ifelse(E <= 4, "낮음", ifelse(E <= 6, "중하", ifelse(E <= 8, "중상", "높음"))) 
+N_level_kr <- BFI_score %$%
+  ifelse(N <= 4, "낮음", ifelse(N <= 6, "중하", ifelse(N <= 8, "중상", "높음")))
+C_level_kr <- BFI_score %$%
+  ifelse(C <= 4, "낮음", ifelse(C <= 6, "중하", ifelse(C <= 8, "중상", "높음")))
+A_level_kr <-  BFI_score %$%
+  ifelse(A <= 10, "낮음", ifelse(A <= 12, "중하", ifelse(A <= 13, "중상", "높음")))
+O_level_kr <-  BFI_score %$%
+  ifelse(O <= 8, "낮음", ifelse(O <= 10, "중하", ifelse(O <= 12, "중상", "높음")))
+```
+
+```{r, criterion2, eval = TRUE}
+E_level_kr <- BFI_score %$%
+  ifelse(.$E <= 4, "낮음", ifelse(.$E <= 6, "중하", ifelse(.$E <= 8, "중상", "높음"))) 
+N_level_kr <- BFI_score %$%
+  ifelse(.$N <= 4, "낮음", ifelse(.$N <= 6, "중하", ifelse(.$N <= 8, "중상", "높음")))
+C_level_kr <- BFI_score %$%
+  ifelse(.$C <= 4, "낮음", ifelse(.$C <= 6, "중하", ifelse(.$C <= 8, "중상", "높음")))
+A_level_kr <-  BFI_score %$%
+  ifelse(.$A <= 10, "낮음", ifelse(.$A <= 12, "중하", ifelse(.$A <= 13, "중상", "높음")))
+O_level_kr <-  BFI_score %$%
+  ifelse(.$O <= 8, "낮음", ifelse(.$O <= 10, "중하", ifelse(.$O <= 12, "중상", "높음")))
+```
+
+ordered factor 로 구성된 data frame 으로 정리
+
+```{r, ordered factor}
+BFI_level <- data.frame(E_level_kr, N_level_kr, C_level_kr, A_level_kr, O_level_kr)
+BFI_level_kr <- BFI_level %>%
+  lapply(. %>% factor(., levels = c("낮음", "중하", "중상", "높음"), ordered = TRUE)) %>%
+  data.frame
+# BFI_level_kr <- data.frame(lapply(BFI_level, 
+#                                   function(x) factor(x, levels = c("낮음", "중하", "중상", "높음"), 
+#                                                      ordered = TRUE)))
+dimnames(BFI_level_kr) <- list(ID = BFI$ID, BFI_type_kr)
+kable(head(BFI_level_kr))
+```
+
+### `mapply()`
+
+위 과정은 다음과 같이 사용자 함수와 `mapply()` 또는 `lapply()`를 이용하여 다소 줄일 수도 있다.
+
+```{r, anonymous function}
+criteria <- function(x, a = c(4, 6, 8)){
+  ifelse(x <= a[1], "낮음", ifelse(x <= a[2], "중하", ifelse(x <= a[3], "중상", "높음")))
+}
+a <- list(c(4, 6, 8), c(4, 6, 8), c(4, 6, 8), c(10, 12, 13), c(8, 10, 12)) 
+BFI_level_kr <- BFI_score %>%
+  mapply(criteria, ., a = a) %>%
+  data.frame %>%
+  lapply(. %>% factor(., levels = c("낮음", "중하", "중상", "높음"), ordered = TRUE)) %>%
+  data.frame
+# BFI_level <- data.frame(mapply(criteria, BFI_score, a = a))
+# BFI_level_kr <- data.frame(lapply(BFI_level, 
+#                                     function(x) factor(x, levels = c("낮음", "중하", "중상", "높음"), 
+#                                                        ordered = TRUE)))
+dimnames(BFI_level_kr) <- list(ID = BFI$ID, BFI_type_kr)
+BFI_level_kr %>%
+  head %>%
+  kable
+# kable(head(BFI_level_kr))
+```
+-->
+
+## 컴퓨터 계산 등급 vs 손계산 등급
+
+```{r, self, echo = FALSE, eval = TRUE}
+BFI_level_kr %>%
+  cbind(BFI[paste(c("E", "N", "C", "A", "O"),"Score", sep = "_")]) %>%
+  kable(align = "c")
+```
+
+<!--
+## 각 성격 특성의 분포를 `table`로 요약
+
+```{r, table}
+BFI_level_kr %>%
+  sapply(table) %>%
+  `[`(4:1, ) %>%
+  kable
+# BFI_level_tbl <- sapply(BFI_level_kr, table)
+# kable(BFI_level_tbl[4:1, ])
+```
+
+## 출석부에 합치기
+
+`rownames`으로 되어 있는 학번(`ID`)을 `ID`로 돌리고, `row.names`는 일련번호로 정리하여 `left_join`에 사용할 수 있도록 한다.
+
+```{r, row.names, eval = TRUE}
+BFI_level_kr_df <- BFI_level_kr %>%
+  data.frame(ID = BFI$ID, ., 
+             row.names = 1:nrow(.), 
+             stringsAsFactors = FALSE) 
+BFI_level_kr_df %>%
+  head %>%
+  kable
+```
+
+전체 출석부로 통합하고, 실험에 참여하지 않은 사람들은 `<NA>`로 표시.
+
+```{r, join with class roll, eval = TRUE}
+BFI_full_kr <- BFI_level_kr_df %>%
+  left_join(class_roll, ., by = "ID")
+# Name 제외
+BFI_full_kr <- BFI_full_kr[-2]
+BFI_full_kr %>%
+  kable
+# kable(head(BFI_full_kr))
+```
+-->
+
+# 다중지능 점수 
+
+<!--
+## `for` loop
+
+다중지능 점수를 합산하기 위하여 `for` loop를 활용.
+
+```{r, summation}
+#> 매 여덟번째 나오는 컬럼을 합해서 지능별 점수  소계 산출
+#> time stamp 빼고, ID 컬럼 다음부터 계산이 시작되므로 `j + 1`인 것이다.
+#> 일곱번 반복되는 데 초기값을 넣었으므로 `i  in 1:6`이다.
+M <- matrix(numeric(0), nrow = nrow(MI), ncol = 8)
+for(j in 1:8) {
+  M[, j] <- MI[-1][, j + 1]
+    for(i in 1:6) {
+      M[, j] <- M[, j] + MI[-1][, j + 1 + i * 8]
+    }
+}
+MI_score_kr <- M
+MI_names_kr <- c("음악", "신체운동", "논리수학", "공간", "언어", "인간친화", "자기성찰", "자연친화")
+dimnames(MI_score_kr) <- list(ID = MI$ID, MI_names_kr)
+kable(head(MI_score_kr))
+```
+-->
+
+## 컴퓨터 계산 점수 vs 손계산 점수
+
+```{r, echo = FALSE}
+kable(cbind(MI_score_kr, MI[paste(LETTERS[1:8], "Score", sep = "_")]))
+```
+
+<!--
+
+## `sapply()`
+
+```{r}
+MI_score <- LETTERS[1:8] %>%
+  sapply(. %>% {MI[3:58][, `==`(MI[3:58] %>% names %>% substr(1, 1), .)] %>% 
+      apply(1, sum)}) %>%
+  data.frame
+MI_names_kr <- c("음악", "신체운동", "논리수학", "공간", "언어", "인간친화", "자기성찰", "자연친화")
+dimnames(MI_score) <- list(ID = MI$ID, MI_names_kr)
+kable(head(MI_score))
+```
+
+각 지능을 점수 순으로 배열, NA는 나중에 처리. 구글 설문지의 구조상 일부 문항에서 무응답이 나오지는 않는 구조임. 
+
+```{r, MI in order}
+MI_order_kr <- MI_score_kr %>%
+  apply(MARGIN = 1, 
+        FUN = order, decreasing = TRUE)
+#> `apply` 연산의 결과로 `MI_order_kr` 은 8개의 행을 가진 행렬이 된다. 
+#> 학번 별로 order를 보려면 전치 행렬이 필요하다.
+MI_order_kr %>%
+  t %>%
+  head %>%
+  pander
+```
+
+강점 순위별로 정리
+
+```{r, ranks}
+MI_sort_kr <- matrix(MI_names_kr[MI_order_kr], 
+                     ncol = 8, byrow = TRUE, 
+                     dimnames = list(MI$ID, 
+                                     paste0("제", 1:8, "순위")))
+MI_sort_kr %>%
+  kable(align = "c")
+```
+
+### 전체 출석부에 합치기
+
+`rownames`를 `ID`로 돌리고, `row.names`는 없앰.
+
+```{r, sort}
+MI_sort_kr_df <- MI_sort_kr %>%
+  data.frame(ID = MI$ID, ., row.names = NULL, stringsAsFactors = FALSE)
+MI_sort_kr_df %>%
+  kable(align = "c")
+# kable(head(MI_sort_kr_df), align = "c")
+```
+
+각 순위를 8수준 factor로 통일
+
+```{r, factor}
+# MI_sort_kr_df[-1] <- lapply(MI_sort_kr_df[-1], function(x) factor(x, levels = c("음악", "신체운동", "논리수학", "공간", "언어", "인간친화", "자기성찰", "자연친화")))
+MI_sort_kr_df[-1] %<>%
+  lapply(. %>% factor(levels = c("음악", "신체운동", "논리수학", "공간", "언어", "인간친화", "자기성찰", "자연친화")))
+```
+
+출석부에 통합
+
+```{r, merge with class_roll}
+MI_sort_full_kr <- MI_sort_kr_df %>%
+  left_join(class_roll, ., by = "ID")
+setdiff(MI_sort_full_kr$ID, BFI_full_kr$ID)
+setdiff(BFI_full_kr$ID, MI_sort_full_kr$ID)
+#> 이름은 제외
+MI_sort_full_kr <- MI_sort_full_kr[-2]
+MI_sort_full_kr %>%
+  head %>%
+  kable(align = "c")
+```
+
+# 두 data frame을 하나로
+
+Merge 2 data frames into one
+
+```{r, one data frame}
+BFI_MI_full <- data.frame(BFI_full_kr, MI_sort_full_kr[c(2:4)])
+BFI_MI_full %>%
+  head %>%
+  kable(align = "c")
+# kable(head(BFI_MI_full), align = "c")
+```
+
+## 결석생 확인
+
+### BFI
+
+BFI결석생은 간단히 전체 출석부의 학번 집합에서 BFI 응답자의 학번 집합을 뺸 것임.
+시행 당일 외에 늦은 응답도 출석으로 인정하지만, 한 가지 조사만 수행한 경우는 별도 처리.
+
+```{r, BFI absence, echo = FALSE, results = 'markup'}
+class_roll$ID %>%
+  setdiff(BFI$ID) 
+# setdiff(class_roll$ID, BFI$ID)
+# class_roll$Name[class_roll$ID %in% setdiff(class_roll$ID, BFI$ID)]
+```
+
+### MI
+
+```{r, MI absence, echo = FALSE, results = 'markup'}
+class_roll$ID %>%
+  setdiff(MI$ID)
+# setdiff(class_roll$ID, MI$ID)
+# class_roll$Name[class_roll$ID %in% setdiff(class_roll$ID, MI$ID)]
+```
+
+## Save
+
+```{r, save, echo = FALSE}
+saveRDS(BFI, file = "./BFI230510.RDS")
+saveRDS(MI, file = "./MI230510.RDS")
+save.image("BFI_MI_report_230510.RData")
+```
+-->

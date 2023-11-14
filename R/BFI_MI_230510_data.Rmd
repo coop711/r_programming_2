@@ -1,0 +1,164 @@
+---
+title: "BFI MI data : 230510"
+author: "coop711"
+date: "2022-11-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(knitr)
+library(pander)
+library(magrittr)
+panderOptions("table.split.table", Inf)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Data
+
+### 출석부
+
+```{r, xlsx}
+library(readxl)
+options(width = 180)
+# load("./red_and_black_220909_data.RData")
+# class_roll <- class_roll[, c("id", "name")]
+# names(class_roll) <- c("ID", "Name")
+class_roll <- read_excel("../data/class_roll230511.xlsx",
+                         range = "B1:B1006",
+                         col_names = TRUE,
+                         col_types = "text")
+class_roll %<>%
+  data.frame
+class_roll %<>%
+  `names<-`(c("ID"))
+class_roll$ID %<>%
+  as.character
+str(class_roll)
+```
+
+### BFI
+
+```{r}
+BFI <- "../data/BFI230510.xlsx" %>% 
+  read_excel(range = "A1:X892",
+             col_names = TRUE)
+BFI %<>%
+  data.frame
+BFI %<>%
+  `names<-`(c("Time", "ID", 
+              "E1", "A1", "O1", "C1", "N1", "E2", "A2", "O2", "C2", "N2", "O3", "A3",
+              "E", "N", "C", "A", "O", "E_Score", "N_Score", "C_Score", "A_Score", "O_Score"))
+BFI$ID %<>%
+  as.character
+#> Likert Scale 값만 추출하여 숫자로 변환
+BFI[3:14] %<>%
+  sapply(FUN = {. %>% strsplit(split = "[.]") %>% sapply(`[`, 1)}) %>%
+  as.numeric
+# sapply(BFI[5:16], function(x){sapply(strsplit(x, split = "[.]"), `[`, 1)})
+#> (R) 표시된 문항의 응답값을 역순으로 다시 계산
+BFI[c("A2", "O2", "C2")] %<>% 
+  `-` (6, .)
+BFI %>% 
+  head %>%
+  kable
+#> 구글 설문지를 사용하면서 필요없게된 코드이나 만약을 위하여
+# duplicated(BFI$ID)
+# BFI <- unique(BFI)
+str(BFI)
+#> ID 잘못 적은 친구
+BFI[BFI$ID %in% setdiff(BFI$ID, class_roll$ID), c("ID")]
+BFI_days <- as.numeric(difftime("2023-05-24 09:00:00", BFI$Time, units = 'days'))
+BFI_hours <- as.numeric(difftime("2023-05-24 09:00:00", BFI$Time, units = 'hours'))
+```
+
+### MI
+
+```{r}
+MI <- "../data/MI230510.xlsx" %>% 
+  read_excel(range = "A1:BN867",
+             col_names = TRUE)
+MI %<>%
+  data.frame
+# MI <- MI[, -2]
+MI %<>%
+  `names<-`(c("Time", "ID", 
+              paste0(LETTERS[1:8], 1:56), 
+              paste(LETTERS[1:8], "Score", sep = "_")))
+# MI %<>%
+#   `names<-`(c("Time", "Dept", "ID", "Name", 
+#               paste0("Q", 1:56), 
+#               paste(LETTERS[1:8], "Score", sep = "_")))
+MI$ID %<>% 
+  as.character
+# duplicated(MI$ID) %>% 
+# which
+# MI <- unique(MI)
+MI[3:58] %<>%
+  sapply(FUN = {. %>% strsplit(split = "[.]") %>% sapply(`[`, 1)}) %>%
+  as.numeric
+# kable(head(MI[c(3, 5:18)]))
+# kable(head(MI[c(3, 19:32)]))
+# kable(head(MI[c(3, 33:46)]))
+# kable(head(MI[c(3, 47:60)]))
+#> 각 조사 불참자 
+# setdiff(class_roll$ID, BFI$ID)
+# setdiff(class_roll$ID, MI$ID)
+setdiff(BFI$ID, MI$ID) %>%
+  sort
+setdiff(MI$ID, BFI$ID) %>%
+  sort
+str(MI)
+#> ID 잘못 적은 친구
+MI[MI$ID %in% setdiff(MI$ID, class_roll$ID), c("ID")]
+```
+
+### Time
+
+```{r, echo = TRUE, eval = TRUE}
+par(family = "KoPubWorldDotum Medium")
+BFI_days %>%
+  cut(breaks = c(0:14), include.lowest = TRUE) %>%
+  table %>%
+#  cbind("계" = rowSums(.)) %>%
+#  rbind("계" = colSums(.)) %>%
+  pander(caption = "일 단위")
+BFI_days %>%
+  cut(breaks = c(0:14), include.lowest = TRUE) %>%
+  table %>%
+  chisq.test %>%
+  pander
+BFI_days %>%
+  cut(breaks = c(0:14), include.lowest = TRUE) %>%
+  table %>%
+  rev %>%
+  barplot(space = 0, 
+          names.arg = rep(c("수", "목", "금", "토", "일", "월", "화"), 2), 
+          col = c(rep("white", 13), "pink"))
+title(main = "일 단위 퀴즈 제출 횟수")
+```
+
+### Working Data
+
+```{r, echo = TRUE, eval = FALSE}
+BFI <- BFI[, -c(3, 5)]
+MI <- MI[, -c(2, 4)]
+## piping을 이용한 다음 대안들을 개선해 보세요.
+# lapply(list(1:15, c(1, 16:29), c(1, 30:43), c(1, 44:57)), 
+#        function(x) MI %>% `[`(x) %>% head %>% kable)
+# list(1:15, c(1, 16:29), c(1, 30:43), c(1, 44:57)) %>%
+#   lapply(function(x) MI %>% `[`(x) %>% head %>% kable)
+# list(1:15, c(1, 16:29), c(1, 30:43), c(1, 44:57)) %>%
+#   lapply(. %>% {kable(head(MI[.]))})
+
+```
+
+
+### Save Data
+
+```{r, save.image}
+saveRDS(BFI, file = "./BFI230510.RDS")
+saveRDS(MI, file = "./MI230510.RDS")
+save.image("./BFI_MI_230510.RData")
+```
+
