@@ -111,11 +111,14 @@ setdiff(MI$ID, BFI$ID) %>%
 str(MI)
 #> ID 잘못 적은 친구
 MI[MI$ID %in% setdiff(MI$ID, class_roll$ID), c("ID")]
+MI_days <- as.numeric(difftime("2023-05-24 09:00:00", MI$Time, units = 'days'))
+MI_hours <- as.numeric(difftime("2023-05-24 09:00:00", MI$Time, units = 'hours'))
 ```
 
 ### Time
 
 ```{r, echo = TRUE, eval = TRUE}
+library(extrafont)
 par(family = "KoPubWorldDotum Medium")
 BFI_days %>%
   cut(breaks = c(0:14), include.lowest = TRUE) %>%
@@ -135,24 +138,33 @@ BFI_days %>%
   barplot(space = 0, 
           names.arg = rep(c("수", "목", "금", "토", "일", "월", "화"), 2), 
           col = c(rep("white", 13), "pink"))
-title(main = "일 단위 퀴즈 제출 횟수")
+title(main = "일 단위 BFI 제출 횟수")
 ```
 
-### Working Data
 
-```{r, echo = TRUE, eval = FALSE}
-BFI <- BFI[, -c(3, 5)]
-MI <- MI[, -c(2, 4)]
-## piping을 이용한 다음 대안들을 개선해 보세요.
-# lapply(list(1:15, c(1, 16:29), c(1, 30:43), c(1, 44:57)), 
-#        function(x) MI %>% `[`(x) %>% head %>% kable)
-# list(1:15, c(1, 16:29), c(1, 30:43), c(1, 44:57)) %>%
-#   lapply(function(x) MI %>% `[`(x) %>% head %>% kable)
-# list(1:15, c(1, 16:29), c(1, 30:43), c(1, 44:57)) %>%
-#   lapply(. %>% {kable(head(MI[.]))})
-
+```{r, echo = TRUE, eval = TRUE}
+library(extrafont)
+par(family = "KoPubWorldDotum Medium")
+MI_days %>%
+  cut(breaks = c(0:14), include.lowest = TRUE) %>%
+  table %>%
+#  cbind("계" = rowSums(.)) %>%
+#  rbind("계" = colSums(.)) %>%
+  pander(caption = "일 단위")
+MI_days %>%
+  cut(breaks = c(0:14), include.lowest = TRUE) %>%
+  table %>%
+  chisq.test %>%
+  pander
+MI_days %>%
+  cut(breaks = c(0:14), include.lowest = TRUE) %>%
+  table %>%
+  rev %>%
+  barplot(space = 0, 
+          names.arg = rep(c("수", "목", "금", "토", "일", "월", "화"), 2), 
+          col = c(rep("white", 13), "pink"))
+title(main = "일 단위 MI 제출 횟수")
 ```
-
 
 ### Save Data
 
