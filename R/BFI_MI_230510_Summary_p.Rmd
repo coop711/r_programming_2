@@ -1,5 +1,5 @@
 ---
-title: "BFP and MI : 230510"
+title: "BFP and MI Summary"
 author: "coop711"
 date: "2023-05-10"
 output: html_document
@@ -93,7 +93,7 @@ b_fill +
   theme(plot.title = element_text(hjust = 0.5, 
                                   size = 18, 
                                   family = "KoPubWorldDotum Bold"))
-ggsave("../pics/BFP_strengths2202.png", dpi = 120, width = 10, height = 7.5, units = "in")
+ggsave("../pics/BFP_strengths2301.png", dpi = 120, width = 10, height = 7.5, units = "in")
 ```
 
 
@@ -232,6 +232,6 @@ m_fill +
   theme(plot.title = element_text(hjust = 0.5, 
                                   size = 18, 
                                   family = "KoPubWorldDotum Bold"))
-ggsave("../pics/MI_strengths2202.png", dpi = 120, width = 10, height = 7.5, units = "in")
+ggsave("../pics/MI_strengths2301.png", dpi = 120, width = 10, height = 7.5, units = "in")
 ```
 

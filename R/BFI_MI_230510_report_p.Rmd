@@ -1,5 +1,5 @@
 ---
-title: "BFI, MI Report : 230510"
+title: "BFI, MI Report"
 author: "coop711"
 date: "2023-05-10"
 output: html_document
@@ -9,7 +9,7 @@ output: html_document
 
 `join()`을 사용하기 위하여 `dplyr` 패키지는 사전에 등록
 
-```{r, plyr}
+```{r, plyr, echo = FALSE,  message = FALSE}
 library(knitr)
 library(pander)
 library(magrittr)
@@ -62,7 +62,7 @@ BFI_type_kr <- c("외향성", "신경성", "성실성", "친화성", "개방성"
 BFI_score_kr <- BFI_score
 names(BFI_score_kr) <- BFI_type_kr
 #> 학번을 행이름으로 설정
-rownames(BFI_score_kr) <- BFI$ID
+rownames(BFI_score_kr) <- BFI$id
 kable(head(BFI_score_kr))
 ```
 
@@ -116,7 +116,7 @@ BFI_level_kr <- BFI_level %>%
 # BFI_level_kr <- data.frame(lapply(BFI_level, 
 #                                   function(x) factor(x, levels = c("낮음", "중하", "중상", "높음"), 
 #                                                      ordered = TRUE)))
-dimnames(BFI_level_kr) <- list(ID = BFI$ID, BFI_type_kr)
+dimnames(BFI_level_kr) <- list(id = BFI$id, BFI_type_kr)
 kable(head(BFI_level_kr))
 ```
 
@@ -138,7 +138,7 @@ BFI_level_kr <- BFI_score %>%
 # BFI_level_kr <- data.frame(lapply(BFI_level, 
 #                                     function(x) factor(x, levels = c("낮음", "중하", "중상", "높음"), 
 #                                                        ordered = TRUE)))
-dimnames(BFI_level_kr) <- list(ID = BFI$ID, BFI_type_kr)
+dimnames(BFI_level_kr) <- list(id = BFI$id, BFI_type_kr)
 BFI_level_kr %>%
   head %>%
   kable
@@ -167,11 +167,11 @@ BFI_level_kr %>%
 
 ## 출석부에 합치기
 
-`rownames`으로 되어 있는 학번(`ID`)을 `ID`로 돌리고, `row.names`는 일련번호로 정리하여 `left_join`에 사용할 수 있도록 한다.
+`rownames`으로 되어 있는 학번(`id`)을 `id`로 돌리고, `row.names`는 일련번호로 정리하여 `left_join`에 사용할 수 있도록 한다.
 
 ```{r, row.names, eval = TRUE}
 BFI_level_kr_df <- BFI_level_kr %>%
-  data.frame(ID = BFI$ID, ., 
+  data.frame(id = BFI$id, ., 
              row.names = 1:nrow(.), 
              stringsAsFactors = FALSE) 
 BFI_level_kr_df %>%
@@ -183,7 +183,7 @@ BFI_level_kr_df %>%
 
 ```{r, join with class roll, eval = TRUE}
 BFI_full_kr <- BFI_level_kr_df %>%
-  left_join(class_roll, ., by = "ID")
+  left_join(class_roll, ., by = "id")
 BFI_full_kr %>%
   head %>%
   kable
@@ -198,7 +198,7 @@ BFI_full_kr %>%
 
 ```{r, summation, eval = FALSE}
 #> 매 여덟번째 나오는 컬럼을 합해서 지능별 점수  소계 산출
-#> time stamp 빼고, ID 컬럼 다음부터 계산이 시작되므로 `j + 1`인 것이다.
+#> time stamp 빼고, id 컬럼 다음부터 계산이 시작되므로 `j + 1`인 것이다.
 #> 일곱번 반복되는 데 초기값을 넣었으므로 `i  in 1:6`이다.
 M <- matrix(numeric(0), nrow = nrow(MI), ncol = 8)
 for(j in 1:8) {
@@ -220,7 +220,7 @@ M <-
 #   sapply(abb_MI, function(x) rowSums(MI[3:58][, substr(names(MI[3:58]), 1, 1) == x]))
 MI_score_kr <- M
 MI_names_kr <- c("음악", "신체운동", "논리수학", "공간", "언어", "인간친화", "자기성찰", "자연친화")
-dimnames(MI_score_kr) <- list(ID = MI$ID, MI_names_kr)
+dimnames(MI_score_kr) <- list(id = MI$id, MI_names_kr)
 kable(head(MI_score_kr))
 kable(head(cbind(MI_score_kr, MI[paste(LETTERS[1:8], "Score", sep = "_")])))
 ```
@@ -233,7 +233,7 @@ MI_score <- LETTERS[1:8] %>%
       apply(1, sum)}) %>%
   data.frame
 MI_names_kr <- c("음악", "신체운동", "논리수학", "공간", "언어", "인간친화", "자기성찰", "자연친화")
-dimnames(MI_score) <- list(ID = MI$ID, MI_names_kr)
+dimnames(MI_score) <- list(id = MI$id, MI_names_kr)
 kable(head(MI_score))
 ```
 
@@ -256,7 +256,7 @@ MI_order_kr %>%
 ```{r, ranks}
 MI_sort_kr <- matrix(MI_names_kr[MI_order_kr], 
                      ncol = 8, byrow = TRUE, 
-                     dimnames = list(MI$ID, 
+                     dimnames = list(MI$id, 
                                      paste0("제", 1:8, "순위")))
 MI_sort_kr %>%
   head %>%
@@ -265,11 +265,11 @@ MI_sort_kr %>%
 
 ### 전체 출석부에 합치기
 
-`rownames`를 `ID`로 돌리고, `row.names`는 없앰.
+`rownames`를 `id`로 돌리고, `row.names`는 없앰.
 
 ```{r, sort}
 MI_sort_kr_df <- MI_sort_kr %>%
-  data.frame(ID = MI$ID, ., row.names = NULL, stringsAsFactors = FALSE)
+  data.frame(id = MI$id, ., row.names = NULL, stringsAsFactors = FALSE)
 MI_sort_kr_df %>%
   head %>%
   kable(align = "c")
@@ -288,9 +288,9 @@ MI_sort_kr_df[-1] %<>%
 
 ```{r, merge with class_roll}
 MI_sort_full_kr <- MI_sort_kr_df %>%
-  left_join(class_roll, ., by = "ID")
-setdiff(MI_sort_full_kr$ID, BFI_full_kr$ID)
-setdiff(BFI_full_kr$ID, MI_sort_full_kr$ID)
+  left_join(class_roll, ., by = "id")
+setdiff(MI_sort_full_kr$id, BFI_full_kr$id)
+setdiff(BFI_full_kr$id, MI_sort_full_kr$id)
 MI_sort_full_kr %>%
   head %>%
   kable(align = "c")
@@ -316,19 +316,19 @@ BFI결석생은 간단히 전체 출석부의 학번 집합에서 BFI 응답자�
 시행 당일 외에 늦은 응답도 출석으로 인정하지만, 한 가지 조사만 수행한 경우는 별도 처리.
 
 ```{r, BFI absence, echo = FALSE, results = 'markup'}
-class_roll$ID %>%
-  setdiff(BFI$ID) 
-# setdiff(class_roll$ID, BFI$ID)
-# class_roll$Name[class_roll$ID %in% setdiff(class_roll$ID, BFI$ID)]
+class_roll$id %>%
+  setdiff(BFI$id) 
+# setdiff(class_roll$id, BFI$id)
+# class_roll$Name[class_roll$id %in% setdiff(class_roll$id, BFI$id)]
 ```
 
 ### MI
 
 ```{r, MI absence, echo = FALSE, results = 'markup'}
-class_roll$ID %>%
-  setdiff(MI$ID)
-# setdiff(class_roll$ID, MI$ID)
-# class_roll$Name[class_roll$ID %in% setdiff(class_roll$ID, MI$ID)]
+class_roll$id %>%
+  setdiff(MI$id)
+# setdiff(class_roll$id, MI$id)
+# class_roll$Name[class_roll$id %in% setdiff(class_roll$id, MI$id)]
 ```
 
 ## Save
