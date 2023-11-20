@@ -315,7 +315,7 @@ BFI_MI_full %>%
 BFI결석생은 간단히 전체 출석부의 학번 집합에서 BFI 응답자의 학번 집합을 뺸 것임.
 시행 당일 외에 늦은 응답도 출석으로 인정하지만, 한 가지 조사만 수행한 경우는 별도 처리.
 
-```{r, BFI absence, echo = FALSE, results = 'markup'}
+```{r, BFI absence, echo = FALSE, results = 'markup', eval = FALSE}
 class_roll$id %>%
   setdiff(BFI$id) 
 # setdiff(class_roll$id, BFI$id)
@@ -324,7 +324,7 @@ class_roll$id %>%
 
 ### MI
 
-```{r, MI absence, echo = FALSE, results = 'markup'}
+```{r, MI absence, echo = FALSE, results = 'markup', eval = FALSE}
 class_roll$id %>%
   setdiff(MI$id)
 # setdiff(class_roll$id, MI$id)
