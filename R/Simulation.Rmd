@@ -69,7 +69,7 @@ birthday(x = 23)
 ```{r echo = FALSE}
 #> sapply 와 birthday 함수를 이용하여 인원이 2명~100명까지 모였을 때 한 쌍 이상 생일같은 사람이 있을 확률 계산. 반복수로 N = 100000 설정. N = 100, 1000, 10000 실행하여 비교하세요.
 probs <- 
-  sapply(2:100, FUN = function(x) birthday(N = 1000, x))
+  sapply(2:100, FUN = function(x) birthday(N = 100000, x))
 #> plot 그리고 되돌려 놓기 위하여 그래픽 파라미터 저장
 opar <- par(no.readonly = TRUE)
 #> plot 의 왼쪽 여백 확보 (default 는 0.82)

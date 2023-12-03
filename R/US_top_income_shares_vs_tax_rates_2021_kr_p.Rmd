@@ -1,5 +1,5 @@
 ---
-title: "Marginal Tax Rates vs US Income (1913 ~ 2021)"
+title: "US Top Marginal Tax Rates vs Top Income Shares (1913 ~ 2021)"
 author: "coop711"
 date: "`r Sys.Date()`"
 output: html_document
@@ -106,11 +106,11 @@ text(x = 1964, y = 0.2,
      cex = 1.2)
 #> 외부 그림 파일로 저장.
 # dev.copy(png, file ="../pics/US_Top_Income_Share_vs_MTR_kr.png", width = 960, height = 540)
-dev.copy(png, 
-         file ="../pics/US_Top_Income_Share_vs_MTR_kr_wide.png",
-         width = 960, 
-         height = 540)
-dev.off()
+# dev.copy(png, 
+#          file ="../pics/US_Top_Income_Share_vs_MTR_kr_wide.png",
+#          width = 960, 
+#          height = 540)
+invisible(dev.off())
 ``` 
 
 위의 그림으로부터 한계소득세율이 높을 때 상위1%의 소득점유율이 낮고, 한계소득세율이 낮을 때는 반대로 상위1%의 소득점유율이 높은 것을 관찰할 수 있다. 이를 보다 명확히 파악하기 위하여 한계소득세율을 뒤집어 보면, 즉 `u`를 변환한 한계소득세율이라 할 때  `1 - u`를 비교 대상으로 그려보면, 
@@ -184,11 +184,11 @@ text(x = 1998,
      y = 0.17, 
      labels = "상위 1% 소득점유율", 
      cex = 1.2)
-dev.copy(png, 
-         file ="../pics/US_Top_Income_Share_vs_inverse_MTR_kr.png",
-         width = 960, 
-         height = 540)
-dev.off()
+# dev.copy(png, 
+#          file ="../pics/US_Top_Income_Share_vs_inverse_MTR_kr.png",
+#          width = 960, 
+#          height = 540)
+invisible(dev.off())
 ``` 
 
 상위 1%의 소득 증가폭과 하위 99%의 소득 증가폭(자본소득 제외)을 최고한계세율의 변화와 함께 비교
@@ -277,11 +277,11 @@ text(x = 1925,
      y = 0.9, 
      labels = "최고 한계세율", 
      cex = 1.2)
-dev.copy(png, 
-         file ="../pics/US_Income_Growth_vs_MTR_kr.png", 
-         width = 960, 
-         height = 540)
-dev.off()
+# dev.copy(png, 
+#          file ="../pics/US_Income_Growth_vs_MTR_kr.png", 
+#          width = 960, 
+#          height = 540)
+invisible(dev.off())
 ```
 
 상위 1%의 소득 증가폭과 하위 99%의 소득 증가폭(자본소득 포함)을 최고세율의 변화와 함께 비교
@@ -365,11 +365,11 @@ text(x = 1925,
      y = 0.9, 
      labels = "최고 한계세율", 
      cex = 1.2)
-dev.copy(png, 
-         file ="../pics/US_Income_Growth_vs_MTR_K_kr.png", 
-         width = 960, 
-         height = 540)
-dev.off()
+# dev.copy(png, 
+#          file ="../pics/US_Income_Growth_vs_MTR_K_kr.png", 
+#          width = 960, 
+#          height = 540)
+invisible(dev.off())
 ```
 
 <!--## 뒷 정리
