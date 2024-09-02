@@ -1,0 +1,70 @@
+
+---
+title: "Exploring VADeaths Data: A Guide to Tidy Data in R"
+author: "coop711"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+This document provides an analysis of the `VADeaths` dataset using R. We will explore how to tidy the data and utilize various base R functions for data manipulation. The goal is to understand the structure of the data, why it might not be considered "tidy" in its current form, and how to transform it.
+
+## Tidy Data
+
+In this section, we will examine the `VADeaths` dataset, which is included in base R. The data is structured as a matrix with age groups as row names and combinations of place (Rural, Urban) and gender (Male, Female) as column names. This format does not conform to the principles of tidy data, where each variable forms a column, each observation forms a row, and each type of observational unit forms a table.
+
+```{r display_VADeaths}
+VADeaths
+str(VADeaths)
+```
+
+## Using Base R Tools
+
+Let's think about why this data is not considered tidy and how we can transform it into a tidy format. The final result will be compared with the original data to understand the difference.
+
+We start by converting the matrix `VADeaths` into a long vector using the `c()` function. This vector will represent the mortality rates. Since age is an ordered factor, we use `ordered()` instead of `factor()` to properly reflect the sequence of age groups.
+
+```{r tidy_VADeaths}
+# Convert the VADeaths matrix into a single vector of rates
+Rates <- c(VADeaths)
+
+# Store the length of Rates in N
+N <- length(Rates)
+
+# Convert row names (age groups) to an ordered factor
+Age <- rep(ordered(rownames(VADeaths)), length.out = N)
+
+# Generate the 'Place' factor (Rural/Urban) for the corresponding rates
+Place <- gl(2, 10, N, labels = c("Rural", "Urban"))
+
+# Generate the 'Gender' factor (Male/Female) for the corresponding rates
+Gender <- gl(2, 5, labels = c("Male", "Female"))
+
+# Combine these into a data frame
+VADeaths_tidy <- data.frame(Age, Place, Gender, Rates)
+str(VADeaths_tidy)
+```
+
+## Data Visualization
+
+To better understand the structure of the tidied data, let's visualize it using a bar plot. This will allow us to compare mortality rates across different age groups, places, and genders.
+
+```{r plot_VADeaths, echo=FALSE}
+library(ggplot2)
+ggplot(VADeaths_tidy, aes(x = Age, y = Rates, fill = Place)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~Gender) +
+  theme_minimal() +
+  labs(title = "Mortality Rates by Age, Place, and Gender",
+       x = "Age Group",
+       y = "Mortality Rate")
+```
+
+## Conclusion
+
+In this analysis, we successfully transformed the `VADeaths` dataset into a tidy format and explored its structure using base R functions. This process highlights the importance of data tidying in making datasets easier to analyze and visualize.
+
