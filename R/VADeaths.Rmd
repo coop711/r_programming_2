@@ -51,7 +51,6 @@ as.data.frame(as.table(VADeaths))
 
 혹은 한 번에
 
-
 ```{r, as.data.frame.table}
 as.data.frame.table(VADeaths)
 ```
