@@ -53,7 +53,7 @@ str(finger_sample_sd)
 t-통계량 계산. Student는 표준편차 계산에서 분모에 $n$을 사용하고 히스토그램을 그려 비교하였으나 자유도 3인 t-분포와 비교하기 위하여 $t=\frac{\bar{X_n}-\mu}{\hat{SD}/\sqrt{n}}$을 계산함. (여기서 $\hat{SD}$는 표본 표준편차)
 
 ```{r, t stats}
-sample_t <- (finger_sample_mean - mean(crimtab_long_df[, "finger"]))/(finger_sample_sd/sqrt(4))
+sample_t <- (finger_sample_mean - mean(crimtab_long_df[, "finger"])) / (finger_sample_sd/sqrt(4))
 str(sample_t)
 ```
 

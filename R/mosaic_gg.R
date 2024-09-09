@@ -1,8 +1,7 @@
 mosaic_gg <-
 function(tbl){
-tbl_df <- tbl 
-# %>%
-# as.data.frame
+tbl_df <- tbl %>%
+as.data.frame
 N <- length(levels(tbl_df[, 1]))
 #> data for mosaic coordinates
   pos <- function(x){

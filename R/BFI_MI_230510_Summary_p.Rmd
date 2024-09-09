@@ -1,0 +1,236 @@
+---
+title: "BFP and MI Summary"
+author: "coop711"
+date: "2023-05-10"
+output: html_document
+---
+
+### Data Reading
+
+`join()`을 사용하기 위하여 `dplyr` 패키지는 사전에 등록
+
+```{r, echo = FALSE, message = FALSE}
+library(knitr)
+library(pander)
+library(dplyr)
+library(magrittr)
+library(extrafont)
+panderOptions("table.split.table", Inf)
+```
+필수 자료 읽어들이기
+
+```{r, echo = FALSE}
+load("./BFI_MI_report_230510.RData")
+```
+
+## 성격특성별 분포
+
+### 집계
+
+```{r, table, echo = FALSE}
+BFI_level_kr %>%
+  sapply(FUN = table) %>%
+  `[`(4:1, ) %>%
+  rbind("계" = colSums(.)) %>%
+  kable(align = "c")
+```
+
+### %
+
+```{r, echo = FALSE}
+BFI_level_kr %>%
+  sapply(FUN = table) %>%
+  `[`(4:1, ) %>%
+  prop.table(margin = 2) %>%
+  `*`(100) %>%
+  rbind("계" = colSums(.)) %>%
+  format(digits = 1, nsmall = 1) %>%
+  kable(align = "c")
+#> barplot y-ticks
+y_breaks <- 
+  BFI_level_kr %>%
+  sapply(FUN = table) %>%
+  `[`(4:1, ) %>%
+  prop.table(margin = 2) %>%
+  `*`(100) %>%
+  apply(cumsum, MARGIN = 2) %>%
+  c  
+y_breaks_f <- 
+  BFI_level_kr %>%
+  sapply(FUN = table) %>%
+  `[`(4:1, ) %>%
+  prop.table(margin = 2) %>%
+  `*`(100) %>%
+  apply(cumsum, MARGIN = 2) %>%
+  c %>%
+  cut(breaks = seq(0, 100, by = 10)) 
+y_breaks_m <- 
+  tapply(y_breaks, y_breaks_f, max) %>%
+  unname
+```
+
+### Barplot
+
+```{r, echo = FALSE, fig.width = 8, fig.height = 6, message = FALSE}
+library(ggplot2)
+source("./barplot_gg.R")
+b_fill <-
+  BFI_level_kr %>%
+  sapply(FUN = table) %>%
+  `[`(4:1, ) %>% 
+  as.table %>%
+  as.data.frame %>%
+  barplot_gg(position = "fill")
+b_fill + 
+  theme_bw(base_family = "KoPubWorldDotum Medium") +
+  labs(title = "BFP 성격특성별 분포", x = "성격특성", y = "집계(%, 명)") +
+  scale_fill_brewer(name = "등급", 
+                    type = "seq", 
+                    palette = "Blues", 
+                    direction = -1) +
+  scale_y_continuous(breaks = c(0, y_breaks_m/100),
+                     labels = format(c(0, y_breaks_m), digits = 1, nsmall = 1)) +
+  theme(plot.title = element_text(hjust = 0.5, 
+                                  size = 18, 
+                                  family = "KoPubWorldDotum Bold"))
+ggsave("../pics/BFP_strengths2301.png", dpi = 120, width = 10, height = 7.5, units = "in")
+```
+
+## BFP 와 과제제출 시간 
+
+마감일이 되어서야 질문지에 응답하는 사람들과 그 이전에 응답하는 사람들이 BFP 와 어떤 관련이 있는지 알아 보겠습니다. 성실성의 중상 이상인 사람들이 마감일 이전에 제출하는 비중이 높다는 것을 알 수 있습니다. 
+
+```{r, echo = FALSE}
+source("./mosaic_gg.R")
+mosaic_gg(t(table(BFI_level_kr$외향성, BFI_days <= 1)))$m +
+  theme_bw(base_family = "KoPubWorldDotum Medium") +
+  labs(title = "외향성과 과제 응답시간", x = "등급", y = "제출(명, %") +
+  scale_fill_brewer(name = "제출시간",
+                    labels = c("마감이전", "마감날"),
+                    type = "qual", 
+                    palette = "Set2", 
+                    direction = -1) +
+  theme(plot.title = element_text(hjust = 0.5, 
+                                  size = 18, 
+                                  family = "KoPubWorldDotum Bold"))
+mosaic_gg(t(table(BFI_level_kr$신경성, BFI_days <= 1)))$m +
+  theme_bw(base_family = "KoPubWorldDotum Medium") +
+  labs(title = "신경성과 과제 응답시간", x = "등급", y = "제출(명, %") +
+  scale_fill_brewer(name = "제출시간",
+                    labels = c("마감이전", "마감날"),
+                    type = "qual", 
+                    palette = "Set2", 
+                    direction = -1) +
+  theme(plot.title = element_text(hjust = 0.5, 
+                                  size = 18, 
+                                  family = "KoPubWorldDotum Bold"))
+mosaic_gg(t(table(BFI_level_kr$성실성, BFI_days <= 1)))$m +
+  theme_bw(base_family = "KoPubWorldDotum Medium") +
+  labs(title = "성실성과 과제 응답시간", x = "등급", y = "제출(명, %") +
+  scale_fill_brewer(name = "제출시간",
+                    labels = c("마감이전", "마감날"),
+                    type = "qual", 
+                    palette = "Set2", 
+                    direction = -1) +
+  theme(plot.title = element_text(hjust = 0.5, 
+                                  size = 18, 
+                                  family = "KoPubWorldDotum Bold"))
+mosaic_gg(t(table(BFI_level_kr$친화성, BFI_days <= 1)))$m +
+  theme_bw(base_family = "KoPubWorldDotum Medium") +
+  labs(title = "친화성과 과제 응답시간", x = "등급", y = "제출(명, %") +
+  scale_fill_brewer(name = "제출시간",
+                    labels = c("마감이전", "마감날"),
+                    type = "qual", 
+                    palette = "Set2", 
+                    direction = -1) +
+  theme(plot.title = element_text(hjust = 0.5, 
+                                  size = 18, 
+                                  family = "KoPubWorldDotum Bold"))
+mosaic_gg(t(table(BFI_level_kr$개방성, BFI_days <= 1)))$m +
+  theme_bw(base_family = "KoPubWorldDotum Medium") +
+  labs(title = "개방성과 과제 응답시간", x = "등급", y = "제출(명, %") +
+  scale_fill_brewer(name = "제출시간",
+                    labels = c("마감이전", "마감날"),
+                    type = "qual", 
+                    palette = "Set2", 
+                    direction = -1) +
+  theme(plot.title = element_text(hjust = 0.5, 
+                                  size = 18, 
+                                  family = "KoPubWorldDotum Bold"))
+```
+
+
+## 3대 강점지능 분포
+
+### 집계
+
+```{r, MI table, echo = FALSE}
+BFI_MI_full %>%
+  .[c("제1순위", "제2순위", "제3순위")] %>%
+  sapply(FUN = table) %>%
+  t %>%
+  cbind("계" = rowSums(.)) %>%
+  kable
+```
+
+### % 
+
+```{r, MI table2, echo = FALSE}
+BFI_MI_full %>%
+  .[c("제1순위", "제2순위", "제3순위")] %>%
+  sapply(FUN = table) %>%
+  t %>%
+  prop.table(margin = 1) %>%
+  `*`(100) %>%
+  cbind("계" = rowSums(.)) %>%
+  format(digits = 1, nsmall = 1) %>%
+  kable(align = "c")
+#> barplot y-ticks
+y2_breaks <- 
+  BFI_MI_full %>%
+  .[c("제1순위", "제2순위", "제3순위")] %>%
+  sapply(FUN = table) %>%
+  t %>%
+  prop.table(margin = 1) %>%
+  `*`(100) %>%
+  apply(cumsum, MARGIN = 1) %>%
+  c  
+y2_breaks_f <- 
+  BFI_MI_full %>%
+  .[c("제1순위", "제2순위", "제3순위")] %>%
+  sapply(FUN = table) %>%
+  t %>%
+  prop.table(margin = 1) %>%
+  `*`(100) %>%
+  apply(cumsum, MARGIN = 1) %>%
+  c %>%
+  cut(breaks = seq(0, 100, by = 10)) 
+y2_breaks_m <- 
+  tapply(y2_breaks, y2_breaks_f, max) %>%
+  unname
+```
+
+## Bar Plot
+
+```{r, echo = FALSE, fig.width = 8, fig.height = 6, message = FALSE}
+m_fill <- BFI_MI_full %>%
+  .[c("제1순위", "제2순위", "제3순위")] %>%
+  sapply(FUN = table) %>%
+  as.table %>%
+  as.data.frame %>%
+  barplot_gg(position = "fill")
+m_fill + 
+  theme_bw(base_family = "KoPubWorldDotum Medium") +
+  labs(title = "MI 강점지능 분포", x = "강점 순위", y = "집계(%, 명)") +
+  scale_fill_brewer(name = "지능", 
+                    type = "qual", 
+                    palette = "Set3", 
+                    direction = -1) +
+  scale_y_continuous(breaks = c(0, y2_breaks_m / 100),
+                     labels = format(c(0, y2_breaks_m), digits = 1, nsmall = 1)) +
+  theme(plot.title = element_text(hjust = 0.5, 
+                                  size = 18, 
+                                  family = "KoPubWorldDotum Bold"))
+ggsave("../pics/MI_strengths2301.png", dpi = 120, width = 10, height = 7.5, units = "in")
+```
+

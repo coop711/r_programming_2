@@ -1,0 +1,120 @@
+---
+title: "Doorae_data"
+author: "coop711"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+### Data 
+
+* Reading data with xlsx
+     + Note the arguments `stringsAsFactors` and `encoding` 
+     + `knitr` 에서 default로 `R` 폴더를 작업 디렉토리로 설정함에 유의.
+     
+```{r, data_xlsx}
+# library(xlsx)
+library(knitr)
+library(magrittr)
+library(readxl)
+doorae0924_rest <- read_excel("../data/Data0924.xlsx", 
+                              sheet = 1, 
+                              range = "B1:BB98")
+doorae0924_name <- read_excel("../data/Data0924.xlsx", 
+                              sheet = 1, 
+                              range = "A1:A98")
+doorae0924 <- data.frame(doorae0924_name, doorae0924_rest)
+# doorae0924_rest <- read.xlsx("../data/Data0924.xlsx", 
+#                              sheetIndex = 1, 
+#                              colIndex = 2:54, endRow = 98, 
+#                              stringsAsFactors = TRUE, 
+#                              encoding = "UTF-8")
+# doorae0924_name <- read.xlsx("../data/Data0924.xlsx", 
+#                              sheetIndex = 1, 
+#                              colIndex = 1, endRow = 98, 
+#                              stringsAsFactors = FALSE, 
+#                              encoding = "UTF-8")
+# doorae0924 <- doorae0924_name %>%
+#   data.frame(doorae0924_rest)
+# doorae0924 <- doorae0924_rest %>%
+#   data.frame(doorae0924_name, .)
+# doorae0924 <- data.frame(doorae0924_name, doorae0924_rest)
+```
+
+<!--
+### Data cleaning
+
+```{r, data anomaly, eval = FALSE}
+doorae0924$"시도"
+```
+
+* 전북이 두 개 나옴에 유의. 어떤 사연인가 하면,
+
+```{r, data cleaning, eval = FALSE}
+# (id_to_fix <- which(doorae0924$"시도" == "전북 "))
+(id_to_fix <- doorae0924 %>%
+  `[`(, "시도") %>%
+  `==`("전북 ") %>%
+  which)
+doorae0924 %>%
+  `[`(id_to_fix, "조직명")
+doorae0924[id_to_fix, "시도"] <- "전북"
+doorae0924 %>%
+  `[`(, "시도") %>%
+  table %>%
+#  as.matrix %>%
+  t %>%
+  kable
+```
+
+* count가 없는 factor level도 손봐야 함. 이는 간단히
+
+```{r, removing null factor level, eval = FALSE}
+(doorae0924$"시도" %<>% 
+  factor)
+doorae0924 %>%
+  `[`(, "시도") %>%
+  table %>%
+#  as.matrix %>%
+  t %>%
+  kable
+```
+-->
+
+### Data for Years in Business
+
+* 업력(years in business) 계산
+
+```{r, difftime}
+doorae0924 %>%
+  str
+doorae0924$"업력" <- doorae0924$"설립일" %>%
+#  `[`(, "설립일") %>%
+  difftime("2015-09-24", ., units = "days") %>%
+  `/`(365) %>%
+  as.numeric %>%
+  round(digits = 1)
+doorae0924$"업력" %>% 
+  str
+doorae0924$"업력" %>%
+  head
+doorae0924 %>%
+  str
+```
+
+* 사업자등록여부와 업력을 함께 새로운 data frame 으로
+
+```{r, business registration}
+doorae0924$"사업자등록여부" <- doorae0924$"사업자등록" %>%
+  `==`("NA") %>%
+  ifelse("No", "Yes") %>%
+  factor(levels = c("Yes", "No"))
+doorae0924_ys <- doorae0924$"공동체상태" %>%
+  factor(levels = c("창업준비", "경영개선")) %>%
+  data.frame(status = ., years = doorae0924$"업력")
+```
+
+### Save data
+
+```{r save_image}
+save.image("./doorae_new_data.RData")
+```                        

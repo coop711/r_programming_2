@@ -21,24 +21,30 @@ options(width = 180)
 
 ```{r, data, echo = FALSE, results = 'hide', message = FALSE}
 # load("./red_and_black_220305_data.RData")
-quiz <- "../data/quiz220523.xlsx" %>% 
+quiz <- 
+  "../data/quiz220523.xlsx" %>% 
   read_excel(range = "B1:K821",
              col_types = "text")
 quiz %>% 
   str
 names(quiz) <- 
   c("id", "Q1", paste("Q2", 1:4, sep = "_"), "Q3", "group", "Q4_R", "Q4_B")
-quiz[paste("Q2", 1:4, sep = "_")] %<>% sapply(FUN = . %>% {substr(., 1, 1)})
-quiz$Q2 <- apply(quiz[paste("Q2", 1:4, sep = "_")], 
-                     MARGIN = 1, paste, collapse = "")
-quiz$group %<>% factor(levels = c("Red", "Black"))
-quiz$Q4 <- ifelse(is.na(quiz$Q4_R), quiz$Q4_B, quiz$Q4_R)
+quiz[paste("Q2", 1:4, sep = "_")] %<>% 
+  sapply(FUN = . %>% {substr(., 1, 1)})
+quiz$Q2 <- 
+  apply(quiz[paste("Q2", 1:4, sep = "_")], 
+        MARGIN = 1, paste, collapse = "")
+quiz$group %<>% 
+  factor(levels = c("Red", "Black"))
+quiz$Q4 <- 
+  ifelse(is.na(quiz$Q4_R), quiz$Q4_B, quiz$Q4_R)
 # quiz$Q4 <- ifelse(is.na(quiz$Q4_R), quiz$Q4_B, quiz$Q4_R)
 # quiz$Q4 %<>% 
 #   strsplit(split = "[.]") %>% sapply(`[`, 1)
 quiz[c("Q3", "Q4")] %<>%
-  sapply(FUN = . %>% {strsplit(., split = "[.]") %>% 
-  sapply(`[`, 1)})
+  sapply(FUN = . %>% 
+           {strsplit(., split = "[.]") %>% 
+               sapply(`[`, 1)})
 #> birth_month_date <- strsplit(quiz$Q1, ",")
 birth_month_date <- quiz %>%
   select("Q1") %>%

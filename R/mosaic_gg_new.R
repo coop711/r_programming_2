@@ -56,7 +56,7 @@ m <-
   geom_bar(aes(fill = tbl_df[, 1]), 
            stat = "identity", 
            col = "white", 
-           size = 1, 
+           linewidth = 1, 
            position = position_stack(reverse = TRUE)) +
   geom_text(aes(x = center, 
                 y = 1.05), 

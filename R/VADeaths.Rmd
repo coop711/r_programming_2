@@ -32,8 +32,9 @@ N <- length(Rates) ## `Rates`의 크기를 `N`으로 저장.
 Age <- ordered(rownames(VADeaths)) # 행 이름으로 주어진 글자 벡터, 연령대를 순서형 범주로 변환. 
 Age <- rep(ordered(rownames(VADeaths)), # 전체 관찰 수효 만큼 반복. `length.out = `의 용례에 유의. 
            length.out = N)
-Place <- gl(2, 10, N, # 농촌, 도시의 두 수준을 10번씩 반복하는 `factor` 설정
-           labels = c("Rural", "Urban"))
+Place <- gl(2, 10, N, 
+            labels = c("Rural", "Urban"))
+        # 농촌, 도시의 두 수준을 10번씩 반복하는 `factor` 설정
 Gender <- gl(2, 5, N, # 성별은 5번씩 반복 
              labels = c("Male", "Female"))
 data.frame(Age, Place, Gender, Rates) # 각 벡터를 데이터 프레임의 요소로 편성
@@ -50,9 +51,17 @@ as.data.frame(as.table(VADeaths))
 
 혹은 한 번에
 
-
 ```{r, as.data.frame.table}
 as.data.frame.table(VADeaths)
+```
+
+```{r, strsplit}
+df <- as.data.frame.table(VADeaths)
+df$Var2
+Var2_str <- strsplit(as.character(df$Var2), split = " ")
+Place <- sapply(Var2_str, function(x) x[1])
+Gender <- sapply(Var2_str, function(x) x[2])
+data.frame(Age = df$Var1, Place, Gender, Rates = df$Freq)
 ```
 
 ## tidyverse를 이용한 방법 
@@ -133,7 +142,6 @@ VADeaths %>%
          Place = factor(Place),
          Gender = factor(Gender,
                          levels = c("Male", "Female"))) 
-         
 ```
 
 
@@ -190,7 +198,7 @@ ggplot(data = VADeaths_tbl,
                             fill = Age)) +
 geom_bar(stat = "identity", 
          position = position_dodge()) + 
-scale_fill_brewer(guide = FALSE,
+scale_fill_brewer(guide = "none",
                   palette = "YlOrRd", 
                   direction = -1) +
 facet_grid(Gender ~ Place)
@@ -217,23 +225,16 @@ geom_bar(stat = "identity",
          alpha = 0.3)
 ```
 
+
 ```{r}
-ggplot(data = VADeaths_df,
+ggplot(data = VADeaths_df[c(5:1, 10:6, 16:11, 20:16), ], 
               mapping = aes(x = interaction(Place, Gender), 
-                            y = rev(Rates), 
+                            y = Rates, 
                             fill = Age)) +
 geom_bar(stat = "identity", 
          position = "identity")
 ```
 
-```{r}
-ggplot(data = VADeaths_df,
-              mapping = aes(x = interaction(Place, Gender), 
-                            y = rev(Rates), 
-                            fill = Age)) +
-geom_bar(stat = "identity", 
-         position = position_stack())
-```
 
 ## Comments
 

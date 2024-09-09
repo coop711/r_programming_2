@@ -24,8 +24,8 @@ options(width=180)
 #> saveRDS <=> readRDS 용법 익혀둘 것.
 # class_roll <- readRDS("./class_roll_id_group.RDS")
 literacy_data <- 
-  read_excel("../data/literacy_ar_2202.xlsx",
-             range = "A1:AA39",
+  read_excel("../data/literacy_ar_2302.xlsx",
+             range = "A1:AA42",
              col_names = TRUE)
 names(literacy_data) <- c("time", "id", paste0("Q", 1:25))
 class(literacy_data$id) <- "character"
@@ -36,7 +36,7 @@ class(literacy_data$Q1) <- "character"
 # literacy_data$group <- class_roll$group[match(literacy_data$id, class_roll$id)]
 
 #> literacy_data 에 그룹을 랜덤하게 추가 (예시이나 재현하려면 set.seed 사용하여야 함)
-set.seed(2)
+set.seed(1)
 literacy_data$group <- 
   literacy_data %>%
   nrow %>%
@@ -140,8 +140,8 @@ pos <- {. %>% {cumsum(.) - `/`(., 2)}}
 x_text <- apply(literacy_tbl, MARGIN = 2, FUN = pos)
 text(x = x_text, y = rep(b, each = 4), labels = label_ptbl)
 title(main = "문해력조사 문항별 응답", cex.main = 1.8, line = -0.5)
-# dev.off()
-dev.copy(png, file = "../pics/Literacy_220919.png", width = 640, height = 840)
+# dev.copy(png, file = "../pics/Literacy_220919.png", width = 640, height = 840)
+invisible(dev.off())
 ```
 
 ### ggplot
@@ -165,7 +165,7 @@ ggplot(data = literacy_tbl2, mapping = aes(x = Questions)) +
 #> Counts 를 Item별로 막대그래프에 쌓아올린다. 순서는 1, 2, 3, 4 순 (reverse = TRUE).
 #> stat = "identity" 는 디폴트이므로 굳이 설정하지 않아도 무방. 
   geom_bar(aes(y = Counts, fill = Item),
-           col = "black", size = 0.3,
+           col = "black", linewidth = 0.3,
            stat = "identity", position = position_stack(reverse = TRUE)) +
 #> 퍼센티지를 추가 정보로 각 막대의 중점에 표시. mapping = aes() 에서 공통되는 x 좌표 설정은 생략 가능.
   geom_text(aes(y = x_text, label = label_ptbl)) +
@@ -201,8 +201,6 @@ ggplot(data = literacy_tbl2, mapping = aes(x = Questions)) +
 ggsave(file = "../pics/Literacy_220919_ggplot.png", bg = "white", dpi = 72, width = 840, height = 480, units = "px")
 ```
 
-
-
 ## 문해력 점수 계산
 
 <!--* 정답 맞춰보기
@@ -212,7 +210,6 @@ ggsave(file = "../pics/Literacy_220919_ggplot.png", bg = "white", dpi = 72, widt
     * 문항별로 정답과 비교하기 위하여 각 문항을 리스트의 원소로 분리
     * `split()` 의 기능과 한계에 유의. `factor` 성격으로부터 `1, 10, 11, ..., 2, 20, ..., 3, 4, 5, ... , 9`로 순서를 잡게 되므로 다시 한번 정리할 필요.
 -->
-    
     
 ```{r, ans list and unlist, echo = FALSE, results = 'hide'}
 ans <- "../data/literacy_ans.txt" %>%

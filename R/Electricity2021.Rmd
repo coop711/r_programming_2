@@ -5,6 +5,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
 library(magrittr)
 library(readxl)
 library(pander)
@@ -154,8 +155,8 @@ W_B <- round(B / sum(B) *100, 1)
 A <- A[match(Province, Province_old)]
 B <- B[match(Province, Province_old)]
 SS <- round(A / B * 100, digits = 1)
-pander(data.frame(A, W_A, B, W_B, SS),
-       col.names = c("발전량", "발전량비중", "판매량", "판매량비중", "전력자급도(%)"))
+kable(data.frame(A, W_A, B, W_B, SS),
+       col.names = c("발전량(GWh)", "발전량비중(%)", "판매량(GWh)", "판매량비중(%)", "전력자급도(%)"), align = "r")
 ```
 
 ### 초광역 접근
@@ -166,12 +167,12 @@ R <- R[match(Province, Province_old)]
 R2 <- c("수도권", "수도권", "가야", "신라", "영산강", "신라", "백제", "가야", "수도권", "백제", "가야", "수도권", "영산강", "백제", "영산강", "백제", "백제")
 R2 <- R2[match(Province, Province_old)]
 Electricity <- 
-  data.frame(Province, R, R2, A, B, SS)
-pander(Electricity, col.names = c("시도", "5극3특", "5대권역", "발전량", "판매량", "전력자급도(%)"))
+  data.frame(Province, R, R2, A, W_A, B, W_B, SS)
+kable(Electricity, col.names = c("시도", "5극3특", "5대권역", "발전량(GWh)", "발전량비중(%)", "판매량(GWh)", "판매량비중(%)", "전력자급도(%)"))
 Electricity$R2 <- factor(Electricity$R2, 
                          levels = c("수도권", "가야", "백제", "신라", "영산강"))
 Electricity %>%
-  pander(col.names = c("시도", "5극3특", "5대권역", "발전량", "판매량", "전력자급도(%)"))
+  kable(col.names = c("시도", "5극3특", "5대권역", "발전량(GWh)", "발전량비중(%)", "판매량(GWh)", "판매량비중(%)", "전력자급도(%)"), row.names = FALSE)
 # by(Electricity[4:5], factor(Electricity$R2), 
 #    function(x) round(sum(x[1]) / sum(x[2]) * 100, digits = 1)) 
 ```
@@ -179,9 +180,9 @@ Electricity %>%
 ```{r, echo = FALSE}
 library(plyr)
 ddply(Electricity, .(R2), 
-      function(x) round(sum(x[, 4]) / sum(x[, 5]) * 100, digits = 1)) %>%
+      function(x) round(sum(x[, 4]) / sum(x[, 6]) * 100, digits = 1)) %>%
   format(digits = 2, nsmall = 1) %>%
-  pander(col.names = c("5대권역", "전력자급도"))
+  pander(col.names = c("5대권역", "전력자급도(%)"), align = "r")
 ```
 
 

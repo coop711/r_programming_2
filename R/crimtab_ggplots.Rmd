@@ -26,7 +26,7 @@ head(crimtab_long_df)
 ```{r, scatter diagram, fig.width = 7, fig_height = 7}
 # plot(finger ~ height, data = crimtab_long_df)
 crimtab_long_df[2:1] %>%
-  plot()
+  plot
 plot(crimtab_long_df[, 2:1])
 ```
 
@@ -247,20 +247,20 @@ f1 + geom_histogram(alpha = 0.5)
 ```
 
 ```{r, fig.width = 8, fig_height = 4}
-h1 + geom_histogram(aes(y = ..density..), 
+h1 + geom_histogram(aes(y = after_stat(density)),
                     binwidth = 1, 
                     alpha = 0.5)
 ```
 
 ```{r, fig.width = 8, fig_height = 4}
-f1 + geom_histogram(aes(y = ..density..), 
+f1 + geom_histogram(aes(y = after_stat(density)), 
                     binwidth = 0.1, 
                     alpha = 0.5)
 ```
 
 ```{r, fig.width = 8, fig_height = 4}
 (g_h_1 <- h1 + 
-   geom_histogram(aes(y = ..density..), 
+   geom_histogram(aes(y = after_stat(density)), 
                   binwidth = 1, 
                   fill = "white", 
                   colour = "black"))
@@ -277,7 +277,7 @@ f1 + geom_histogram(aes(y = ..density..),
 
 ```{r, fig.width = 8, fig_height = 4}
 (g_f_1 <- f1 + 
-   geom_histogram(aes(y = ..density..), 
+   geom_histogram(aes(y = after_stat(density)), 
                   binwidth = 0.2, 
                   fill = "white", 
                   colour = "black"))

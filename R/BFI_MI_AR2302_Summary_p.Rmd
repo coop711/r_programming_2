@@ -1,0 +1,101 @@
+---
+title: "BFP and MI : AR2302"
+author: "coop711"
+date: "2023-11-27"
+output: html_document
+---
+
+<!--
+### Data Reading
+
+`join()`을 사용하기 위하여 `dplyr` 패키지는 사전에 등록
+
+```{r, echo = FALSE, message = FALSE}
+library(knitr)
+library(pander)
+library(dplyr)
+library(magrittr)
+library(extrafont)
+panderOptions("table.split.table", Inf)
+```
+필수 자료 읽어들이기
+
+```{r, echo = FALSE}
+load("./BFI_MI_report_AR2302.RData")
+```
+-->
+
+## 성격특성별 분포
+
+```{r, table, echo = FALSE}
+BFI_level_kr %>%
+  sapply(FUN = table) %>%
+  `[`(4:1, ) %>%
+  rbind("계" = colSums(.)) %>%
+  kable(align = "c")
+```
+
+```{r, echo = FALSE, fig.width = 9, fig.height = 5}
+library(ggplot2)
+source("./mosaic_gg.R")
+m_list <- BFI_level_kr %>%
+  sapply(FUN = table) %>%
+  `[`(4:1, ) %>% 
+  as.table %>%
+  mosaic_gg
+m <- m_list$m
+df <- m_list$df
+p_df <- m_list$p_df
+m + geom_text(aes(x = center, y = 1.05), 
+            family = "KoPubWorldDotum Medium",
+            label = p_df[, 2]) +
+  theme_bw(base_family = "KoPubWorldDotum Medium") +
+  labs(title = "성격특성별 분포", x = "성격 특성(누적 %)", y = "인원(%, 명)") +
+  scale_fill_brewer(name = "등급", type = "seq", palette = "Blues", direction = -1) +
+  theme(plot.title = element_text(hjust = 0.5, 
+                                  size = 18, 
+                                  family = "KoPubWorldDotum Bold")) 
+ggsave("../pics/BFI_strengths.png", dpi = 72, width = 960, height = 480, units = "px")
+```
+
+## 3대 강점지능 분포
+
+```{r, MI table, echo = FALSE}
+BFI_MI_full %>%
+  .[c("제1순위", "제2순위", "제3순위")] %>%
+  sapply(FUN = table) %>%
+  t %>%
+  rbind("계" = colSums(.)) %>%
+  kable
+```
+
+## Mosaic Plot
+
+```{r, echo = FALSE, fig.width = 9, fig.height = 5}
+mB_list <-BFI_MI_full %>%
+  .[c("제1순위", "제2순위", "제3순위")] %>%
+  sapply(FUN = table) %>%
+  t %>% 
+  as.table %>%
+  mosaic_gg
+mB <- mB_list$m
+dfB <- mB_list$df
+p_dfB <- mB_list$p_df
+mB + geom_text(aes(x = center, y = 1.05), 
+            family = "KoPubWorldDotum Medium",
+            label = p_dfB[, 2]) +
+  theme_bw(base_family = "KoPubWorldDotum Medium") +
+  labs(title = "다중지능 강점순위 분포", x = "지능(누적 %)", y = "인원(%, 명)") +
+  scale_fill_brewer(name = "강점 지능", type = "seq", palette = "Blues", direction = -1) +
+  theme(plot.title = element_text(hjust = 0.5, 
+                                  size = 18, 
+                                  family = "KoPubWorldDotum Bold")) 
+ggsave("../pics/MI_strengths.png", dpi = 72, width = 960, height = 480, units = "px")
+```
+
+## 개별 BFP와 3대 강점지능
+
+```{r, one data frame, echo = FALSE}
+BFI_MI_full %>%
+  kable(align = "c")
+```

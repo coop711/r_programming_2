@@ -378,10 +378,11 @@ library(ggplot2)
 g0 <- ggplot(data = data.frame(chest_vec), 
              mapping = aes(x = chest_vec)) 
 (g1 <- g0 +
-  stat_bin(aes(y = ..density..), 
-           binwidth = 1, 
-           fill = "white", 
-           colour = "black"))
+    stat_bin(aes(y = after_stat(density)),
+#   stat_bin(aes(y = ..density..), 
+             binwidth = 1, 
+             fill = "white", 
+             colour = "black"))
 # (g1 <- g0 + 
 #   stat_count(fill = "white", 
 #              colour = "black"))

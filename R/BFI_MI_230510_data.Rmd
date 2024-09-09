@@ -1,0 +1,183 @@
+---
+title: "BFI MI data"
+author: "coop711"
+date: "2023-05-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(knitr)
+library(pander)
+library(magrittr)
+panderOptions("table.split.table", Inf)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Data
+
+### 출석부
+
+```{r, xlsx}
+library(readxl)
+options(width = 180)
+class_roll <- 
+  read_excel("../data/class_roll230511.xlsx",
+             range = "B1:B1006",
+             col_names = TRUE,
+             col_types = "text")
+class_roll %<>%
+  data.frame
+class_roll %<>%
+  `names<-`(c("id"))
+class_roll$id %<>%
+  as.character
+str(class_roll)
+```
+
+### BFI
+
+```{r}
+BFI <- "../data/BFI230510.xlsx" %>% 
+  read_excel(range = "A1:X892",
+             col_names = TRUE)
+BFI %<>%
+  data.frame
+BFI %<>%
+  `names<-`(c("Time", "id", 
+              "E1", "A1", "O1", "C1", "N1", "E2", "A2", "O2", "C2", "N2", "O3", "A3",
+              "E", "N", "C", "A", "O", "E_Score", "N_Score", "C_Score", "A_Score", "O_Score"))
+BFI$id %<>%
+  as.character
+#> Likert Scale 값만 추출하여 숫자로 변환
+BFI[3:14] %<>%
+  sapply(FUN = {. %>% strsplit(split = "[.]") %>% sapply(`[`, 1)}) %>%
+  as.numeric
+# sapply(BFI[3:14], function(x){sapply(strsplit(x, split = "[.]"), `[`, 1)})
+#> (R) 표시된 문항의 응답값을 역순으로 다시 계산
+BFI[c("A2", "O2", "C2")] %<>% 
+  `-` (6, .)
+BFI %>% 
+  head %>%
+  kable
+#> 구글 설문지를 사용하면서 필요없게된 코드이나 만약을 위하여
+# duplicated(BFI$id)
+# BFI <- unique(BFI)
+str(BFI)
+#> id 잘못 적은 친구
+BFI[BFI$id %in% setdiff(BFI$id, class_roll$id), c("id")]
+#> 제출까지 걸린 시간
+BFI_days <- 
+  as.numeric(difftime("2023-05-24 09:00:00", BFI$Time, 
+                      tz = "Asia/Seoul", units = 'days'))
+BFI_hours <- 
+  as.numeric(difftime("2023-05-24 09:00:00", BFI$Time, 
+                      tz = "Asia/Seoul", units = 'hours'))
+```
+
+### MI
+
+```{r}
+MI <- "../data/MI230510.xlsx" %>% 
+  read_excel(range = "A1:BN867",
+             col_names = TRUE)
+MI %<>%
+  data.frame
+MI %<>%
+  `names<-`(c("Time", "id", 
+              paste0(LETTERS[1:8], 1:56), 
+              paste(LETTERS[1:8], "Score", sep = "_")))
+# MI %<>%
+#   `names<-`(c("Time", "Dept", "id", "Name", 
+#               paste0("Q", 1:56), 
+#               paste(LETTERS[1:8], "Score", sep = "_")))
+MI$id %<>% 
+  as.character
+# duplicated(MI$id) %>% 
+# which
+# MI <- unique(MI)
+MI[3:58] %<>%
+  sapply(FUN = {. %>% strsplit(split = "[.]") %>% sapply(`[`, 1)}) %>%
+  as.numeric
+# kable(head(MI[c(3, 5:18)]))
+# kable(head(MI[c(3, 19:32)]))
+# kable(head(MI[c(3, 33:46)]))
+# kable(head(MI[c(3, 47:60)]))
+#> 각 조사 불참자 
+# setdiff(class_roll$id, BFI$id)
+# setdiff(class_roll$id, MI$id)
+setdiff(BFI$id, MI$id) %>%
+  sort
+setdiff(MI$id, BFI$id) %>%
+  sort
+str(MI)
+#> id 잘못 적은 친구
+MI[MI$id %in% setdiff(MI$id, class_roll$id), c("id")]
+#> 제출까지 걸린 시간
+MI_days <- 
+  as.numeric(difftime("2023-05-24 09:00:00", MI$Time, 
+                      tz = "Asia/Seoul", units = 'days'))
+MI_hours <- 
+  as.numeric(difftime("2023-05-24 09:00:00", MI$Time, 
+                      tz = "Asia/Seoul", units = 'hours'))
+```
+
+### Time
+
+```{r, echo = TRUE, eval = TRUE}
+library(extrafont)
+par(family = "KoPubWorldDotum Medium")
+BFI_days %>%
+  cut(breaks = c(0:14), include.lowest = TRUE) %>%
+  table %>%
+#  cbind("계" = rowSums(.)) %>%
+#  rbind("계" = colSums(.)) %>%
+  pander(caption = "일 단위")
+BFI_days %>%
+  cut(breaks = c(0:14), include.lowest = TRUE) %>%
+  table %>%
+  chisq.test %>%
+  pander
+BFI_days %>%
+  cut(breaks = c(0:14), include.lowest = TRUE) %>%
+  table %>%
+  rev %>%
+  barplot(space = 0, 
+          names.arg = rep(c("수", "목", "금", "토", "일", "월", "화"), 2), 
+          col = c(rep("white", 13), "pink"))
+title(main = "일 단위 BFI 제출 횟수")
+```
+
+
+```{r, echo = TRUE, eval = TRUE}
+library(extrafont)
+par(family = "KoPubWorldDotum Medium")
+MI_days %>%
+  cut(breaks = c(0:14), include.lowest = TRUE) %>%
+  table %>%
+#  cbind("계" = rowSums(.)) %>%
+#  rbind("계" = colSums(.)) %>%
+  pander(caption = "일 단위")
+MI_days %>%
+  cut(breaks = c(0:14), include.lowest = TRUE) %>%
+  table %>%
+  chisq.test %>%
+  pander
+MI_days %>%
+  cut(breaks = c(0:14), include.lowest = TRUE) %>%
+  table %>%
+  rev %>%
+  barplot(space = 0, 
+          names.arg = rep(c("수", "목", "금", "토", "일", "월", "화"), 2), 
+          col = c(rep("white", 13), "pink"))
+title(main = "일 단위 MI 제출 횟수")
+```
+
+### Save Data
+
+```{r, save.image}
+saveRDS(BFI, file = "./BFI230510.RDS")
+saveRDS(MI, file = "./MI230510.RDS")
+save.image("./BFI_MI_230510.RData")
+```
+
