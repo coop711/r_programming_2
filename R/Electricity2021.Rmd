@@ -24,9 +24,8 @@ Electricity <-
   "../data/Electricity_Produce.xlsx" %>%
   read_excel(range = "B1:I18", 
              col_names = TRUE,
-             col_types = "numeric",
-             na = "-") 
-Electricity[is.na(Electricity)] <- 0
+             col_types = "numeric") 
+# Electricity[is.na(Electricity)] <- 0
 Electricity
 Province <- 
   c("서울", "부산", "대구", "인천", "광주", "대전", "울산", "세종", "경기", "강원", "충북", "충남", "전북", "전남", "경북", "경남", "제주")
