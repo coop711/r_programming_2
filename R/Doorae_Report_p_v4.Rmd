@@ -568,7 +568,8 @@ ggplot(data = doorae_ys,
   labs(colour = "공동체상태") + 
   scale_colour_brewer(palette = "Set2", 
                       labels = c("창업준비", "경영개선")) + 
-  theme(legend.position = c(0.78, 0.5)) + 
+  theme(legend.position = "inside", legend.position.inside = c(0.78, 0.5)) +
+#  theme(legend.position = c(0.78, 0.5)) + 
   annotate("segment", 
            x = 1.4, 
            xend = 4.5, 
@@ -688,7 +689,8 @@ ggplot(data = doorae,
   theme(plot.title = element_text(hjust = 0.5),
         axis.text.y = element_text(size = 6),
         panel.grid.major.y = element_blank(), 
-        legend.position = c(0.9, 0.55), 
+        legend.position = "inside",
+        legend.position.inside = c(0.9, 0.55), 
         legend.justification = c(1, 0.5),
         legend.background = element_rect(colour = "black"))
 ```
