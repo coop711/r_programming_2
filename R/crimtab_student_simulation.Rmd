@@ -105,6 +105,33 @@ legend("topright",
 
 <P style = "page-break-before:always">
 
+### ggplot 
+
+```{r, ggplot, fig.width = 10, fig.height = 6, warning = FALSE}
+library(ggplot2)
+
+# 샘플 데이터로 히스토그램 생성
+ggplot(data.frame(x = sample_t), aes(x = x)) +
+  geom_histogram(aes(y = after_stat(density)), 
+                 breaks = seq(-20, 20, by = 0.5), 
+                 color = "black", fill = "white") +
+  xlim(c(-6, 6)) + 
+  ylim(c(0, 0.5)) +
+  stat_function(fun = dt, args = list(df = 3), aes(color = "t with df = 3"), linetype = "solid") +
+  stat_function(fun = dnorm, aes(color = "standard normal"), linetype = "solid") +
+  labs(title = "Histogram of Sample t-statistics", 
+       x = "Sampled t-values", 
+       color = NULL) +  # 범례 제목을 빈 문자열로 설정
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_color_manual(values = c("t with df = 3" = "blue", "standard normal" = "red")) +
+  guides(color = guide_legend(override.aes = list(linetype = c("solid", "solid"), size = 1.5))) +
+  theme(legend.position = "inside", 
+        legend.justification = c(0.8, 0.8), # 범례의 위치를 플롯 내부로 지정
+        legend.background = element_rect(fill = "white", color = "black"))
+```
+
+
 ### QQnorm
 
 `qqnorm()` 을 그려보면 정규분포와 꼬리에서 큰 차이가 난다는 것을 알 수 있음.
