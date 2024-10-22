@@ -1,0 +1,100 @@
+---
+title: "Identity Masking with Class Roll Data"
+author: "coop711"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readxl)
+library(pander)
+library(knitr)
+library(magrittr)
+```
+
+### Data
+
+```{r, data}
+class_roll <- read_excel("../data/class_roll240824.xlsx", 
+                        range = "B1:H812",
+                        col_names = FALSE)
+str(class_roll)
+names(class_roll) <- c("college", "dept", "id", "name", "status", "email", "cell_no")
+class_roll %>%
+  str
+```
+
+### 학번 가리기
+
+학번은 입학연도를 나타내는 첫 네자리와 개인 식별번호로 구성되어 있다. 여기서,  
+개인식별번호를 "9999"로 가려보자. `substr() <-` 을 이용하면 학번의 개인정보를 가리는 일은 한 줄의 코드로 가능하다. 
+
+```{r}
+substr(class_roll$id, start = 5, stop = 8) <- "9999"
+# `substr<-`(class_roll$id, start = 5, stop = 8, "9999")
+# class_roll$id %<>%
+#   `substr<-`(start = 5, stop = 8, "9999")
+kable(head(class_roll$id))
+```
+
+### 이름 가리기
+
+`substring() <- `을 이용하면 각 이름의 2번째 글자 이후를 모두 "ㅇㅇ"으로 대체할 수 있다. 
+
+```{r}
+substring(class_roll$name, 
+          first = 2) <- "ㅇㅇ"
+kable(head(class_roll[, c("id", "name")], n = 10))
+```
+
+### 전화번호 가리기
+
+모바일 폰 번호의 끝 네 자리를 "xxxx" 로 대체한다. 정상적으로 번호가 나올 경우 여덟번째 글자부터 열한번째글자에 해당한다.
+
+```{r, cell_no}
+# substr(class_roll$cell_no, 
+#       start = 10, stop = 13) <- "xxxx"
+substring(class_roll$cell_no, 
+       first = 4, last = 7) <- "xxxx"
+kable(head(class_roll[, c("id", "name", "cell_no")], n = 10))
+```
+
+### 전공 단위 이름 가리기
+
+전공 단위 이름은 "학과", "과", "학", "전공"  등 매우 다양한 명칭이 있으므로 `sub()`, `gsub()` 함수의 정규표현(regular expression)을 활용하여 "ㅇㅇ학과" 와 같은 방식으로 이름을 가릴 수 있다. 
+
+```{r, dept}
+class_roll$dept <- sub("^.+$", "ㅇㅇ학과", class_roll$dept)
+# class_roll$dept %<>%
+#   sub("^.+$", "ㅇㅇ학과", .)
+kable(head(class_roll[, c("id", "name", "dept", "cell_no")]))
+```
+
+### e-mail 가리기
+
+email 주소는 `@`를 사이에 두고 나뉘어진다. 
+
+`sub()`, `gsub()` 함수와 정규표현(regular expression)을 활용하면 email 주소에서 서비스업체명은 그대로 두고 개인 식별이 가능한 이름 부분을 `user_name`으로 대체할 수 있다. 160명 중 25명만 랜덤하게 표본추출한다.
+
+```{r, e_mail}
+class_roll$email <- sub(pattern = "^.+@", 
+                        replacement = "user_name@",
+                        class_roll$email)
+class_roll$email %<>%
+  sub(pattern = "^.+@", 
+      replacement = "user_name@", 
+      .)
+kable(class_roll[sample(1:nrow(class_roll), size = 25), ])
+class_roll %>%
+  str
+```
+
+
+```{r, save}
+ls()
+write.table(class_roll, file ="../data/class_roll_masked_2402.txt")
+save.image("./class_roll_data_masked_2402.RData")
+saveRDS(class_roll, "./class_roll_masked_2402.RDS")
+```
