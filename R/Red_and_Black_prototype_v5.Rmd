@@ -16,22 +16,113 @@ panderOptions('table.split.table', Inf)
 
 ## Data
 
-```{r, data, echo = TRUE, results = 'hide'}
+```{r, data, echo = TRUE, results = 'show', warning = TRUE}
 class_roll <- readRDS("./class_roll_masked_2402.RDS")
 str(class_roll)
-names(class_roll) <- c("college", "dept", "id", "name", "status", "email", "cell_no")
-class_roll$status <- ifelse(is.na(class_roll$status), "휴학", class_roll$status)
-str(class_roll)
-source("./RnB_2024_v5.R")
 ```
 
+## Helper Functions
+
+```{r, helper}
+# Helper function to calculate chi-square for a given variable
+calculate_chi_square <- function(data, group_var) {
+  # Table of group vs variable, then run chi-square test
+  table(data$group, group_var) %>%
+    chisq.test(simulate.p.value = FALSE) %>%
+    `[[`(1) %>%
+    unname  # Return the chi-square statistic
+}
+
+# Function to handle Student ID category
+calc_id_chi_square <- function(data) {
+  data$id_2 <- data$id %>% substr(1, 4) %>% ifelse(as.numeric(.) <= 2018, "2018", .)
+  calculate_chi_square(data, data$id_2)
+}
+
+# Function to handle Email service provider category
+calc_email_chi_square <- function(data) {
+  isp <- data$email %>%
+    strsplit("@", fixed = TRUE) %>%
+    sapply("[", 2) %>%
+    strsplit("[.]", fixed = FALSE) %>%
+    sapply("[", 1)
+  
+  # Group into naver, gmail, 기타서비스
+  email_group <- isp %>% 
+    `%in%`(c("naver", "gmail")) %>% 
+    ifelse(isp, "기타서비스") %>% 
+    factor(levels = c("naver", "gmail", "기타서비스"))
+  
+  calculate_chi_square(data, email_group)
+}
+
+# Function to handle phone number category
+calc_phone_chi_square <- function(data) {
+  cut_label <- paste(paste0(0:9, "000"), paste0(0:9, "999"), sep = "~")
+  
+  phone_group <- data$cell_no %>%
+    substr(start = 8, stop = 11) %>%
+    sapply(as.numeric) %>%
+    cut(labels = cut_label, breaks = seq(0, 10000, by = 1000))
+  
+  calculate_chi_square(data, phone_group)
+}
+
+# Function to handle last name category
+calc_lastname_chi_square <- function(data) {
+  f_name <- data$name %>% substring(first = 1, last = 1)
+  
+  last_name_group <- f_name %>%
+    `%in%`(c("김", "이", "박", "최", "정")) %>%
+    ifelse(f_name, "기타") %>%
+    factor(levels = c("김", "이", "박", "최", "정", "기타"))
+  
+  calculate_chi_square(data, last_name_group)
+}
+
+# Function to handle College category
+calc_college_chi_square <- function(data) {
+  calculate_chi_square(data, data$college)
+}
+
+red_and_black <- function(k) {
+  set.seed(k)
+  N <- nrow(class_roll) 
+  class_roll$group <- sample(1:N) %% 2 %>% factor(levels = c(0, 1), labels = c("Red", "Black"))
+  
+  # Calculate Chi-square for each category
+  X1 <- calc_id_chi_square(class_roll)
+  X2 <- calc_email_chi_square(class_roll)
+  X3 <- calc_phone_chi_square(class_roll)
+  X4 <- calc_lastname_chi_square(class_roll)
+  X5 <- calc_college_chi_square(class_roll)
+  
+  # Sum of all Chi-square statistics
+  Xsum <- X1 + X2 + X3 + X4 + X5
+  
+  # Return the sum and individual components (for detailed analysis)
+  list(Xsum = Xsum, X1 = X1, X2 = X2, X3 = X3, X4 = X4, X5 = X5)
+}
+```
 
 ## Search for Best Configuration
 
 ```{r, echo = TRUE}
+library(parallel)
 M1 <- 1
-M2 <- 100000
-Xsum <- sapply(M1:M2, red_and_black)
+M2 <- 100
+
+# Number of cores on your machine
+num_cores <- detectCores() - 1
+
+# Parallelized version of running red_and_black over multiple iterations
+results <- mclapply(M1:M2, red_and_black, mc.cores = num_cores)
+
+# Extract Xsum from the results
+Xsum <- sapply(results, function(res) res$Xsum)
+
+# Xsum_list <- sapply(M1:M2, red_and_black)
+# Xsum <- Xsum_list$Xsum
 names(Xsum) <- M1:M2
 ```
 
@@ -178,42 +269,7 @@ tbl1 <- class_roll %$%
   `colnames<-`(c("2018 이전", 2019:2024)) 
 tbl1 %>%
   pander
-# X1min <- tbl1 %>%
-#   chisq.test(simulate.p.value = TRUE) %>%
-#   `[[`(1)
-# X1min
 ```
-
-<!--
-### 학번 홀짝
-
-```{r, odd or even, eval = FALSE}
-tbl2 <- class_roll$id %>%
-  as.numeric %>%
-  `%%`(2) %>%
-  factor(levels = c(1, 0), labels = c("홀", "짝")) %>%
-  table(class_roll$group, .) 
-tbl2 %>%
-  pander
-X2min <- tbl2 %>%
-  chisq.test(simulate.p.value = TRUE) %>%
-  `[[`(1)
-X2min
-```
-
-### 학적 상태
-
-```{r, status, eval = FALSE}
-tbl3 <- class_roll$status %>%
-  table(class_roll$group, .) 
-tbl3 %>%
-  pander
-X3min <- tbl3 %>%
-  chisq.test(simulate.p.value = TRUE) %>%
-  `[[`(1)
-X3min
-```
--->
 
 ## e-mail 서비스업체
 
@@ -223,18 +279,14 @@ isp <- class_roll$email %>%
   sapply("[", 2) %>%
   strsplit("[.]", fixed = FALSE) %>%
   sapply("[", 1)
-tbl4 <- isp %>%
+tbl2 <- isp %>%
   `%in%`(c("naver", "gmail")) %>%
   ifelse(isp, "기타서비스") %>%
   factor(levels = c("naver", "gmail", "기타서비스"),
          labels = c("네이버", "구글", "기타서비스")) %>%
   table(class_roll$group, .) 
-tbl4 %>%
+tbl2 %>%
   pander
-# X4min <- tbl4 %>%
-#   chisq.test(simulate.p.value = FALSE) %>%
-#   `[[`(1)
-# X4min
 ```
 
 ## 전화번호의 분포
@@ -250,10 +302,6 @@ tbl5 <- class_roll$cell_no %>%
   table(class_roll$group, .) 
 tbl5 %>%
   pander
-# X5min <- tbl5 %>%
-#   chisq.test(simulate.p.value = TRUE) %>%
-#   `[[`(1)
-# X5min
 ```
 
 ## 성씨 분포
@@ -268,10 +316,6 @@ tbl6 <- f_name %>%
   table(class_roll$group, .) 
 tbl6 %>%
   pander
-# X6min <- tbl6 %>%
-#   chisq.test(simulate.p.value = TRUE) %>%
-#   `[[`(1)
-# X6min
 ```
 
 ## 단과대학
@@ -282,24 +326,4 @@ tbl7 <-
   table(.$group, .$college) 
 tbl7 %>%
   pander
-# X7min <- tbl7 %>%
-#   chisq.test(simulate.p.value = TRUE) %>%
-#   `[[`(1) 
-# X7min
 ```
-
-<!--
-### Sum of Chi_Squares
-
-```{r, eval = FALSE}
-# Xsum_min <- X0min + X1min + X2min + X3min + X4min + X5min + X6min + X7min
-Xsum_min <- X1min + X7min
-Xsum_min
-```
--->
-
-<!--
-```{r, save}
-save.image("./red_and_black_optimum_data_240824_v5_0_1.RData")
-```
--->
