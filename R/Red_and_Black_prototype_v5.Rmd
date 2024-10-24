@@ -88,7 +88,9 @@ calc_college_chi_square <- function(data) {
 red_and_black <- function(k) {
   set.seed(k)
   N <- nrow(class_roll) 
-  class_roll$group <- sample(1:N) %% 2 %>% factor(levels = c(0, 1), labels = c("Red", "Black"))
+  class_roll$group <- 
+    sample(1:N) %% 2 %>% 
+    factor(levels = c(0, 1), labels = c("Red", "Black"))
   
   # Calculate Chi-square for each category
   X1 <- calc_id_chi_square(class_roll)
@@ -124,6 +126,8 @@ Xsum <- sapply(results, function(res) res$Xsum)
 # Xsum_list <- sapply(M1:M2, red_and_black)
 # Xsum <- Xsum_list$Xsum
 names(Xsum) <- M1:M2
+Xmin <- names(Xsum[which(Xsum == min(Xsum))])
+Xmin
 ```
 
 ## Summary
@@ -140,8 +144,13 @@ Xsum %>%
   which %>%
   `[`(Xsum, .) %>%
   round(2)
-Xmin <- names(Xsum[which(Xsum == min(Xsum))])
-Xmin
+
+best_config <- red_and_black(Xmin)
+X1_min <- best_config$X1
+X2_min <- best_config$X3
+X3_min <- best_config$X3
+X4_min <- best_config$X4
+X5_min <- best_config$X5
 ```
 
 ## Plot
@@ -230,8 +239,7 @@ ggplot(data.frame(Xsum = Xsum), aes(x = Xsum)) +
         legend.key = element_blank())  # 범례 키 박스 제거 
 ```
 
-<!--
-## Randomization
+## Report
 
 ```{r, randomization}
 set.seed(Xmin)
@@ -240,22 +248,8 @@ class_roll$group <-
   sample(1:N) %%
   2 %>%
   factor(levels = c(0, 1), labels = c("Red", "Black"))
-red_and_black(Xmin)
+# red_and_black(Xmin)
 ```
-
-### 학년
-
-```{r, year, eval = FALSE}
-tbl0 <- class_roll$year %>%
-  table(class_roll$group, .) 
-tbl0 %>%
-  pander
-X0min <- tbl0 %>%
-  chisq.test(simulate.p.value = TRUE) %>%
-  `[[`(1)
-X0min
-```
--->
 
 ## 학번
 
@@ -264,11 +258,19 @@ class_roll$id_2 <-
   class_roll$id %>%
   substr(1, 4) %>%
   ifelse(. <= 2018, "2018", .)
-tbl1 <- class_roll %$%
+class_roll %$%
   table(.$group, .$id_2) %>%
-  `colnames<-`(c("2018 이전", 2019:2024)) 
-tbl1 %>%
+  `colnames<-`(c("2018 이전", 2019:2024)) %>%
   pander
+# 데이터 프레임 생성
+result1 <- data.frame(
+  Statistic = round(X1_min, 2),
+  P.value = round(1 - pchisq(X1_min, df = 6), digits = 4)
+)
+# 열 이름 수정 (P.value -> P-value)
+colnames(result1) <- c("Statistic", "P-value")
+# pander()로 출력
+pander(result1, caption = "Chi-square Statistic and P-value")
 ```
 
 ## e-mail 서비스업체
@@ -279,14 +281,22 @@ isp <- class_roll$email %>%
   sapply("[", 2) %>%
   strsplit("[.]", fixed = FALSE) %>%
   sapply("[", 1)
-tbl2 <- isp %>%
+isp %>%
   `%in%`(c("naver", "gmail")) %>%
   ifelse(isp, "기타서비스") %>%
   factor(levels = c("naver", "gmail", "기타서비스"),
          labels = c("네이버", "구글", "기타서비스")) %>%
-  table(class_roll$group, .) 
-tbl2 %>%
+  table(class_roll$group, .) %>%
   pander
+# 데이터 프레임 생성
+result2 <- data.frame(
+  Statistic = round(X2_min, 2),
+  P.value = round(1 - pchisq(X2_min, df = 2), digits = 4)
+)
+# 열 이름 수정 (P.value -> P-value)
+colnames(result2) <- c("Statistic", "P-value")
+# pander()로 출력
+pander(result2, caption = "Chi-square Statistic and P-value")
 ```
 
 ## 전화번호의 분포
@@ -294,14 +304,22 @@ tbl2 %>%
 ```{r, cell_no, echo = FALSE, eval = TRUE}
 cut_label <- paste(paste0(0:9, "000"), paste0(0:9, "999"), 
                    sep = "~")
-tbl5 <- class_roll$cell_no %>%
+class_roll$cell_no %>%
   substr(start = 8, stop = 11) %>%
   sapply(as.numeric) %>%
   cut(labels = cut_label, 
       breaks = seq(0, 10000, by = 1000)) %>%
-  table(class_roll$group, .) 
-tbl5 %>%
+  table(class_roll$group, .) %>%
   pander
+# 데이터 프레임 생성
+result3 <- data.frame(
+  Statistic = round(X3_min, 2),
+  P.value = round(1 - pchisq(X3_min, df = 9), digits = 4)
+)
+# 열 이름 수정 (P.value -> P-value)
+colnames(result3) <- c("Statistic", "P-value")
+# pander()로 출력
+pander(result3, caption = "Chi-square Statistic and P-value")
 ```
 
 ## 성씨 분포
@@ -309,21 +327,36 @@ tbl5 %>%
 ```{r, name, echo = FALSE, eval = TRUE}
 f_name <- class_roll$name %>%
   substring(first = 1, last = 1) 
-tbl6 <- f_name %>%
+f_name %>%
   `%in%`(c("김", "이", "박", "최", "정")) %>%
   ifelse(f_name, "기타") %>%
   factor(levels = c("김", "이", "박", "최", "정", "기타")) %>%
-  table(class_roll$group, .) 
-tbl6 %>%
+  table(class_roll$group, .) %>%
   pander
+# 데이터 프레임 생성
+result4 <- data.frame(
+  Statistic = round(X4_min, 2),
+  P.value = round(1 - pchisq(X4_min, df = 5), digits = 4)
+)
+# 열 이름 수정 (P.value -> P-value)
+colnames(result4) <- c("Statistic", "P-value")
+# pander()로 출력
+pander(result4, caption = "Chi-square Statistic and P-value")
 ```
 
 ## 단과대학
 
 ```{r, college, echo = FALSE, eval = TRUE}
-tbl7 <- 
-  class_roll %$%
-  table(.$group, .$college) 
-tbl7 %>%
+class_roll %$%
+  table(.$group, .$college) %>%
   pander
+# 데이터 프레임 생성
+result5 <- data.frame(
+  Statistic = round(X5_min, 2),
+  P.value = round(1 - pchisq(X5_min, df = 5), digits = 4)
+)
+# 열 이름 수정 (P.value -> P-value)
+colnames(result5) <- c("Statistic", "P-value")
+# pander()로 출력
+pander(result5, caption = "Chi-square Statistic and P-value")
 ```
