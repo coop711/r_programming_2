@@ -112,7 +112,7 @@ red_and_black <- function(k) {
 ```{r, echo = TRUE}
 library(parallel)
 M1 <- 1
-M2 <- 100
+M2 <- 10000
 
 # Number of cores on your machine
 num_cores <- detectCores() - 1
