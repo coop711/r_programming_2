@@ -109,10 +109,48 @@ red_and_black <- function(k) {
 
 ## Search for Best Configuration
 
-```{r, echo = TRUE}
+```{r, for PC, echo = TRUE, eval = TRUE}
+#> Windows version
 library(parallel)
 M1 <- 1
-M2 <- 1000000
+M2 <- 100
+
+# 클러스터 생성 (예: 4개의 코어 사용)
+cl <- makeCluster(detectCores() - 1)
+
+# 각 노드에서 필요한 패키지 로드
+clusterEvalQ(cl, {
+  library(dplyr)
+  library(magrittr)
+})
+
+# 각 노드에 필요한 객체와 함수들을 모두 전달
+clusterExport(cl, c("class_roll", "calculate_chi_square", 
+                    "calc_id_chi_square", "calc_email_chi_square", 
+                    "calc_phone_chi_square", "calc_lastname_chi_square", 
+                    "calc_college_chi_square", "red_and_black"))
+
+# parLapply() 사용
+results <- parLapply(cl, M1:M2, red_and_black)
+
+# 작업 종료 후 클러스터 종료
+stopCluster(cl)
+
+# Extract Xsum from the results
+Xsum <- sapply(results, function(res) res$Xsum)
+
+# Xsum_list <- sapply(M1:M2, red_and_black)
+# Xsum <- Xsum_list$Xsum
+names(Xsum) <- M1:M2
+Xmin <- names(Xsum[which(Xsum == min(Xsum))])
+Xmin
+```
+
+```{r, for Mac, echo = TRUE, eval = FALSE}
+#> Mac or Linux Version
+library(parallel)
+M1 <- 1
+M2 <- 10000
 
 # Number of cores on your machine
 num_cores <- detectCores() - 1

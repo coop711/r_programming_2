@@ -106,7 +106,7 @@ function(k){
 
 ```{r, echo = TRUE}
 M1 <- 1
-M2 <- 100
+M2 <- 10000
 Xsum <- sapply(M1:M2, red_and_black)
 names(Xsum) <- M1:M2
 ```
