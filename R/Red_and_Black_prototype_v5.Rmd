@@ -109,7 +109,7 @@ red_and_black <- function(k) {
 
 ## Search for Best Configuration
 
-```{r, for PC, echo = TRUE, eval = TRUE}
+```{r, for PC, echo = TRUE, eval = FALSE}
 #> Windows version
 library(parallel)
 M1 <- 1
@@ -146,7 +146,7 @@ Xmin <- names(Xsum[which(Xsum == min(Xsum))])
 Xmin
 ```
 
-```{r, for Mac, echo = TRUE, eval = FALSE}
+```{r, for Mac, echo = TRUE, eval = TRUE}
 #> Mac or Linux Version
 library(parallel)
 M1 <- 1

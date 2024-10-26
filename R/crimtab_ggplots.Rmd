@@ -391,6 +391,11 @@ grid.arrange(g_h, blank, g3, g_f,
              ncol = 2, 
              widths = c(4, 1), 
              heights = c(1, 4))
+blank <- nullGrob()
+grid.arrange(g_h, blank, g3, g_f, 
+             ncol = 2, 
+             widths = c(4, 1), 
+             heights = c(1, 4))
 ```
 
 <P style = "page-break-before: always">
