@@ -69,7 +69,7 @@ function(k){
     cut(labels = cut_label, 
         breaks = seq(0, 10000, by = 1000)) %>%
     table(class_roll$group, .) %>%
-    chisq.test(simulate.p.value = TRUE) %>%
+    chisq.test(simulate.p.value = FALSE) %>%
     `[[`(1) %>%
     unname
 

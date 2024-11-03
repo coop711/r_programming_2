@@ -113,7 +113,7 @@ red_and_black <- function(k) {
 #> Windows version
 library(parallel)
 M1 <- 1
-M2 <- 100
+M2 <- 1000
 
 # 클러스터 생성 (예: 4개의 코어 사용)
 cl <- makeCluster(detectCores() - 1)
@@ -185,7 +185,7 @@ Xsum %>%
 
 best_config <- red_and_black(Xmin)
 X1_min <- best_config$X1
-X2_min <- best_config$X3
+X2_min <- best_config$X2
 X3_min <- best_config$X3
 X4_min <- best_config$X4
 X5_min <- best_config$X5
@@ -283,8 +283,7 @@ ggplot(data.frame(Xsum = Xsum), aes(x = Xsum)) +
 set.seed(Xmin)
 N <- nrow(class_roll) 
 class_roll$group <- 
-  sample(1:N) %%
-  2 %>%
+  sample(1:N) %% 2 %>%
   factor(levels = c(0, 1), labels = c("Red", "Black"))
 ```
 
