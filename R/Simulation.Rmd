@@ -234,9 +234,10 @@ ggplot(mapping = aes(x = N_matches), data = matching_tbl) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-## Chisquare Test : simulated p-value
+## Chisquare Test : simulated p-value = TRUE
 
 ```{r}
+#> Matching Problem 100명 수행 예시
 set.seed(1)
 M <- 100
 Expected <- 
@@ -248,9 +249,10 @@ Observed <-
          replace = TRUE) %>%
   factor(levels = c(0, 1, 2, 4)) %>%
   table 
-    chi_square <- 
-      sum((Observed - Expected) ^ 2 / Expected)
-    chi_square
+chi_square <- 
+  sum((Observed - Expected) ^ 2 / Expected)
+chi_square
+#> 카이제곱 통계량 계산 함수 작성
 chi_square_stat <-
   function(M) {
     Expected <- 
@@ -266,7 +268,9 @@ chi_square_stat <-
       sum((Observed - Expected) ^ 2 / Expected)
     chi_square
   }
-chi_square_stat(M = 100)  
+#> M = 100으로 하여 테스트
+chi_square_stat(M = 100)
+#> simulated.p.value = TRUE 의 작동 시뮬레이션, B = 2,000
 B <- 2000
 chi_squares <-
   replicate(B, chi_square_stat(M = 100))
