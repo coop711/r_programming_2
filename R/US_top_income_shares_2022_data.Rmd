@@ -1,0 +1,49 @@
+---
+title: "US Top Income Shares 1913-2022 (Data)"
+author: "coop711"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Data Preparation
+
+준비한 자료는  [E. Saez 교수의 홈페이지](http://elsa.berkeley.edu/~saez/)에 있는 [`TabFig2018prel.xls`](http://eml.berkeley.edu//~saez/TabFig2022.xls)` 를 손봐서 불러들인 것이다. 
+
+<!--
+## readxl
+-->
+
+```{r, readxl, message = FALSE, echo = FALSE, results = 'hide', eval = TRUE}
+library(readxl)
+library(magrittr)
+v_names <- c("Year", "P90_100", "P95_100", "P99_100", "P99.5_100", "P99.9_100", "P99.99_100", "P90_95", "P95_99", "P99_99.5", "P99.5_99.9", "P99.9_99.99")
+US_top_income_shares_22 <-
+  readxl::read_excel("../data/TabFig2022.xlsx",
+#                     sheet = "Table A3",
+#                     range = "A6:M115",
+                     range = "Table A3!A6:M115",
+                     col_names = FALSE)
+US_top_income_shares_22 %<>%
+  `[`(-8)
+# <- US_top_income_shares_21[-8]
+names(US_top_income_shares_22) <- v_names
+# US_top_income_shares_21[106, 1] <- 2018L
+str(US_top_income_shares_22)
+US_top_income_shares_22 %<>% 
+  data.frame
+class(US_top_income_shares_22$Year) <- "integer"
+```
+
+## Data
+
+```{r, data structure, echo = FALSE}
+library(knitr)
+kable(format(US_top_income_shares_22, digits = 1, nsmall = 1))
+```
+
+## Save Data
+
+```{r, save.image}
+saveRDS(US_top_income_shares_22, file = "./US_top_income.RDS")
+save.image(file = "US_top_income_shares_2022.RData")
+```
