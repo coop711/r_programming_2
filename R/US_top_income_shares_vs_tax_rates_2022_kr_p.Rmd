@@ -173,12 +173,12 @@ axis(side = 4,
 mtext("최고 한계세율(%)", 
       side = 4, 
       line = 3)
-title(main = "상위 1% 소득점유율과 최고 한계세율", 
+title(main = "상위 1% 소득점유율과 1 - 최고 한계세율", 
       xlab = "연도", 
       cex.main = 1.8)
 text(x = 1973, 
      y = 0.35, 
-     labels = "최고 한계세율", 
+     labels = "1 - 최고 한계세율", 
      cex = 1.2)
 text(x = 1998, 
      y = 0.17, 
