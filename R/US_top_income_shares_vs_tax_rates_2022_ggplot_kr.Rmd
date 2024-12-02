@@ -42,7 +42,7 @@ M1 <-
 #             shape = 17, size = 3, show.legend = FALSE)
 M2 <- M1 +
   scale_colour_manual(values = c("red", "black")) +
-  scale_linetype_manual(values = c("longdash", "solid")) 
+  scale_linetype_manual(values = c("solid", "solid")) 
 M3 <- M2 + 
   theme_bw(base_family = "KoPubWorldDotum Medium") + 
   scale_x_continuous(name = "연도", 
@@ -53,7 +53,7 @@ M3 <- M2 +
                      labels = labels1_at, 
                      limits = c(0, 1),
                      sec.axis = sec_axis(name = "한계 소득세율(%)", 
-                                         trans = ~ z(., q = .), 
+                                         transform = ~ z(., q = .), 
                                          breaks = (y4_at + 0.05 )/1.1, 
                                          labels = labels4_at)) +
   labs(title = "상위 1% 소득점유율과 한계 소득세율") +
@@ -93,7 +93,7 @@ Mi1 <-
              show.legend = FALSE)
 Mi2 <- Mi1 +
   scale_colour_manual(values = c("red", "black")) +
-  scale_linetype_manual(values = c("longdash", "solid")) 
+  scale_linetype_manual(values = c("solid", "solid")) 
 Mi3 <- Mi2 + 
   theme_bw(base_family = "KoPubWorldDotum Medium") + 
   scale_x_continuous(name = "연도", 
@@ -104,7 +104,7 @@ Mi3 <- Mi2 +
                      labels = labels1_at, 
                      limits = c(0, 1),
                      sec.axis = sec_axis(name = "한계 소득세율(%)",
-                                         trans = ~ z(., q = .), 
+                                         transform = ~ z(., q = .), 
                                          breaks = (y4_at + 0.05 )/1.1, 
                                          labels = rev(labels4_at))) +
   labs(title = "상위 1% 소득점유율과 한계 소득세율") +
@@ -140,7 +140,7 @@ R1 <- ggplot(data = Rates_tbl,
 R2 <- R1 +
   scale_colour_manual(values = c("red", "black", "black"), 
                       guide = "none") +
-  scale_linetype_manual(values = c("longdash", "solid", "solid"), 
+  scale_linetype_manual(values = c("solid", "solid", "solid"), 
                         guide = "none") +
   scale_shape_manual(name = "", 
                      labels = c("상위1%", "하위99%"), 
@@ -156,7 +156,7 @@ R3 <- R2 +
                      labels = labels2_at, 
                      limits = c(0, 1),
                      sec.axis = sec_axis(name = "한계 소득세율(%)", 
-                                         trans = ~ z(., q = .), 
+                                         transform = ~ z(., q = .), 
                                          breaks = (y4_at + 0.05 )/1.1, 
                                          labels = labels4_at)) +
   labs(title = "한계 소득세율과 상위 1% 및 하위 99%의 소득 증가\n(자본이득 제외)") +
@@ -166,7 +166,8 @@ R3 <- R2 +
            label = "한계 소득세율", 
            family = "KoPubWorldDotum Medium", size = 6) +
   theme(plot.title = element_text(hjust = 0.5, size = 20),
-        legend.position = c(0.9, 0.1),
+        legend.position = "inside",
+        legend.position.inside = c(0.9, 0.1),
         legend.title = element_blank(),
         legend.background = element_rect(colour = "black",
                                          linetype = "solid"))
@@ -195,7 +196,7 @@ RK1 <- ggplot(data = Rates_K_tbl,
 RK2 <- RK1 +
   scale_colour_manual(values = c("red", "black", "black"), 
                       guide = "none") +
-  scale_linetype_manual(values = c("longdash", "solid", "solid"), 
+  scale_linetype_manual(values = c("solid", "solid", "solid"), 
                         guide = "none") +
   scale_shape_manual(name = "", 
                      labels = c("상위1%", "하위99%"), 
@@ -211,7 +212,7 @@ RK3 <- RK2 +
                      labels = labels3_at, 
                      limits = c(0, 1),
                      sec.axis = sec_axis(name = "한계 소득세율(%)", 
-                                         trans = ~ z(., q = .), 
+                                         transform = ~ z(., q = .), 
                                          breaks = (y4_at + 0.05 )/1.1, 
                                          labels = labels4_at)) +
   labs(title = "한계 소득세율과 상위 1% 및 하위 99%의 소득 증가\n(자본이득 포함)") +
@@ -222,7 +223,8 @@ RK3 <- RK2 +
            family = "KoPubWorldDotum Medium", 
            size = 6) +
   theme(plot.title = element_text(hjust = 0.5, size = 20),
-        legend.position = c(0.9, 0.1),
+        legend.position = "inside",
+        legend.position.inside = c(0.9, 0.1),
         legend.title = element_blank(),
         legend.background = element_rect(colour = "black", 
                                          linetype = "solid"))
