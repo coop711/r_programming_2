@@ -70,6 +70,8 @@ data.frame(Age = df$Var1, Place, Gender, Rates = df$Freq)
 
 경고문의 `Conflicts ...`이하는  `R Base`에 있는 `filter()`나 `lag()`함수를 사용하려면 구체적으로 `stats::filter()` 나 `stats::lag()`라고 하여야 한다는 것을 의미한다.
 
+### `gather()` 버전
+
 ```{r, tidyverse}
 library(tidyverse) # `tidyverse`를 검색 경로에 올려 놓음. 함께 불러들이는 패키지들과 경고문에 유의.
 VADeaths_tbl <- VADeaths %>% # 최종 결과물을 `tibble` 형식으로 지정.
@@ -144,6 +146,23 @@ VADeaths %>%
                          levels = c("Male", "Female"))) 
 ```
 
+### `pivot_longer()` 버전
+
+```{r, pivot_longer}
+VADeaths %>%
+  as_tibble(rownames = "Age") %>%
+  pivot_longer(
+    cols = -Age,
+    names_to = c("Place", "Gender"),
+    names_sep = " ",
+    values_to = "Rates"
+  ) %>%
+  mutate(
+    Age = ordered(Age),
+    Place = factor(Place),
+    Gender = factor(Gender, levels = c("Male", "Female"))
+  )
+```
 
 ## Plots
 
